@@ -11,7 +11,8 @@ model User {
   id              String    @id @default(uuid())
   email           String    @unique
   passwordHash    String
-  name            String
+  firstName       String
+  lastName        String
   profilePicture  String?
   bio             String?
   location        String
