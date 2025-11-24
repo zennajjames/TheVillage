@@ -3,11 +3,12 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { prisma } from './config/database';
 import authRoutes from './routes/auth.routes';
+import postsRoutes from './routes/posts.routes';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8000;
 
 // Log all incoming requests
 app.use((req, res, next) => {
@@ -18,12 +19,14 @@ app.use((req, res, next) => {
 // CORS configuration
 app.use(cors({
   origin: 'http://localhost:3000',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
 
-app.use(express.json());
+// Increase payload limit for image uploads
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Routes
 app.get('/api/health', (req, res) => {
@@ -32,6 +35,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/posts', postsRoutes);
 
 // Start server
 app.listen(PORT, () => {
