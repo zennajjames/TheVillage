@@ -56,8 +56,12 @@ const Dashboard: React.FC = () => {
             <p className="text-gray-600 text-sm mb-4">
               Message other moms in your area
             </p>
-            <span className="text-gray-400 text-sm">Coming soon</span>
-          </div>
+            <button
+              onClick={() => navigate('/messages')}
+              className="text-purple-600 hover:text-purple-700 font-medium text-sm"
+            >
+              View Messages →
+            </button>          </div>
         </div>
       </div>
     </div>

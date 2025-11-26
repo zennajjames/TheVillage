@@ -36,6 +36,18 @@ const Header: React.FC = () => {
                 Community Board
               </button>
               <button
+                onClick={() => navigate('/groups')}
+                className="text-gray-700 hover:text-purple-600 font-medium transition"
+              >
+                Groups
+              </button>
+              <button
+                onClick={() => navigate('/messages')}
+                className="text-gray-700 hover:text-purple-600 font-medium transition"
+              >
+                Messages
+              </button>
+              <button
                 onClick={() => navigate('/profile')}
                 className="text-gray-700 hover:text-purple-600 font-medium transition"
               >

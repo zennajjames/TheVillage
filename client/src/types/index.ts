@@ -67,3 +67,111 @@ export interface CreatePostData {
   description: string;
   location: string;
 }
+
+// Group types
+export interface Group {
+  id: string;
+  name: string;
+  description: string;
+  location: string;
+  category: string;
+  isPrivate: boolean;
+  coverImage?: string;
+  createdById: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    profilePicture?: string;
+  };
+  _count?: {
+    members: number;
+    posts: number;
+  };
+  isMember?: boolean;
+  userRole?: string | null;
+  members?: GroupMember[];
+  posts?: GroupPost[];
+}
+
+export interface GroupMember {
+  id: string;
+  groupId: string;
+  userId: string;
+  role: 'ADMIN' | 'MODERATOR' | 'MEMBER';
+  joinedAt: string;
+  user: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    profilePicture?: string;
+    location: string;
+  };
+}
+
+export interface GroupPost {
+  id: string;
+  groupId: string;
+  userId: string;
+  content: string;
+  images: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateGroupData {
+  name: string;
+  description: string;
+  location: string;
+  category: string;
+  isPrivate: boolean;
+}
+
+// Messaging types
+export interface Conversation {
+  id: string;
+  otherUser: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    profilePicture?: string;
+  };
+  lastMessage: {
+    content: string;
+    senderId: string;
+    createdAt: string;
+    isRead: boolean;
+  } | null;
+  updatedAt: string;
+}
+
+export interface Message {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  content: string;
+  isRead: boolean;
+  createdAt: string;
+  sender: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    profilePicture?: string;
+  };
+}
+
+export interface ConversationDetail {
+  id: string;
+  participants: Array<{
+    id: string;
+    userId: string;
+    user: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      profilePicture?: string;
+    };
+  }>;
+}

@@ -18,12 +18,21 @@ model User {
   location        String
   zipCode         String
   isVerified      Boolean   @default(false)
+  
+  // Notification preferences
+  emailNotifications Boolean @default(true)
+  notifyOnMessages   Boolean @default(true)
+  notifyOnPosts      Boolean @default(true)
+  notifyOnGroups     Boolean @default(true)
+  
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  posts           Post[]
-  sentMessages    Message[] @relation("SentMessages")
-  receivedMessages Message[] @relation("ReceivedMessages")
+  posts                    Post[]
+  sentMessages             Message[] @relation("SentMessages")
+  groupMemberships         GroupMember[]
+  createdGroups            Group[] @relation("CreatedGroups")
+  conversationParticipants ConversationParticipant[]
 
   @@index([zipCode])
 }
@@ -47,18 +56,19 @@ model Post {
 }
 
 model Message {
-  id         String   @id @default(uuid())
-  senderId   String
-  receiverId String
-  content    String
-  isRead     Boolean  @default(false)
-  createdAt  DateTime @default(now())
+  id             String   @id @default(uuid())
+  conversationId String
+  senderId       String
+  content        String
+  isRead         Boolean  @default(false)
+  createdAt      DateTime @default(now())
 
-  sender   User @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
-  receiver User @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
 
+  @@index([conversationId])
   @@index([senderId])
-  @@index([receiverId])
+  @@index([createdAt])
 }
 
 enum PostType {
@@ -71,4 +81,85 @@ enum PostStatus {
   IN_PROGRESS
   FULFILLED
   CLOSED
+}
+
+model Group {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  location    String?
+  isPrivate   Boolean  @default(false)
+  category    String
+  coverImage  String?
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  createdBy User @relation("CreatedGroups", fields: [createdById], references: [id], onDelete: Cascade)
+  members   GroupMember[]
+  posts     GroupPost[]
+
+  @@index([category])
+  @@index([location])
+}
+
+model GroupMember {
+  id        String     @id @default(uuid())
+  groupId   String
+  userId    String
+  role      MemberRole @default(MEMBER)
+  joinedAt  DateTime   @default(now())
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@index([groupId])
+  @@index([userId])
+}
+
+model GroupPost {
+  id        String   @id @default(uuid())
+  groupId   String
+  userId    String
+  content   String
+  images    String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([groupId])
+  @@index([createdAt])
+}
+
+enum MemberRole {
+  ADMIN
+  MODERATOR
+  MEMBER
+}
+
+model Conversation {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  participants ConversationParticipant[]
+  messages     Message[]
+
+  @@index([updatedAt])
+}
+
+model ConversationParticipant {
+  id             String   @id @default(uuid())
+  conversationId String
+  userId         String
+  joinedAt       DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@index([conversationId])
+  @@index([userId])
 }

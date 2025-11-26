@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '../config/database';
+import { emailService } from '../services/email.service';
+
 
 export const createPost = async (req: Request, res: Response) => {
   try {
@@ -29,10 +31,41 @@ export const createPost = async (req: Request, res: Response) => {
             id: true,
             firstName: true,
             lastName: true,
-            location: true
+            location: true,
+            profilePicture: true,
+            zipCode: true
           }
         }
       }
+    });
+
+    // Get nearby users (same zip code) to notify
+    const nearbyUsers = await prisma.user.findMany({
+      where: {
+        zipCode: post.user.zipCode,
+        id: { not: userId },
+        emailNotifications: true,
+        notifyOnPosts: true
+      },
+      select: {
+        email: true,
+        firstName: true
+      },
+      take: 50 // Limit to avoid sending too many emails
+    });
+
+    // Send notifications async
+    nearbyUsers.forEach(user => {
+      emailService.sendNewPostNotification(
+        user.email,
+        user.firstName,
+        type,
+        title,
+        description,
+        post.user.firstName + ' ' + post.user.lastName,
+        location,
+        post.id
+      ).catch(err => console.error('Failed to send email:', err));
     });
 
     res.status(201).json(post);

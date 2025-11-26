@@ -1,12 +1,17 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { SocketProvider } from './context/SocketContext';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Posts from './pages/Posts';
 import PostDetail from './pages/PostDetail';
 import Profile from './pages/Profile';
+import Groups from './pages/Groups';
+import GroupDetail from './pages/GroupDetail';
+import Messages from './pages/Messages';
+import MessageThread from './pages/MessageThread';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -69,6 +74,38 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/groups"
+        element={
+          <ProtectedRoute>
+            <Groups />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/groups/:id"
+        element={
+          <ProtectedRoute>
+            <GroupDetail />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/messages"
+        element={
+          <ProtectedRoute>
+            <Messages />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/messages/:conversationId"
+        element={
+          <ProtectedRoute>
+            <MessageThread />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
     </Routes>
   );
@@ -78,7 +115,9 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppRoutes />
+        <SocketProvider>
+          <AppRoutes />
+        </SocketProvider>
       </AuthProvider>
     </BrowserRouter>
   );

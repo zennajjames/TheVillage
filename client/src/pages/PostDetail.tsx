@@ -4,6 +4,7 @@ import { postsService } from '../services/posts.service';
 import { Post, PostType, PostStatus } from '../types';
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/layout/Header';
+import { messagesService } from '../services/messages.service';
 
 const PostDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -128,9 +129,19 @@ const PostDetail: React.FC = () => {
               </div>
             ) : (
               <div>
-                <p className="text-gray-700 mb-3">Interested in helping or connecting? Reach out!</p>
-                <button onClick={() => window.location.href = `mailto:${(post.user as any).email}`} className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition">
-                  Contact {post.user.firstName}
+                <p className="text-gray-700 mb-3">Interested in helping or connecting? Send them a message!</p>
+                <button 
+                  onClick={async () => {
+                    try {
+                      const conv = await messagesService.getOrCreateConversation(post.userId);
+                      navigate(`/messages/${conv.id}`);
+                    } catch (err) {
+                      alert('Failed to start conversation');
+                    }
+                  }}
+                  className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition"
+                >
+                  Message {post.user.firstName}
                 </button>
               </div>
             )}

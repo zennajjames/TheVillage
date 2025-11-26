@@ -238,7 +238,7 @@ const Profile: React.FC = () => {
                     </button>
                   )}
                 </div>
-                <p className="text-sm text-gray-500">Max size: 2MB. JPG, PNG, or GIF</p>
+                <p className="text-sm text-gray-500">Max size: 5MB. JPG, PNG, or GIF</p>
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
