@@ -9,6 +9,7 @@ export interface User {
   zipCode?: string;
   profilePicture?: string;
   bio?: string;
+  isAdmin?: boolean; 
   emailNotifications?: boolean;
   notifyOnMessages?: boolean;
   notifyOnPosts?: boolean;

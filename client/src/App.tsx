@@ -14,6 +14,10 @@ import Messages from './pages/Messages';
 import MessageThread from './pages/MessageThread';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import Admin from './pages/Admin';
+import Search from './pages/Search';
+import Landing from './pages/Landing';
+
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -41,9 +45,12 @@ const AppRoutes = () => {
   }
 
   return (
-    <Routes>
+   <Routes>
+      <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Landing />} />
       <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} />
       <Route path="/signup" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Signup />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
       <Route
         path="/dashboard"
         element={
@@ -125,6 +132,24 @@ const AppRoutes = () => {
         element={
         <ResetPassword />
         } />
+
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <Admin />
+            </ProtectedRoute>
+          } />
+
+        <Route
+          path="/search"
+          element={
+            <ProtectedRoute>
+              <Search />
+            </ProtectedRoute>
+          }
+        />
+        
     </Routes>
   );
 };

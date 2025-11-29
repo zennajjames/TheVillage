@@ -10,7 +10,6 @@ const Header: React.FC = () => {
     logout();
     navigate('/login');
   };
-
   return (
     <nav className="bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 py-4">
@@ -52,6 +51,20 @@ const Header: React.FC = () => {
                 className="text-gray-700 hover:text-purple-600 font-medium transition"
               >
                 Profile
+              </button>
+              {user?.isAdmin && (
+                <button
+                  onClick={() => navigate('/admin')}
+                  className="text-gray-700 hover:text-purple-600 font-medium transition"
+                >
+                  Admin
+                </button>
+              )}
+               <button
+                onClick={() => navigate('/search')}
+                className="text-gray-700 hover:text-purple-600 font-medium transition"
+              >
+                🔍 Search
               </button>
             </div>
           </div>

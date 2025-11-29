@@ -52,7 +52,8 @@ export const signup = async (req: Request, res: Response) => {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        location: user.location
+        location: user.location,
+        isAdmin: user.isAdmin
       }
     });
   } catch (error) {
@@ -100,7 +101,8 @@ export const login = async (req: Request, res: Response) => {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        location: user.location
+        location: user.location,
+        isAdmin: user.isAdmin
       }
     });
   } catch (error) {

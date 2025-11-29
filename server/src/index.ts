@@ -7,6 +7,10 @@ import authRoutes from './routes/auth.routes';
 import postsRoutes from './routes/posts.routes';
 import groupsRoutes from './routes/groups.routes';
 import messagesRoutes from './routes/messages.routes';
+import adminRoutes from './routes/admin.routes';
+import friendshipsRoutes from './routes/friendships.routes';
+import searchRoutes from './routes/search.routes';
+
 import { setupSocketServer } from './socket/socketHandler';
 
 dotenv.config();
@@ -15,7 +19,6 @@ const app = express();
 const httpServer = createServer(app);
 const PORT = process.env.PORT || 8000;
 
-// Setup Socket.io
 setupSocketServer(httpServer);
 
 app.use((req, res, next) => {
@@ -38,10 +41,15 @@ app.get('/api/health', (req, res) => {
   res.json({ message: 'Server is running!' });
 });
 
+// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postsRoutes);
 app.use('/api/groups', groupsRoutes);
 app.use('/api/messages', messagesRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/friendships', friendshipsRoutes);
+app.use('/api/search', searchRoutes);
+
 
 httpServer.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

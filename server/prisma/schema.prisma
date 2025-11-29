@@ -18,6 +18,7 @@ model User {
   location        String
   zipCode         String
   isVerified      Boolean   @default(false)
+  isAdmin         Boolean   @default(false)
   
   // Password reset
   resetPasswordToken   String?
@@ -37,6 +38,8 @@ model User {
   groupMemberships         GroupMember[]
   createdGroups            Group[] @relation("CreatedGroups")
   conversationParticipants ConversationParticipant[]
+  sentFriendRequests       Friendship[] @relation("SentFriendRequests")
+  receivedFriendRequests   Friendship[] @relation("ReceivedFriendRequests")
 
   @@index([zipCode])
   @@index([resetPasswordToken])
@@ -167,4 +170,27 @@ model ConversationParticipant {
   @@unique([conversationId, userId])
   @@index([conversationId])
   @@index([userId])
+}
+
+model Friendship {
+  id          String           @id @default(uuid())
+  requesterId String
+  addresseeId String
+  status      FriendshipStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  requester User @relation("SentFriendRequests", fields: [requesterId], references: [id], onDelete: Cascade)
+  addressee User @relation("ReceivedFriendRequests", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+  @@unique([requesterId, addresseeId])
+  @@index([requesterId])
+  @@index([addresseeId])
+  @@index([status])
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
 }

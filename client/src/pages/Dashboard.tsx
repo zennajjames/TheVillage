@@ -13,7 +13,7 @@ const Dashboard: React.FC = () => {
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <h2 className="text-2xl font-bold mb-4">Welcome to The Village! 👋</h2>
           <p className="text-gray-600 mb-4">
-            Connect with other moms in your community. Request help when you need it, 
+            Connect with people in your community. Request help when you need it, 
             and offer support when you can.
           </p>
           <button

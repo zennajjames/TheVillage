@@ -257,6 +257,59 @@ export const emailService = {
         console.error('Error sending password reset email:', error);
         throw error;
       }
+  },
+
+  async sendFriendRequestNotification(
+  toEmail: string,
+  toName: string,
+  fromName: string,
+  friendshipId: string
+  ) {
+    try {
+      const mailOptions = {
+        from: process.env.EMAIL_FROM,
+        to: toEmail,
+        subject: `${fromName} sent you a friend request - The Village`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background-color: #9333ea; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+                .content { background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
+                .button { display: inline-block; background-color: #9333ea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin-top: 20px; }
+                .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1>🤝 New Friend Request</h1>
+                </div>
+                <div class="content">
+                  <p>Hi ${toName},</p>
+                  <p><strong>${fromName}</strong> wants to connect with you on The Village!</p>
+                  <p>Accept their request to see their posts and stay connected in your community.</p>
+                  <a href="${process.env.CLIENT_URL}/friends" class="button">
+                    View Friend Requests
+                  </a>
+                </div>
+                <div class="footer">
+                  <p>You're receiving this because you're a member of The Village.</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `
+      };
+
+      await transporter.sendMail(mailOptions);
+      console.log(`Friend request email sent to ${toEmail}`);
+    } catch (error) {
+      console.error('Error sending friend request email:', error);
+    }
   }
 };
 
