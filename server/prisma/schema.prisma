@@ -19,6 +19,10 @@ model User {
   zipCode         String
   isVerified      Boolean   @default(false)
   
+  // Password reset
+  resetPasswordToken   String?
+  resetPasswordExpires DateTime?
+  
   // Notification preferences
   emailNotifications Boolean @default(true)
   notifyOnMessages   Boolean @default(true)
@@ -35,6 +39,7 @@ model User {
   conversationParticipants ConversationParticipant[]
 
   @@index([zipCode])
+  @@index([resetPasswordToken])
 }
 
 model Post {

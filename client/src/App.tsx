@@ -12,6 +12,8 @@ import Groups from './pages/Groups';
 import GroupDetail from './pages/GroupDetail';
 import Messages from './pages/Messages';
 import MessageThread from './pages/MessageThread';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -106,7 +108,23 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
+      <Route 
+        path="/" 
+        element={
+        <Navigate to={isAuthenticated ? "/dashboard" : "/login"} />
+        } />
+
+      <Route 
+        path="/forgot-password" 
+        element={
+        <ForgotPassword />
+        } />
+
+      <Route 
+        path="/reset-password/:token" 
+        element={
+        <ResetPassword />
+        } />
     </Routes>
   );
 };

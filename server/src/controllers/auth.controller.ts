@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { prisma } from '../config/database';
+import { emailService } from '../services/email.service';
 
 export const signup = async (req: Request, res: Response) => {
   try {
@@ -211,3 +213,124 @@ export const getUserProfile = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to fetch profile' });
   }
 };
+
+export const forgotPassword = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (!user) {
+      // Don't reveal if user exists or not
+      return res.json({ message: 'If that email exists, a reset link has been sent' });
+    }
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    const resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour
+
+    // Save token to database
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        resetPasswordToken,
+        resetPasswordExpires
+      }
+    });
+
+    // Send email
+    await emailService.sendPasswordResetEmail(
+      user.email,
+      user.firstName,
+      resetToken
+    );
+
+    res.json({ message: 'If that email exists, a reset link has been sent' });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ error: 'Failed to process request' });
+  }
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    if (!password || password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+
+    // Hash the token to compare with database
+    const resetPasswordToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    // Find user with valid token
+    const user = await prisma.user.findFirst({
+      where: {
+        resetPasswordToken,
+        resetPasswordExpires: {
+          gt: new Date()
+        }
+      }
+    });
+
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid or expired reset token' });
+    }
+
+    // Hash new password
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Update password and clear reset token
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordHash,
+        resetPasswordToken: null,
+        resetPasswordExpires: null
+      }
+    });
+
+    res.json({ message: 'Password reset successful' });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ error: 'Failed to reset password' });
+  }
+};
+
+export const updateNotificationPreferences = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.id;
+    const { emailNotifications, notifyOnMessages, notifyOnPosts, notifyOnGroups } = req.body;
+
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        emailNotifications: emailNotifications ?? undefined,
+        notifyOnMessages: notifyOnMessages ?? undefined,
+        notifyOnPosts: notifyOnPosts ?? undefined,
+        notifyOnGroups: notifyOnGroups ?? undefined
+      },
+      select: {
+        id: true,
+        emailNotifications: true,
+        notifyOnMessages: true,
+        notifyOnPosts: true,
+        notifyOnGroups: true
+      }
+    });
+
+    res.json(user);
+  } catch (error) {
+    console.error('Update notification preferences error:', error);
+    res.status(500).json({ error: 'Failed to update preferences' });
+  }
+};
+

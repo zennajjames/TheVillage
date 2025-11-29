@@ -9,6 +9,10 @@ export interface User {
   zipCode?: string;
   profilePicture?: string;
   bio?: string;
+  emailNotifications?: boolean;
+  notifyOnMessages?: boolean;
+  notifyOnPosts?: boolean;
+  notifyOnGroups?: boolean;
 }
 
 export interface AuthResponse {

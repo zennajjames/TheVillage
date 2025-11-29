@@ -195,5 +195,68 @@ export const emailService = {
     } catch (error) {
       console.error('Error sending email:', error);
     }
+  },
+
+  async sendPasswordResetEmail(
+    toEmail: string,
+    toName: string,
+    resetToken: string
+    ) {
+      try {
+        const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+        
+        const mailOptions = {
+          from: process.env.EMAIL_FROM,
+          to: toEmail,
+          subject: 'Reset Your Password - The Village',
+          html: `
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <style>
+                  body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                  .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                  .header { background-color: #9333ea; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+                  .content { background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
+                  .button { display: inline-block; background-color: #9333ea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin-top: 20px; }
+                  .warning { background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; margin: 20px 0; }
+                  .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+                </style>
+              </head>
+              <body>
+                <div class="container">
+                  <div class="header">
+                    <h1>🔒 Password Reset Request</h1>
+                  </div>
+                  <div class="content">
+                    <p>Hi ${toName},</p>
+                    <p>We received a request to reset your password for your The Village account.</p>
+                    <p>Click the button below to create a new password:</p>
+                    <a href="${resetUrl}" class="button">Reset Password</a>
+                    <p style="margin-top: 20px; font-size: 14px; color: #666;">
+                      Or copy and paste this link into your browser:<br>
+                      <a href="${resetUrl}">${resetUrl}</a>
+                    </p>
+                    <div class="warning">
+                      <strong>⚠️ Security Notice:</strong><br>
+                      This link will expire in 1 hour. If you didn't request this password reset, please ignore this email and your password will remain unchanged.
+                    </div>
+                  </div>
+                  <div class="footer">
+                    <p>This is an automated email from The Village. Please do not reply.</p>
+                  </div>
+                </div>
+              </body>
+            </html>
+          `
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log(`Password reset email sent to ${toEmail}`);
+      } catch (error) {
+        console.error('Error sending password reset email:', error);
+        throw error;
+      }
   }
 };
+
