@@ -17,6 +17,8 @@ import ResetPassword from './pages/ResetPassword';
 import Admin from './pages/Admin';
 import Search from './pages/Search';
 import Landing from './pages/Landing';
+import About from './pages/About';
+import Notifications from './pages/Notifications';
 
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -51,6 +53,7 @@ const AppRoutes = () => {
       <Route path="/signup" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Signup />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
+      <Route path="/about" element={<About />} />
       <Route
         path="/dashboard"
         element={
@@ -149,6 +152,15 @@ const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+           path="/notifications"
+           element={
+            <ProtectedRoute>
+             <Notifications />
+            </ProtectedRoute>
+           } 
+          />
+
         
     </Routes>
   );

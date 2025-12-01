@@ -19,6 +19,13 @@ model User {
   zipCode         String
   isVerified      Boolean   @default(false)
   isAdmin         Boolean   @default(false)
+  phoneNumber         String?
+  phoneVerified       Boolean   @default(false)
+  smsNotifications    Boolean   @default(false)
+  notifyViaSMS        Boolean   @default(false)
+  
+  notifications       Notification[]
+
   
   // Password reset
   resetPasswordToken   String?
@@ -193,4 +200,36 @@ enum FriendshipStatus {
   PENDING
   ACCEPTED
   REJECTED
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  actionUrl String?  // URL to navigate to when notification is clicked
+  relatedUserId  String?
+  relatedPostId  String?
+  relatedGroupId String?
+  relatedMessageId String?
+  createdAt DateTime @default(now())
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([createdAt])
+  @@index([read])
+}
+
+enum NotificationType {
+  NEW_MESSAGE
+  NEW_POST
+  FRIEND_REQUEST
+  FRIEND_ACCEPTED
+  GROUP_POST
+  GROUP_INVITE
+  POST_RESPONSE
+  SYSTEM
 }
