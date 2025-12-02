@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import Header from '../components/layout/Header';
 import DashboardMap from '../components/map/DashboardMap';
+import { communitiesService } from '../services/communities.service';
 
 
 
@@ -30,10 +31,32 @@ const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<Stats>({ posts: 0, groups: 0, friends: 0, messages: 0 });
   const [radius, setRadius] = useState(10); // miles
   const [isLoading, setIsLoading] = useState(true);
+  const [hasCommunities, setHasCommunities] = useState<boolean | null>(null);
 
   useEffect(() => {
-    fetchDashboardData();
-  }, [radius]);
+    checkUserCommunities();
+  }, []);
+
+  useEffect(() => {
+    if (hasCommunities !== null && hasCommunities) {
+      fetchDashboardData();
+    }
+  }, [radius, hasCommunities]);
+
+  const checkUserCommunities = async () => {
+    try {
+      const communities = await communitiesService.getUserCommunities();
+      setHasCommunities(communities.length > 0);
+
+      // If user has no communities, redirect to find school page
+      if (communities.length === 0) {
+        navigate('/find-your-school');
+      }
+    } catch (error) {
+      console.error('Failed to check user communities:', error);
+      setHasCommunities(false);
+    }
+  };
 
   const fetchDashboardData = async () => {
     try {
