@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '../config/database';
 import { emailService } from '../services/email.service';
+import { notificationService } from '../services/notification.service';
 
 
 export const createPost = async (req: Request, res: Response) => {
@@ -43,29 +44,45 @@ export const createPost = async (req: Request, res: Response) => {
     const nearbyUsers = await prisma.user.findMany({
       where: {
         zipCode: post.user.zipCode,
-        id: { not: userId },
+        id: { not: userId }
+      },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
         emailNotifications: true,
         notifyOnPosts: true
       },
-      select: {
-        email: true,
-        firstName: true
-      },
-      take: 50 // Limit to avoid sending too many emails
+      take: 50 // Limit to avoid sending too many notifications
     });
+
+    const posterName = post.user.firstName + ' ' + post.user.lastName;
 
     // Send notifications async
     nearbyUsers.forEach(user => {
-      emailService.sendNewPostNotification(
-        user.email,
-        user.firstName,
+      // Create in-app notification
+      notificationService.notifyNewPost(
+        user.id,
+        post.id,
         type,
         title,
-        description,
-        post.user.firstName + ' ' + post.user.lastName,
-        location,
-        post.id
-      ).catch(err => console.error('Failed to send email:', err));
+        posterName,
+        location
+      ).catch(err => console.error('Failed to create notification:', err));
+
+      // Send email if enabled
+      if (user.emailNotifications && user.notifyOnPosts) {
+        emailService.sendNewPostNotification(
+          user.email,
+          user.firstName,
+          type,
+          title,
+          description,
+          posterName,
+          location,
+          post.id
+        ).catch(err => console.error('Failed to send email:', err));
+      }
     });
 
     res.status(201).json(post);

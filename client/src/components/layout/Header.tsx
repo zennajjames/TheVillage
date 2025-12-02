@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import NotificationBell from './NotificationBell';
+import LanguageSelector from './LanguageSelector';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
+  const { t } = useTranslation();
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [showUserMenu, setShowUserMenu] = useState(false);
 
@@ -65,7 +68,7 @@ const Header: React.FC = () => {
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                Home
+                {t('nav.home')}
               </button>
               <button
                 onClick={() => navigate('/about')}
@@ -75,7 +78,7 @@ const Header: React.FC = () => {
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                About
+                {t('nav.about')}
               </button>
               <button
                 onClick={() => navigate('/posts')}
@@ -88,14 +91,14 @@ const Header: React.FC = () => {
                 Posts
               </button>
               <button
-                onClick={() => navigate('/groups')}
+                onClick={() => navigate('/communities')}
                 className={`px-4 py-2 rounded-xl font-medium transition ${
-                  isActive('/groups')
+                  isActive('/communities')
                     ? 'bg-purple-100 text-purple-700'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                Groups
+                {t('nav.communities')}
               </button>
               <button
                 onClick={() => navigate('/search')}
@@ -124,6 +127,9 @@ const Header: React.FC = () => {
 
           {/* Right Side */}
           <div className="flex items-center gap-3">
+            {/* Language Selector */}
+            <LanguageSelector />
+
             {/* Messages Icon */}
             <button
               onClick={() => navigate('/messages')}

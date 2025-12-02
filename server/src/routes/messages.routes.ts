@@ -6,6 +6,7 @@ import {
   sendMessage
 } from '../controllers/messages.controller';
 import { authenticate } from '../middleware/auth.middleware';
+import { prisma } from '../config/database';
 
 const router = Router();
 
@@ -18,7 +19,7 @@ router.post('/conversations/:conversationId/messages', sendMessage);
 
 router.get('/unread-count', authenticate, async (req, res) => {
   const userId = req.user!.id;
-  
+
   const count = await prisma.message.count({
     where: {
       conversation: {
@@ -27,10 +28,10 @@ router.get('/unread-count', authenticate, async (req, res) => {
         }
       },
       senderId: { not: userId },
-      read: false
+      isRead: false
     }
   });
-  
+
   res.json({ count });
 });
 

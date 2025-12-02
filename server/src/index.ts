@@ -3,10 +3,12 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { createServer } from 'http';
 import { prisma } from './config/database';
-import { authenticate } from './middleware/auth';
+import { authenticate } from './middleware/auth.middleware';
 import authRoutes from './routes/auth.routes';
 import postsRoutes from './routes/posts.routes';
+import communitiesRoutes from './routes/communities.routes';
 import groupsRoutes from './routes/groups.routes';
+import subgroupsRoutes from './routes/subgroups.routes';
 import messagesRoutes from './routes/messages.routes';
 import adminRoutes from './routes/admin.routes';
 import friendshipsRoutes from './routes/friendships.routes';
@@ -79,7 +81,9 @@ app.post('/api/test-notification', authenticate, async (req, res) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postsRoutes);
+app.use('/api/communities', communitiesRoutes);
 app.use('/api/groups', groupsRoutes);
+app.use('/api/subgroups', subgroupsRoutes);
 app.use('/api/messages', messagesRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/friendships', friendshipsRoutes);

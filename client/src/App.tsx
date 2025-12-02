@@ -2,12 +2,15 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
+import { GoogleMapsProvider } from './context/GoogleMapsContext';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Posts from './pages/Posts';
 import PostDetail from './pages/PostDetail';
 import Profile from './pages/Profile';
+import Communities from './pages/Communities';
+import CommunityDetail from './pages/CommunityDetail';
 import Groups from './pages/Groups';
 import GroupDetail from './pages/GroupDetail';
 import Messages from './pages/Messages';
@@ -19,6 +22,7 @@ import Search from './pages/Search';
 import Landing from './pages/Landing';
 import About from './pages/About';
 import Notifications from './pages/Notifications';
+import Privacy from './pages/Privacy';
 
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -83,6 +87,22 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/communities"
+        element={
+          <ProtectedRoute>
+            <Communities />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/communities/:id"
+        element={
+          <ProtectedRoute>
+            <CommunityDetail />
           </ProtectedRoute>
         }
       />
@@ -158,10 +178,19 @@ const AppRoutes = () => {
             <ProtectedRoute>
              <Notifications />
             </ProtectedRoute>
-           } 
+           }
           />
 
-        
+        <Route
+          path="/privacy"
+          element={
+            <ProtectedRoute>
+              <Privacy />
+            </ProtectedRoute>
+          }
+        />
+
+
     </Routes>
   );
 };
@@ -170,9 +199,11 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <SocketProvider>
-          <AppRoutes />
-        </SocketProvider>
+        <GoogleMapsProvider>
+          <SocketProvider>
+            <AppRoutes />
+          </SocketProvider>
+        </GoogleMapsProvider>
       </AuthProvider>
     </BrowserRouter>
   );

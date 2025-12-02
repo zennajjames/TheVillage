@@ -1,16 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import Header from '../components/layout/Header';
+import AddressAutocomplete from '../components/forms/AddressAutocomplete';
 
 const Profile: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
     bio: user?.bio || '',
     location: user?.location || '',
+    street: user?.street || '',
+    city: user?.city || '',
+    state: user?.state || '',
+    zipCode: user?.zipCode || '',
   });
   const [message, setMessage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -132,6 +139,69 @@ const Profile: React.FC = () => {
 
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Address
+                    </label>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1.5">
+                          Street Address
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.street}
+                          onChange={(e) => setFormData({ ...formData, street: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          placeholder="123 Main St"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1.5">
+                            City
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.city}
+                            onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="Minneapolis"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1.5">
+                            State
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.state}
+                            onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="MN"
+                            maxLength={2}
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1.5">
+                          Zip Code
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.zipCode}
+                          onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          placeholder="55401"
+                          maxLength={5}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
                       Bio
                     </label>
                     <textarea
@@ -199,6 +269,22 @@ const Profile: React.FC = () => {
                     <div className="font-medium">{user?.zipCode}</div>
                   </div>
                 </div>
+                {(user?.street || user?.city || user?.state) && (
+                  <div className="flex items-center gap-3 text-gray-700">
+                    <span className="text-xl">🏠</span>
+                    <div>
+                      <div className="text-xs text-gray-500">Address</div>
+                      <div className="font-medium">
+                        {user.street && <div>{user.street}</div>}
+                        {(user.city || user.state) && (
+                          <div>
+                            {user.city}{user.city && user.state && ', '}{user.state} {user.zipCode}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -215,7 +301,10 @@ const Profile: React.FC = () => {
                 <button className="w-full text-left px-4 py-2.5 rounded-xl hover:bg-purple-50 transition text-gray-700 font-medium text-sm">
                   ⚙️ Settings
                 </button>
-                <button className="w-full text-left px-4 py-2.5 rounded-xl hover:bg-purple-50 transition text-gray-700 font-medium text-sm">
+                <button
+                  onClick={() => navigate('/privacy')}
+                  className="w-full text-left px-4 py-2.5 rounded-xl hover:bg-purple-50 transition text-gray-700 font-medium text-sm"
+                >
                   🔒 Privacy
                 </button>
               </div>

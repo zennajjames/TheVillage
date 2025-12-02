@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '../config/database';
 import { emailService } from '../services/email.service';
+import { notificationService } from '../services/notification.service';
 
 
 export const getConversations = async (req: Request, res: Response) => {
@@ -265,20 +266,31 @@ export const sendMessage = async (req: Request, res: Response) => {
       data: { updatedAt: new Date() }
     });
 
-    // Send email notification to other participant
+    // Send notification to other participant
     const otherParticipant = conversation.participants.find(p => p.userId !== userId);
-    if (otherParticipant && 
-        otherParticipant.user.emailNotifications && 
-        otherParticipant.user.notifyOnMessages) {
-      
-      // Send async (don't wait for it)
-      emailService.sendNewMessageNotification(
-        otherParticipant.user.email,
-        otherParticipant.user.firstName,
-        message.sender.firstName + ' ' + message.sender.lastName,
-        content.substring(0, 100),
+    if (otherParticipant) {
+      const senderName = message.sender.firstName + ' ' + message.sender.lastName;
+
+      // Create in-app notification
+      notificationService.notifyNewMessage(
+        otherParticipant.userId,
+        userId,
+        senderName,
+        content,
         conversationId
-      ).catch(err => console.error('Failed to send email:', err));
+      ).catch(err => console.error('Failed to create notification:', err));
+
+      // Send email if enabled
+      if (otherParticipant.user.emailNotifications &&
+          otherParticipant.user.notifyOnMessages) {
+        emailService.sendNewMessageNotification(
+          otherParticipant.user.email,
+          otherParticipant.user.firstName,
+          senderName,
+          content.substring(0, 100),
+          conversationId
+        ).catch(err => console.error('Failed to send email:', err));
+      }
     }
 
     res.status(201).json(message);

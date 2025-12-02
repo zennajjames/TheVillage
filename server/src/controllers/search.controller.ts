@@ -64,17 +64,47 @@ export const globalSearch = async (req: Request, res: Response) => {
       take: 10
     });
 
+    // Search communities
+    const communities = await prisma.community.findMany({
+      where: {
+        OR: [
+          { name: { contains: searchTerm, mode: 'insensitive' } },
+          { description: { contains: searchTerm, mode: 'insensitive' } },
+          { location: { contains: searchTerm, mode: 'insensitive' } }
+        ]
+      },
+      include: {
+        createdBy: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true
+          }
+        },
+        _count: {
+          select: { members: true, groups: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 10
+    });
+
     // Search groups
     const groups = await prisma.group.findMany({
       where: {
         OR: [
           { name: { contains: searchTerm, mode: 'insensitive' } },
           { description: { contains: searchTerm, mode: 'insensitive' } },
-          { category: { contains: searchTerm, mode: 'insensitive' } },
-          { location: { contains: searchTerm, mode: 'insensitive' } }
+          { category: { contains: searchTerm, mode: 'insensitive' } }
         ]
       },
       include: {
+        community: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
         createdBy: {
           select: {
             id: true,
@@ -150,15 +180,17 @@ export const globalSearch = async (req: Request, res: Response) => {
       results: {
         users: users.map(u => ({ ...u, type: 'user' })),
         posts: posts.map(p => ({ ...p, type: 'post' })),
+        communities: communities.map(c => ({ ...c, type: 'community' })),
         groups: groups.map(g => ({ ...g, type: 'group' })),
         messages: formattedMessages.map(m => ({ ...m, type: 'message' }))
       },
       counts: {
         users: users.length,
         posts: posts.length,
+        communities: communities.length,
         groups: groups.length,
         messages: messages.length,
-        total: users.length + posts.length + groups.length + messages.length
+        total: users.length + posts.length + communities.length + groups.length + messages.length
       }
     });
   } catch (error) {

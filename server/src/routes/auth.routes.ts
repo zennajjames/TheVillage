@@ -1,13 +1,15 @@
 import { Router } from 'express';
-import { 
-  signup, 
-  login, 
-  getMe, 
-  updateProfile, 
+import {
+  signup,
+  login,
+  getMe,
+  updateProfile,
   getUserProfile,
   forgotPassword,
   resetPassword,
-  updateNotificationPreferences
+  updateNotificationPreferences,
+  updatePrivacySettings,
+  getPrivacySettings
 } from '../controllers/auth.controller';
 import { authenticate } from '../middleware/auth.middleware';
 
@@ -21,5 +23,7 @@ router.get('/me', authenticate, getMe);
 router.patch('/profile', authenticate, updateProfile);
 router.get('/profile/:id', authenticate, getUserProfile);
 router.patch('/notifications', authenticate, updateNotificationPreferences);
+router.get('/privacy', authenticate, getPrivacySettings);
+router.patch('/privacy', authenticate, updatePrivacySettings);
 
 export default router;

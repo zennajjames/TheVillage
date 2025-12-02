@@ -17,32 +17,43 @@ model User {
   bio             String?
   location        String
   zipCode         String
+  street          String?
+  city            String?
+  state           String?
   isVerified      Boolean   @default(false)
   isAdmin         Boolean   @default(false)
   phoneNumber         String?
   phoneVerified       Boolean   @default(false)
   smsNotifications    Boolean   @default(false)
   notifyViaSMS        Boolean   @default(false)
-  
+
   notifications       Notification[]
 
-  
+
   // Password reset
   resetPasswordToken   String?
   resetPasswordExpires DateTime?
-  
+
   // Notification preferences
   emailNotifications Boolean @default(true)
   notifyOnMessages   Boolean @default(true)
   notifyOnPosts      Boolean @default(true)
   notifyOnGroups     Boolean @default(true)
-  
+
+  // Privacy settings
+  showEmail       Boolean @default(false)
+  showAddress     Boolean @default(false)
+  allowMessages   Boolean @default(true)
+
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
   posts                    Post[]
   sentMessages             Message[] @relation("SentMessages")
+  communityMemberships     CommunityMember[]
   groupMemberships         GroupMember[]
+  subGroupMemberships      SubGroupMember[] @relation("SubGroupMemberships")
+  createdCommunities       Community[] @relation("CreatedCommunities")
   createdGroups            Group[] @relation("CreatedGroups")
   conversationParticipants ConversationParticipant[]
   sentFriendRequests       Friendship[] @relation("SentFriendRequests")
@@ -98,24 +109,95 @@ enum PostStatus {
   CLOSED
 }
 
-model Group {
+model Community {
   id          String   @id @default(uuid())
   name        String
   description String
   location    String?
+  address     String?
+  zipCode     String?
+  coverImage  String?
   isPrivate   Boolean  @default(false)
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  createdBy User            @relation("CreatedCommunities", fields: [createdById], references: [id], onDelete: Cascade)
+  members   CommunityMember[]
+  groups    Group[]
+
+  @@index([zipCode])
+  @@index([location])
+}
+
+model CommunityMember {
+  id          String       @id @default(uuid())
+  communityId String
+  userId      String
+  role        MemberRole   @default(MEMBER)
+  joinedAt    DateTime     @default(now())
+
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([communityId, userId])
+  @@index([communityId])
+  @@index([userId])
+}
+
+model Group {
+  id          String   @id @default(uuid())
+  communityId String
+  name        String
+  description String
   category    String
+  isPrivate   Boolean  @default(false)
   coverImage  String?
   createdById String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
   createdBy User @relation("CreatedGroups", fields: [createdById], references: [id], onDelete: Cascade)
   members   GroupMember[]
   posts     GroupPost[]
+  subGroups SubGroup[]
 
+  @@index([communityId])
   @@index([category])
-  @@index([location])
+}
+
+model SubGroup {
+  id          String   @id @default(uuid())
+  parentGroupId String
+  name        String
+  description String?
+  teacherName String?
+  grade       String?
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  parentGroup Group @relation(fields: [parentGroupId], references: [id], onDelete: Cascade)
+  members     SubGroupMember[]
+
+  @@index([parentGroupId])
+  @@index([teacherName])
+  @@index([grade])
+}
+
+model SubGroupMember {
+  id          String   @id @default(uuid())
+  subGroupId  String
+  userId      String
+  joinedAt    DateTime @default(now())
+
+  subGroup SubGroup @relation(fields: [subGroupId], references: [id], onDelete: Cascade)
+  user     User     @relation("SubGroupMemberships", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([subGroupId, userId])
+  @@index([subGroupId])
+  @@index([userId])
 }
 
 model GroupMember {

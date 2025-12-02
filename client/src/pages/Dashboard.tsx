@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import Header from '../components/layout/Header';
+import DashboardMap from '../components/map/DashboardMap';
+
+
 
 interface Group {
   id: string;
@@ -105,7 +108,7 @@ const Dashboard: React.FC = () => {
             <div className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
               {stats.groups}
             </div>
-            <div className="text-sm text-gray-600 font-medium">Groups</div>
+            <div className="text-sm text-gray-600 font-medium">Your Communitiy</div>
           </div>
 
           <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-purple-300 transition-all">
@@ -167,45 +170,8 @@ const Dashboard: React.FC = () => {
                   ))}
                 </div>
               </div>
-
               {/* Map Visualization */}
-              <div className="relative h-96 bg-gradient-to-br from-purple-50 to-pink-50 p-8">
-                {/* Simple visual map representation */}
-                <div className="absolute inset-8 border-2 border-dashed border-purple-300 rounded-3xl flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
-                      <span className="text-white text-2xl">📍</span>
-                    </div>
-                    <p className="text-gray-900 font-bold mb-1">You are here</p>
-                    <p className="text-gray-600 text-sm">{user?.zipCode}</p>
-                  </div>
-                </div>
-
-                {/* Group Markers */}
-                {nearbyGroups.slice(0, 4).map((group, index) => {
-                  const positions = [
-                    { top: '20%', left: '25%' },
-                    { top: '30%', right: '20%' },
-                    { bottom: '25%', left: '30%' },
-                    { bottom: '20%', right: '25%' },
-                  ];
-                  return (
-                    <button
-                      key={group.id}
-                      onClick={() => navigate(`/groups/${group.id}`)}
-                      className="absolute w-12 h-12 bg-white border-2 border-purple-400 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center group"
-                      style={positions[index]}
-                      title={group.name}
-                    >
-                      <span className="text-xl">👥</span>
-                      <div className="absolute top-full mt-2 hidden group-hover:block bg-white rounded-lg shadow-xl p-3 min-w-48 z-10">
-                        <p className="font-semibold text-gray-900 text-sm">{group.name}</p>
-                        <p className="text-xs text-gray-600 mt-1">{group.memberCount || 0} members</p>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+              <DashboardMap groups={nearbyGroups} radius={radius} />
 
               {/* Groups List */}
               <div className="p-6">

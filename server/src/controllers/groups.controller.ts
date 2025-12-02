@@ -1,22 +1,37 @@
 import { Request, Response } from 'express';
 import { prisma } from '../config/database';
 import { emailService } from '../services/email.service';
+import { notificationService } from '../services/notification.service';
 
 
 export const createGroup = async (req: Request, res: Response) => {
   try {
-    const { name, description, location, category, isPrivate } = req.body;
+    const { communityId, name, description, category, isPrivate } = req.body;
     const userId = req.user!.id;
 
-    if (!name || !description || !category) {
-      return res.status(400).json({ error: 'Name, description, and category are required' });
+    if (!communityId || !name || !description || !category) {
+      return res.status(400).json({ error: 'Community ID, name, description, and category are required' });
+    }
+
+    // Verify user is a member of the community
+    const communityMember = await prisma.communityMember.findUnique({
+      where: {
+        communityId_userId: {
+          communityId,
+          userId
+        }
+      }
+    });
+
+    if (!communityMember) {
+      return res.status(403).json({ error: 'You must be a member of the community to create a group' });
     }
 
     const group = await prisma.group.create({
       data: {
+        communityId,
         name,
         description,
-        location: location || '',
         category,
         isPrivate: isPrivate || false,
         createdById: userId,
@@ -51,16 +66,17 @@ export const createGroup = async (req: Request, res: Response) => {
 
 export const getGroups = async (req: Request, res: Response) => {
   try {
-    const { category, location } = req.query;
+    const { category, communityId } = req.query;
+    const userId = req.user!.id;
 
     const where: any = {};
-    
+
+    if (communityId) {
+      where.communityId = communityId;
+    }
+
     if (category) {
       where.category = category;
-    }
-    
-    if (location) {
-      where.location = { contains: location as string, mode: 'insensitive' };
     }
 
     const groups = await prisma.group.findMany({
@@ -74,6 +90,10 @@ export const getGroups = async (req: Request, res: Response) => {
             profilePicture: true
           }
         },
+        members: {
+          where: { userId },
+          select: { userId: true, role: true }
+        },
         _count: {
           select: { members: true, posts: true }
         }
@@ -83,7 +103,15 @@ export const getGroups = async (req: Request, res: Response) => {
       }
     });
 
-    res.json(groups);
+    // Add isMember flag and user role to each group
+    const groupsWithMembership = groups.map(group => ({
+      ...group,
+      isMember: group.members.length > 0,
+      userRole: group.members.length > 0 ? group.members[0].role : null,
+      members: undefined // Remove members array from response
+    }));
+
+    res.json(groupsWithMembership);
   } catch (error) {
     console.error('Get groups error:', error);
     res.status(500).json({ error: 'Failed to fetch groups' });
@@ -269,6 +297,7 @@ export const createGroupPost = async (req: Request, res: Response) => {
           include: {
             user: {
               select: {
+                id: true,
                 email: true,
                 firstName: true,
                 emailNotifications: true,
@@ -295,13 +324,25 @@ export const createGroupPost = async (req: Request, res: Response) => {
 
     // Send notifications to group members
     if (group && poster) {
+      const posterName = poster.firstName + ' ' + poster.lastName;
+
       group.members.forEach(member => {
+        // Create in-app notification
+        notificationService.notifyGroupPost(
+          member.user.id,
+          id,
+          group.name,
+          posterName,
+          content
+        ).catch(err => console.error('Failed to create notification:', err));
+
+        // Send email if enabled
         if (member.user.emailNotifications && member.user.notifyOnGroups) {
           emailService.sendGroupPostNotification(
             member.user.email,
             member.user.firstName,
             group.name,
-            poster.firstName + ' ' + poster.lastName,
+            posterName,
             content,
             id
           ).catch(err => console.error('Failed to send email:', err));

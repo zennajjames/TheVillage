@@ -7,11 +7,11 @@ export const groupsService = {
     return response.data;
   },
 
-  async getGroups(category?: string, location?: string): Promise<Group[]> {
+  async getGroups(filters?: { category?: string; communityId?: string }): Promise<Group[]> {
     const params = new URLSearchParams();
-    if (category) params.append('category', category);
-    if (location) params.append('location', location);
-    
+    if (filters?.category) params.append('category', filters.category);
+    if (filters?.communityId) params.append('communityId', filters.communityId);
+
     const response = await api.get<Group[]>(`/groups?${params.toString()}`);
     return response.data;
   },

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '../config/database';
 import { emailService } from '../services/email.service';
+import { notificationService } from '../services/notification.service';
 
 export const sendFriendRequest = async (req: Request, res: Response) => {
   try {
@@ -61,14 +62,26 @@ export const sendFriendRequest = async (req: Request, res: Response) => {
       }
     });
 
-    // Send email notification
-    if (addressee && addressee.emailNotifications && requester) {
-      emailService.sendFriendRequestNotification(
-        addressee.email,
-        addressee.firstName,
-        requester.firstName + ' ' + requester.lastName,
-        friendship.id
-      ).catch(err => console.error('Failed to send email:', err));
+    // Send notification
+    if (addressee && requester) {
+      const requesterName = requester.firstName + ' ' + requester.lastName;
+
+      // Create in-app notification
+      notificationService.notifyFriendRequest(
+        addresseeId,
+        requesterId,
+        requesterName
+      ).catch(err => console.error('Failed to create notification:', err));
+
+      // Send email if enabled
+      if (addressee.emailNotifications) {
+        emailService.sendFriendRequestNotification(
+          addressee.email,
+          addressee.firstName,
+          requesterName,
+          friendship.id
+        ).catch(err => console.error('Failed to send email:', err));
+      }
     }
 
     res.status(201).json(friendship);
@@ -124,6 +137,16 @@ export const respondToFriendRequest = async (req: Request, res: Response) => {
         }
       }
     });
+
+    // If accepted, notify the requester
+    if (status === 'ACCEPTED') {
+      const accepterName = updatedFriendship.addressee.firstName + ' ' + updatedFriendship.addressee.lastName;
+      notificationService.notifyFriendAccepted(
+        friendship.requesterId,
+        userId,
+        accepterName
+      ).catch(err => console.error('Failed to create notification:', err));
+    }
 
     res.json(updatedFriendship);
   } catch (error) {

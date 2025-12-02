@@ -53,6 +53,12 @@ export const signup = async (req: Request, res: Response) => {
         firstName: user.firstName,
         lastName: user.lastName,
         location: user.location,
+        street: user.street,
+        city: user.city,
+        state: user.state,
+        zipCode: user.zipCode,
+        profilePicture: user.profilePicture,
+        bio: user.bio,
         isAdmin: user.isAdmin
       }
     });
@@ -102,6 +108,12 @@ export const login = async (req: Request, res: Response) => {
         firstName: user.firstName,
         lastName: user.lastName,
         location: user.location,
+        street: user.street,
+        city: user.city,
+        state: user.state,
+        zipCode: user.zipCode,
+        profilePicture: user.profilePicture,
+        bio: user.bio,
         isAdmin: user.isAdmin
       }
     });
@@ -121,9 +133,15 @@ export const getMe = async (req: Request, res: Response) => {
         firstName: true,
         lastName: true,
         location: true,
+        street: true,
+        city: true,
+        state: true,
         zipCode: true,
         profilePicture: true,
-        bio: true
+        bio: true,
+        showEmail: true,
+        showAddress: true,
+        allowMessages: true
       }
     });
 
@@ -143,13 +161,16 @@ export const getMe = async (req: Request, res: Response) => {
 export const updateProfile = async (req: Request, res: Response) => {
   try {
     const userId = req.user!.id;
-    const { firstName, lastName, location, zipCode, bio, profilePicture } = req.body;
+    const { firstName, lastName, location, street, city, state, zipCode, bio, profilePicture } = req.body;
 
     const updateData: any = {};
-    
+
     if (firstName) updateData.firstName = firstName;
     if (lastName) updateData.lastName = lastName;
     if (location) updateData.location = location;
+    if (street !== undefined) updateData.street = street;
+    if (city !== undefined) updateData.city = city;
+    if (state !== undefined) updateData.state = state;
     if (zipCode) updateData.zipCode = zipCode;
     if (bio !== undefined) updateData.bio = bio;
     if (profilePicture !== undefined) updateData.profilePicture = profilePicture;
@@ -163,6 +184,9 @@ export const updateProfile = async (req: Request, res: Response) => {
         firstName: true,
         lastName: true,
         location: true,
+        street: true,
+        city: true,
+        state: true,
         zipCode: true,
         profilePicture: true,
         bio: true,
@@ -333,6 +357,57 @@ export const updateNotificationPreferences = async (req: Request, res: Response)
   } catch (error) {
     console.error('Update notification preferences error:', error);
     res.status(500).json({ error: 'Failed to update preferences' });
+  }
+};
+
+export const updatePrivacySettings = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.id;
+    const { showEmail, showAddress, allowMessages } = req.body;
+
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        showEmail: showEmail ?? undefined,
+        showAddress: showAddress ?? undefined,
+        allowMessages: allowMessages ?? undefined
+      },
+      select: {
+        id: true,
+        showEmail: true,
+        showAddress: true,
+        allowMessages: true
+      }
+    });
+
+    res.json(user);
+  } catch (error) {
+    console.error('Update privacy settings error:', error);
+    res.status(500).json({ error: 'Failed to update privacy settings' });
+  }
+};
+
+export const getPrivacySettings = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.id;
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        showEmail: true,
+        showAddress: true,
+        allowMessages: true
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error('Get privacy settings error:', error);
+    res.status(500).json({ error: 'Failed to get privacy settings' });
   }
 };
 

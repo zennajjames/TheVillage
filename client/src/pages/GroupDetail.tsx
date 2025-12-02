@@ -1,19 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { groupsService } from '../services/groups.service';
-import { Group } from '../types';
+import { subgroupsService } from '../services/subgroups.service';
+import { Group, SubGroup, CreateSubGroupData } from '../types';
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/layout/Header';
+import SubGroupCard from '../components/groups/SubGroupCard';
+import CreateSubGroupForm from '../components/groups/CreateSubGroupForm';
 
 const GroupDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [group, setGroup] = useState<Group | null>(null);
+  const [subGroups, setSubGroups] = useState<SubGroup[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [newPost, setNewPost] = useState('');
   const [isPosting, setIsPosting] = useState(false);
+  const [showCreateSubGroup, setShowCreateSubGroup] = useState(false);
 
   const fetchGroup = async () => {
     try {
@@ -27,8 +32,19 @@ const GroupDetail: React.FC = () => {
     }
   };
 
+  const fetchSubGroups = async () => {
+    try {
+      if (!id) return;
+      const data = await subgroupsService.getSubGroups(id);
+      setSubGroups(data);
+    } catch (err: any) {
+      console.error('Failed to load subgroups:', err);
+    }
+  };
+
   useEffect(() => {
     fetchGroup();
+    fetchSubGroups();
   }, [id]);
 
   const handleJoin = async () => {
@@ -74,6 +90,16 @@ const GroupDetail: React.FC = () => {
       alert('Failed to create post');
     } finally {
       setIsPosting(false);
+    }
+  };
+
+  const handleCreateSubGroup = async (data: CreateSubGroupData) => {
+    try {
+      await subgroupsService.createSubGroup(data);
+      setShowCreateSubGroup(false);
+      fetchSubGroups();
+    } catch (err: any) {
+      alert(err.response?.data?.error || 'Failed to create class');
     }
   };
 
@@ -128,9 +154,6 @@ const GroupDetail: React.FC = () => {
                 )}
               </div>
               <p className="text-purple-600 font-medium mb-2">{group.category}</p>
-              {group.location && (
-                <p className="text-gray-600 text-sm">📍 {group.location}</p>
-              )}
             </div>
             <div className="flex gap-2">
               {!isMember && !isCreator && (
@@ -167,6 +190,48 @@ const GroupDetail: React.FC = () => {
             <span>💬 {group._count?.posts || 0} posts</span>
           </div>
         </div>
+
+        {/* SubGroups Section - Only for School groups */}
+        {group.category === 'School' && isMember && (
+          <div className="bg-white rounded-lg shadow p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-lg">Classes</h3>
+              {!showCreateSubGroup && (
+                <button
+                  onClick={() => setShowCreateSubGroup(true)}
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-lg hover:from-purple-700 hover:to-pink-700 transition text-sm font-medium"
+                >
+                  + Create Class
+                </button>
+              )}
+            </div>
+
+            {showCreateSubGroup ? (
+              <div className="border border-gray-200 rounded-lg p-4">
+                <CreateSubGroupForm
+                  parentGroupId={id!}
+                  onSubmit={handleCreateSubGroup}
+                  onCancel={() => setShowCreateSubGroup(false)}
+                />
+              </div>
+            ) : subGroups.length > 0 ? (
+              <div className="grid md:grid-cols-2 gap-3">
+                {subGroups.map((subGroup) => (
+                  <SubGroupCard
+                    key={subGroup.id}
+                    subGroup={subGroup}
+                    onMembershipChange={fetchSubGroups}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <p className="mb-2">No classes yet</p>
+                <p className="text-sm">Create a class to organize parents by teacher and grade</p>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="grid md:grid-cols-3 gap-6">
           {/* Main Content */}

@@ -3,8 +3,20 @@ import { groupsService } from '../services/groups.service';
 import { Group } from '../types';
 import { useAuth } from '../context/AuthContext';
 import GroupCard from '../components/groups/GroupCard';
-import CreateGroupForm from '../components/groups/CreateGroupForm';
 import Header from '../components/layout/Header';
+
+const CATEGORIES = [
+  'All',
+  'Neighborhood',
+  'Playgroup',
+  'School',
+  'Activities',
+  'Special Needs',
+  'Working Moms',
+  'Stay-at-Home Moms',
+  'Single Parents',
+  'Other'
+];
 
 const Groups: React.FC = () => {
   const { user } = useAuth();
@@ -12,16 +24,14 @@ const Groups: React.FC = () => {
   const [myGroups, setMyGroups] = useState<Group[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showCreateForm, setShowCreateForm] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'my'>('all');
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
   const fetchGroups = async () => {
     try {
       setIsLoading(true);
       const allGroups = await groupsService.getGroups();
-      const userGroups = allGroups.filter(group => 
-        group.members?.some(member => member.userId === user?.id)
-      );
+      const userGroups = allGroups.filter(group => group.isMember === true);
       setGroups(allGroups);
       setMyGroups(userGroups);
     } catch (err: any) {
@@ -35,13 +45,13 @@ const Groups: React.FC = () => {
     fetchGroups();
   }, []);
 
-  const handleCreateGroup = async (data: any) => {
-    await groupsService.createGroup(data);
-    setShowCreateForm(false);
-    fetchGroups();
+  // Filter groups by category
+  const filterByCategory = (groupsList: Group[]) => {
+    if (selectedCategory === 'All') return groupsList;
+    return groupsList.filter(group => group.category === selectedCategory);
   };
 
-  const displayedGroups = activeTab === 'all' ? groups : myGroups;
+  const displayedGroups = filterByCategory(activeTab === 'all' ? groups : myGroups);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
@@ -59,61 +69,60 @@ const Groups: React.FC = () => {
                 Connect with neighbors who share your interests
               </p>
             </div>
-            {!showCreateForm && (
-              <button
-                onClick={() => setShowCreateForm(true)}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl hover:shadow-lg hover:scale-105 transition-all font-semibold"
-              >
-                + Create Group
-              </button>
-            )}
           </div>
 
           {/* Tab Pills */}
-          {!showCreateForm && (
-            <div className="flex gap-3">
-              <button
-                onClick={() => setActiveTab('all')}
-                className={`px-6 py-2.5 rounded-xl font-semibold transition-all ${
-                  activeTab === 'all'
-                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
-                    : 'bg-white text-gray-700 border border-gray-200 hover:border-purple-300'
-                }`}
-              >
-                All Groups ({groups.length})
-              </button>
-              <button
-                onClick={() => setActiveTab('my')}
-                className={`px-6 py-2.5 rounded-xl font-semibold transition-all ${
-                  activeTab === 'my'
-                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
-                    : 'bg-white text-gray-700 border border-gray-200 hover:border-purple-300'
-                }`}
-              >
-                My Groups ({myGroups.length})
-              </button>
-            </div>
-          )}
+          <>
+              <div className="flex gap-3 mb-4">
+                <button
+                  onClick={() => setActiveTab('all')}
+                  className={`px-6 py-2.5 rounded-xl font-semibold transition-all ${
+                    activeTab === 'all'
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                      : 'bg-white text-gray-700 border border-gray-200 hover:border-purple-300'
+                  }`}
+                >
+                  All Groups ({groups.length})
+                </button>
+                <button
+                  onClick={() => setActiveTab('my')}
+                  className={`px-6 py-2.5 rounded-xl font-semibold transition-all ${
+                    activeTab === 'my'
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                      : 'bg-white text-gray-700 border border-gray-200 hover:border-purple-300'
+                  }`}
+                >
+                  My Groups ({myGroups.length})
+                </button>
+              </div>
+
+              {/* Category Filter */}
+              <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-sm font-semibold text-gray-700">Filter by Category:</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {CATEGORIES.map(category => (
+                    <button
+                      key={category}
+                      onClick={() => setSelectedCategory(category)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                        selectedCategory === category
+                          ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      {category}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
         </div>
 
-        {/* Create Form */}
-        {showCreateForm && (
-          <div className="mb-8 bg-white rounded-3xl border border-gray-200 shadow-lg overflow-hidden">
-            <div className="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-4">
-              <h2 className="text-xl font-bold text-white">Create New Group</h2>
-            </div>
-            <div className="p-6">
-              <CreateGroupForm
-                onSubmit={handleCreateGroup}
-                onCancel={() => setShowCreateForm(false)}
-              />
-            </div>
-          </div>
-        )}
 
         {/* Groups Grid */}
-        {!showCreateForm && (
-          <>
+        <>
             {isLoading ? (
               <div className="flex items-center justify-center py-20">
                 <div className="text-center">
@@ -139,27 +148,20 @@ const Groups: React.FC = () => {
                     ? 'Join or create a group to get started!' 
                     : 'Be the first to create a group in your community!'}
                 </p>
-                <button
-                  onClick={() => setShowCreateForm(true)}
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-xl hover:shadow-lg transition-all font-semibold"
-                >
-                  Create First Group
-                </button>
               </div>
             ) : (
               <div className="grid md:grid-cols-2 gap-4">
                 {displayedGroups.map((group) => (
                   <div key={group.id} className="bg-white rounded-3xl border border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all">
-                    <GroupCard group={group} />
+                    <GroupCard group={group} onMembershipChange={fetchGroups} />
                   </div>
                 ))}
               </div>
             )}
           </>
-        )}
 
         {/* Stats */}
-        {!showCreateForm && groups.length > 0 && (
+        {groups.length > 0 && (
           <div className="mt-8 bg-white rounded-3xl border border-gray-200 p-6">
             <div className="grid grid-cols-2 gap-4 text-center">
               <div>
