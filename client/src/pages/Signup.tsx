@@ -1,19 +1,24 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import CommunityGuidelines from '../components/CommunityGuidelines';
 
 const Signup: React.FC = () => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
+    confirmEmail: '',
     password: '',
+    confirmPassword: '',
     location: '',
-    zipCode: ''
+    zipCode: '',
+    agreedToGuidelines: false
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
+  const [showGuidelines, setShowGuidelines] = useState(false);
+
   const { signup } = useAuth();
   const navigate = useNavigate();
 
@@ -27,10 +32,30 @@ const Signup: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Validate email confirmation
+    if (formData.email !== formData.confirmEmail) {
+      setError('Email addresses do not match');
+      return;
+    }
+
+    // Validate password confirmation
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (!formData.agreedToGuidelines) {
+      setShowGuidelines(true);
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      await signup(formData);
+      // Remove confirmation fields before sending to backend
+      const { confirmEmail, confirmPassword, ...signupData } = formData;
+      await signup(signupData);
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.error || 'Signup failed');
@@ -39,9 +64,50 @@ const Signup: React.FC = () => {
     }
   };
 
+  const handleAgreeToGuidelines = async () => {
+    setFormData({
+      ...formData,
+      agreedToGuidelines: true
+    });
+    setShowGuidelines(false);
+    setIsLoading(true);
+
+    try {
+      // Remove confirmation fields before sending to backend
+      const { confirmEmail, confirmPassword, ...signupData } = {
+        ...formData,
+        agreedToGuidelines: true
+      };
+      await signup(signupData);
+      navigate('/dashboard');
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Signup failed');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeclineGuidelines = () => {
+    setShowGuidelines(false);
+    setError('You must agree to the community guidelines to join The Village.');
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+    <>
+      {showGuidelines && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="my-8">
+            <CommunityGuidelines
+              onAgree={handleAgreeToGuidelines}
+              onDecline={handleDeclineGuidelines}
+              showActions={true}
+            />
+          </div>
+        </div>
+      )}
+
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         <h1 className="text-3xl font-bold text-purple-600 mb-2 text-center">
           Join The Village
         </h1>
@@ -102,6 +168,20 @@ const Signup: React.FC = () => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
+              Confirm Email
+            </label>
+            <input
+              type="email"
+              name="confirmEmail"
+              value={formData.confirmEmail}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Password
             </label>
             <input
@@ -117,16 +197,16 @@ const Signup: React.FC = () => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Location (City, State)
+              Confirm Password
             </label>
             <input
-              type="text"
-              name="location"
-              value={formData.location}
+              type="password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
               onChange={handleChange}
-              placeholder="e.g., Minneapolis, MN"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               required
+              minLength={6}
             />
           </div>
 
@@ -139,6 +219,7 @@ const Signup: React.FC = () => {
               name="zipCode"
               value={formData.zipCode}
               onChange={handleChange}
+              placeholder="e.g., 55417"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               required
               pattern="[0-9]{5}"
@@ -161,8 +242,9 @@ const Signup: React.FC = () => {
             Log in
           </Link>
         </p>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

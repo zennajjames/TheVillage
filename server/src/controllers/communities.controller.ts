@@ -353,7 +353,7 @@ export const joinCommunity = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    // Check if already a member
+    // Check if already a member of this specific community
     const existingMembership = await prisma.communityMember.findUnique({
       where: {
         communityId_userId: {

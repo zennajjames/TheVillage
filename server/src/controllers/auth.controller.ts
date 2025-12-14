@@ -7,11 +7,16 @@ import { emailService } from '../services/email.service';
 
 export const signup = async (req: Request, res: Response) => {
   try {
-    const { email, password, firstName, lastName, location, zipCode } = req.body;
+    const { email, password, firstName, lastName, zipCode, agreedToGuidelines } = req.body;
 
     // Validate input
-    if (!email || !password || !firstName || !lastName || !location || !zipCode) {
+    if (!email || !password || !firstName || !lastName || !zipCode) {
       return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    // Validate community guidelines agreement
+    if (!agreedToGuidelines) {
+      return res.status(400).json({ error: 'You must agree to the community guidelines to join' });
     }
 
     // Check if user already exists
@@ -26,15 +31,17 @@ export const signup = async (req: Request, res: Response) => {
     // Hash password
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // Create user
+    // Create user with zipCode as location initially
     const user = await prisma.user.create({
       data: {
         email,
         passwordHash,
         firstName,
         lastName,
-        location,
-        zipCode
+        location: zipCode, // Use zipCode as location temporarily
+        zipCode,
+        agreedToGuidelines: true,
+        guidelinesAgreedAt: new Date()
       }
     });
 

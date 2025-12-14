@@ -34,6 +34,7 @@ export interface SignupData {
   lastName: string;
   location: string;
   zipCode: string;
+  agreedToGuidelines?: boolean;
 }
 
 export interface LoginData {

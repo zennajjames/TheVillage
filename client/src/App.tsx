@@ -24,6 +24,7 @@ import About from './pages/About';
 import Notifications from './pages/Notifications';
 import Privacy from './pages/Privacy';
 import FindYourSchool from './components/communities/FindYourSchool';
+import BrowseCommunities from './pages/BrowseCommunities';
 
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -112,6 +113,14 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <CommunityDetail />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/browse-communities"
+        element={
+          <ProtectedRoute>
+            <BrowseCommunities />
           </ProtectedRoute>
         }
       />

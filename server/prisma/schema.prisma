@@ -43,7 +43,13 @@ model User {
   // Privacy settings
   showEmail       Boolean @default(false)
   showAddress     Boolean @default(false)
+  showPhone       Boolean @default(false)
+  showChildrenNames Boolean @default(false)
   allowMessages   Boolean @default(true)
+
+  // Community guidelines agreement
+  agreedToGuidelines Boolean @default(false)
+  guidelinesAgreedAt DateTime?
 
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -58,6 +64,7 @@ model User {
   conversationParticipants ConversationParticipant[]
   sentFriendRequests       Friendship[] @relation("SentFriendRequests")
   receivedFriendRequests   Friendship[] @relation("ReceivedFriendRequests")
+  children                 Child[]
 
   @@index([zipCode])
   @@index([resetPasswordToken])
@@ -122,10 +129,12 @@ model Community {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  createdBy User            @relation("CreatedCommunities", fields: [createdById], references: [id], onDelete: Cascade)
+  createdBy User              @relation("CreatedCommunities", fields: [createdById], references: [id], onDelete: Cascade)
   members   CommunityMember[]
   groups    Group[]
+  children  CommunityChild[]
 
+  @@unique([name, zipCode])
   @@index([zipCode])
   @@index([location])
 }
@@ -314,4 +323,32 @@ enum NotificationType {
   GROUP_INVITE
   POST_RESPONSE
   SYSTEM
+}
+
+model Child {
+  id        String   @id @default(uuid())
+  userId    String
+  firstName String
+  gradeLevel String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  communityChildren CommunityChild[]
+
+  @@index([userId])
+}
+
+model CommunityChild {
+  id          String   @id @default(uuid())
+  communityId String
+  childId     String
+  addedAt     DateTime @default(now())
+
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  child     Child     @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@unique([communityId, childId])
+  @@index([communityId])
+  @@index([childId])
 }

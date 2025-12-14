@@ -12,13 +12,13 @@ const Communities: React.FC = () => {
   const [myCommunities, setMyCommunities] = useState<Community[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'all' | 'my'>('all');
+  const [activeTab, setActiveTab] = useState<'my' | 'all'>('my');
 
   const fetchCommunities = async () => {
     try {
       setIsLoading(true);
       const allCommunities = await communitiesService.getAllCommunities();
-      const userCommunities = allCommunities.filter(community => community.isMember === true);
+      const userCommunities = await communitiesService.getUserCommunities();
       setCommunities(allCommunities);
       setMyCommunities(userCommunities);
     } catch (err: any) {
@@ -31,6 +31,13 @@ const Communities: React.FC = () => {
   useEffect(() => {
     fetchCommunities();
   }, []);
+
+  // If no communities, redirect to find your school
+  useEffect(() => {
+    if (!isLoading && myCommunities.length === 0 && activeTab === 'my') {
+      navigate('/find-your-school');
+    }
+  }, [isLoading, myCommunities, activeTab, navigate]);
 
   const handleJoinCommunity = async (communityId: string) => {
     try {
@@ -53,26 +60,16 @@ const Communities: React.FC = () => {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-                Communities
+                My Communities
               </h1>
               <p className="text-gray-600">
-                Join your school community and connect with other families
+                Your school communities
               </p>
             </div>
           </div>
 
           {/* Tab Pills */}
           <div className="flex gap-3 mb-4">
-            <button
-              onClick={() => setActiveTab('all')}
-              className={`px-6 py-2.5 rounded-xl font-semibold transition-all ${
-                activeTab === 'all'
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
-                  : 'bg-white text-gray-700 border border-gray-200 hover:border-purple-300'
-              }`}
-            >
-              All Communities ({communities.length})
-            </button>
             <button
               onClick={() => setActiveTab('my')}
               className={`px-6 py-2.5 rounded-xl font-semibold transition-all ${
@@ -82,6 +79,16 @@ const Communities: React.FC = () => {
               }`}
             >
               My Communities ({myCommunities.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('all')}
+              className={`px-6 py-2.5 rounded-xl font-semibold transition-all ${
+                activeTab === 'all'
+                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                  : 'bg-white text-gray-700 border border-gray-200 hover:border-purple-300'
+              }`}
+            >
+              All Communities ({communities.length})
             </button>
           </div>
         </div>
@@ -112,6 +119,14 @@ const Communities: React.FC = () => {
                 ? 'Join a school community to get started!'
                 : 'Be the first to create a community!'}
             </p>
+            {activeTab === 'my' && (
+              <button
+                onClick={() => navigate('/find-your-school')}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition"
+              >
+                Find Your School
+              </button>
+            )}
           </div>
         ) : (
           <div className="grid md:grid-cols-2 gap-6">

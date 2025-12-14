@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../context/AuthContext';
 import { communitiesService } from '../../services/communities.service';
 import { Community } from '../../types';
 
@@ -11,16 +12,15 @@ interface FindYourSchoolProps {
 const FindYourSchool: React.FC<FindYourSchoolProps> = ({ onClose }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [zipCode, setZipCode] = useState('');
   const [schools, setSchools] = useState<Community[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [searching, setSearching] = useState(false);
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (zipCode.length !== 5) {
+  const searchByZipCode = async (zip: string) => {
+    if (zip.length !== 5) {
       setError('Please enter a valid 5-digit zip code');
       return;
     }
@@ -32,13 +32,13 @@ const FindYourSchool: React.FC<FindYourSchoolProps> = ({ onClose }) => {
     try {
       const allCommunities = await communitiesService.getAllCommunities();
       const filteredSchools = allCommunities.filter(
-        (community) => community.zipCode === zipCode
+        (community) => community.zipCode === zip
       );
 
       setSchools(filteredSchools);
 
       if (filteredSchools.length === 0) {
-        setError(`No schools found for zip code ${zipCode}. Try a nearby zip code or contact us to add your school.`);
+        setError(`No schools found for zip code ${zip}. Try a nearby zip code or contact us to add your school.`);
       }
     } catch (err) {
       setError('Failed to search for schools. Please try again.');
@@ -46,6 +46,19 @@ const FindYourSchool: React.FC<FindYourSchoolProps> = ({ onClose }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Automatically search for schools when component mounts if user has zipCode
+  useEffect(() => {
+    if (user?.zipCode) {
+      setZipCode(user.zipCode);
+      searchByZipCode(user.zipCode);
+    }
+  }, [user]);
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    searchByZipCode(zipCode);
   };
 
   const handleJoinCommunity = async (communityId: string) => {
@@ -178,7 +191,7 @@ const FindYourSchool: React.FC<FindYourSchoolProps> = ({ onClose }) => {
             Don't see your school?
           </p>
           <button
-            onClick={() => navigate('/communities')}
+            onClick={() => navigate('/browse-communities')}
             className="text-purple-600 hover:text-purple-700 font-medium text-sm"
           >
             Browse all communities →
