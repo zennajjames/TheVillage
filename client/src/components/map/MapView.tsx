@@ -12,6 +12,7 @@ interface MapMarker {
   };
   memberCount?: number;
   category?: string;
+  iconUrl?: string;
 }
 
 interface MapViewProps {
@@ -114,7 +115,7 @@ const MapView: React.FC<MapViewProps> = ({
           title="You are here"
         />
 
-        {/* Group markers */}
+        {/* Community markers */}
         {markers.map((marker) => (
           <Marker
             key={marker.id}
@@ -125,10 +126,13 @@ const MapView: React.FC<MapViewProps> = ({
                 onMarkerClick(marker.id);
               }
             }}
-            icon={{
+            icon={marker.iconUrl ? {
+              url: marker.iconUrl,
+              scaledSize: new google.maps.Size(40, 40),
+            } : {
               url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
                 <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="20" cy="20" r="18" fill="#ec4899" stroke="white" stroke-width="3"/>
+                  <circle cx="20" cy="20" r="18" fill="#dc2626" stroke="white" stroke-width="3"/>
                   <text x="20" y="27" font-size="20" text-anchor="middle" fill="white">👥</text>
                 </svg>
               `),

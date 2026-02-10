@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -12,56 +12,58 @@
   body {
     @apply bg-neutral-50 text-neutral-800 font-sans antialiased;
     margin: 0;
+    letter-spacing: -0.01em;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply text-brand-navy font-semibold;
+    @apply text-brand-black font-bold tracking-tight;
   }
 }
 
 @layer components {
-  /* Modern Button Styles */
+  /* Terminal-style Button Styles */
   .btn-primary {
-    @apply bg-brand-teal text-white px-6 py-3 rounded-xl font-medium
-           hover:bg-brand-teal/90 active:scale-[0.98]
-           transition-all duration-200 shadow-soft
+    @apply bg-brand-red text-white px-6 py-3 rounded-md font-medium uppercase tracking-wide text-sm
+           hover:bg-brand-red-dark active:scale-[0.98]
+           transition-all duration-150 border border-brand-red
            disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-secondary {
-    @apply bg-white text-brand-navy px-6 py-3 rounded-xl font-medium border-2 border-neutral-200
-           hover:border-brand-teal hover:text-brand-teal active:scale-[0.98]
-           transition-all duration-200
+    @apply bg-white text-brand-black px-6 py-3 rounded-md font-medium uppercase tracking-wide text-sm
+           border-2 border-neutral-800
+           hover:border-brand-red hover:text-brand-red active:scale-[0.98]
+           transition-all duration-150
            disabled:opacity-50 disabled:cursor-not-allowed
            flex items-center justify-center gap-3;
   }
 
   .btn-coral {
-    @apply bg-brand-coral text-white px-6 py-3 rounded-xl font-medium
-           hover:bg-brand-coral/90 active:scale-[0.98]
-           transition-all duration-200 shadow-soft
+    @apply bg-brand-red text-white px-6 py-3 rounded-md font-medium uppercase tracking-wide text-sm
+           hover:bg-brand-red-dark active:scale-[0.98]
+           transition-all duration-150 border border-brand-red
            disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
-  /* Modern Input Styles */
+  /* Terminal-style Input Styles */
   .input-modern {
-    @apply w-full px-4 py-3 rounded-xl border-2 border-neutral-200
-           focus:border-brand-teal focus:ring-4 focus:ring-brand-teal/10 focus:outline-none
-           transition-all duration-200 bg-white;
+    @apply w-full px-4 py-3 rounded-md border-2 border-neutral-300
+           focus:border-brand-red focus:ring-2 focus:ring-brand-red/20 focus:outline-none
+           transition-all duration-150 bg-white;
   }
 
-  /* Card Styles */
+  /* Card Styles — sharp edges */
   .card-modern {
-    @apply bg-white rounded-3xl shadow-soft p-8 border border-neutral-100;
+    @apply bg-white rounded-lg shadow-soft p-8 border border-neutral-200;
   }
 
-  /* Gradient Background */
+  /* Flat Background */
   .bg-gradient-community {
-    background: linear-gradient(135deg, #E0F2FE 0%, #FCE7F3 50%, #FEF3C7 100%);
+    @apply bg-neutral-50;
   }
 
-  /* Modern Link Styles */
+  /* Link Styles */
   .link-modern {
-    @apply text-brand-teal hover:text-brand-teal/80 font-medium transition-colors duration-200;
+    @apply text-brand-red hover:text-brand-red-dark font-medium transition-colors duration-150;
   }
 }

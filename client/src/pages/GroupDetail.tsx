@@ -199,7 +199,7 @@ const GroupDetail: React.FC = () => {
               {!showCreateSubGroup && (
                 <button
                   onClick={() => setShowCreateSubGroup(true)}
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-lg hover:from-purple-700 hover:to-pink-700 transition text-sm font-medium"
+                  className="bg-brand-red text-white px-4 py-2 rounded-md hover:bg-brand-red-dark transition text-sm font-medium"
                 >
                   + Create Class
                 </button>

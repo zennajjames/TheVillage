@@ -51,11 +51,11 @@ const Header: React.FC = () => {
               className="flex items-center gap-2 hover:opacity-80 transition"
             >
               <img
-                src="/VillageLogoGreyCircle.png"
+                src="/villageLogo.png"
                 alt="The Village Logo"
                 className="w-8 h-8 sm:w-10 sm:h-10"
               />
-              <span className="text-lg sm:text-xl md:text-2xl font-bold text-brand-navy hidden sm:block">
+              <span className="text-lg sm:text-xl md:text-2xl font-bold text-brand-black hidden sm:block">
                 The Village
               </span>
             </button>
@@ -66,7 +66,7 @@ const Header: React.FC = () => {
                 onClick={() => navigate('/dashboard')}
                 className={`px-3 lg:px-4 py-2 rounded-xl text-sm lg:text-base font-medium transition ${
                   isActive('/dashboard')
-                    ? 'bg-brand-teal/10 text-brand-teal'
+                    ? 'bg-brand-red/10 text-brand-red'
                     : 'text-neutral-700 hover:bg-neutral-100'
                 }`}
               >
@@ -76,7 +76,7 @@ const Header: React.FC = () => {
                 onClick={() => navigate('/about')}
                 className={`px-3 lg:px-4 py-2 rounded-xl text-sm lg:text-base font-medium transition ${
                   isActive('/about')
-                    ? 'bg-brand-teal/10 text-brand-teal'
+                    ? 'bg-brand-red/10 text-brand-red'
                     : 'text-neutral-700 hover:bg-neutral-100'
                 }`}
               >
@@ -86,7 +86,7 @@ const Header: React.FC = () => {
                 onClick={() => navigate('/posts')}
                 className={`px-3 lg:px-4 py-2 rounded-xl text-sm lg:text-base font-medium transition ${
                   isActive('/posts')
-                    ? 'bg-brand-teal/10 text-brand-teal'
+                    ? 'bg-brand-red/10 text-brand-red'
                     : 'text-neutral-700 hover:bg-neutral-100'
                 }`}
               >
@@ -96,7 +96,7 @@ const Header: React.FC = () => {
                 onClick={() => navigate('/communities')}
                 className={`px-3 lg:px-4 py-2 rounded-xl text-sm lg:text-base font-medium transition ${
                   isActive('/communities')
-                    ? 'bg-brand-teal/10 text-brand-teal'
+                    ? 'bg-brand-red/10 text-brand-red'
                     : 'text-neutral-700 hover:bg-neutral-100'
                 }`}
               >
@@ -106,7 +106,7 @@ const Header: React.FC = () => {
                 onClick={() => navigate('/search')}
                 className={`px-3 lg:px-4 py-2 rounded-xl text-sm lg:text-base font-medium transition flex items-center gap-2 ${
                   isActive('/search')
-                    ? 'bg-brand-teal/10 text-brand-teal'
+                    ? 'bg-brand-red/10 text-brand-red'
                     : 'text-neutral-700 hover:bg-neutral-100'
                 }`}
               >
@@ -120,7 +120,7 @@ const Header: React.FC = () => {
                   onClick={() => navigate('/admin')}
                   className={`px-3 lg:px-4 py-2 rounded-xl text-sm lg:text-base font-medium transition ${
                     isActive('/admin')
-                      ? 'bg-brand-teal/10 text-brand-teal'
+                      ? 'bg-brand-red/10 text-brand-red'
                       : 'text-neutral-700 hover:bg-neutral-100'
                   }`}
                 >
@@ -138,7 +138,7 @@ const Header: React.FC = () => {
             {/* Messages Icon */}
             <button
               onClick={() => navigate('/messages')}
-              className="relative p-2 rounded-xl hover:bg-brand-teal/10 transition group"
+              className="relative p-2 rounded-xl hover:bg-brand-red/10 transition group"
               title="Messages"
             >
               <svg
@@ -147,7 +147,7 @@ const Header: React.FC = () => {
                 viewBox="0 0 24 24"
                 strokeWidth={2}
                 stroke="currentColor"
-                className={`w-5 h-5 lg:w-6 lg:h-6 ${isActive('/messages') ? 'text-brand-teal' : 'text-neutral-700 group-hover:text-brand-teal'}`}
+                className={`w-5 h-5 lg:w-6 lg:h-6 ${isActive('/messages') ? 'text-brand-red' : 'text-neutral-700 group-hover:text-brand-red'}`}
               >
                 <path
                   strokeLinecap="round"
@@ -156,7 +156,7 @@ const Header: React.FC = () => {
                 />
               </svg>
               {unreadMessages > 0 && (
-                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-brand-coral to-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg">
+                <span className="absolute -top-1 -right-1 bg-brand-red text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                   {unreadMessages > 9 ? '9+' : unreadMessages}
                 </span>
               )}
@@ -175,10 +175,10 @@ const Header: React.FC = () => {
                   <img
                     src={user.profilePicture}
                     alt="Profile"
-                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-brand-teal/30"
+                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-brand-red/30"
                   />
                 ) : (
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-brand-teal/20 to-brand-coral/20 flex items-center justify-center text-xs sm:text-sm font-bold text-brand-navy">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-brand-red/10 flex items-center justify-center text-xs sm:text-sm font-bold text-brand-black">
                     {user?.firstName?.[0]}{user?.lastName?.[0]}
                   </div>
                 )}
@@ -216,7 +216,7 @@ const Header: React.FC = () => {
                         navigate('/profile');
                         setShowUserMenu(false);
                       }}
-                      className="w-full text-left px-4 py-2.5 text-sm text-neutral-700 hover:bg-brand-teal/10 transition flex items-center gap-3"
+                      className="w-full text-left px-4 py-2.5 text-sm text-neutral-700 hover:bg-brand-red/10 transition flex items-center gap-3"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
@@ -228,7 +228,7 @@ const Header: React.FC = () => {
                         navigate('/notifications');
                         setShowUserMenu(false);
                       }}
-                      className="w-full text-left px-4 py-2.5 text-sm text-neutral-700 hover:bg-brand-teal/10 transition flex items-center gap-3"
+                      className="w-full text-left px-4 py-2.5 text-sm text-neutral-700 hover:bg-brand-red/10 transition flex items-center gap-3"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />

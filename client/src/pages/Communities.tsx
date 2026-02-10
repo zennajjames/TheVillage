@@ -51,7 +51,7 @@ const Communities: React.FC = () => {
   const displayedCommunities = activeTab === 'all' ? communities : myCommunities;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+    <div className="min-h-screen bg-neutral-50">
       <Header />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -59,7 +59,7 @@ const Communities: React.FC = () => {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+              <h1 className="text-4xl font-bold text-brand-red mb-2">
                 My Communities
               </h1>
               <p className="text-gray-600">
@@ -74,7 +74,7 @@ const Communities: React.FC = () => {
               onClick={() => setActiveTab('my')}
               className={`px-6 py-2.5 rounded-xl font-semibold transition-all ${
                 activeTab === 'my'
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                  ? 'bg-brand-red text-white'
                   : 'bg-white text-gray-700 border border-gray-200 hover:border-purple-300'
               }`}
             >
@@ -84,7 +84,7 @@ const Communities: React.FC = () => {
               onClick={() => setActiveTab('all')}
               className={`px-6 py-2.5 rounded-xl font-semibold transition-all ${
                 activeTab === 'all'
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                  ? 'bg-brand-red text-white'
                   : 'bg-white text-gray-700 border border-gray-200 hover:border-purple-300'
               }`}
             >
@@ -122,7 +122,7 @@ const Communities: React.FC = () => {
             {activeTab === 'my' && (
               <button
                 onClick={() => navigate('/find-your-community')}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition"
+                className="bg-brand-red text-white px-6 py-3 rounded-md font-semibold hover:bg-brand-red-dark transition"
               >
                 Find Your Community
               </button>
@@ -137,7 +137,7 @@ const Communities: React.FC = () => {
                 onClick={() => navigate(`/communities/${community.id}`)}
               >
                 {community.coverImage && (
-                  <div className="h-40 bg-gradient-to-br from-purple-400 to-pink-400">
+                  <div className="h-40 bg-brand-red">
                     <img
                       src={community.coverImage}
                       alt={community.name}
@@ -146,7 +146,7 @@ const Communities: React.FC = () => {
                   </div>
                 )}
                 {!community.coverImage && (
-                  <div className="h-40 bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
+                  <div className="h-40 bg-brand-red flex items-center justify-center">
                     <span className="text-6xl">🏫</span>
                   </div>
                 )}
@@ -179,7 +179,7 @@ const Communities: React.FC = () => {
                         e.stopPropagation();
                         handleJoinCommunity(community.id);
                       }}
-                      className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2 px-4 rounded-lg font-medium hover:from-purple-700 hover:to-pink-700 transition"
+                      className="w-full bg-brand-red text-white py-2 px-4 rounded-md font-medium hover:bg-brand-red-dark transition"
                     >
                       Join Community
                     </button>
@@ -201,13 +201,13 @@ const Communities: React.FC = () => {
           <div className="mt-8 bg-white rounded-3xl border border-gray-200 p-6">
             <div className="grid grid-cols-2 gap-4 text-center">
               <div>
-                <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                <div className="text-3xl font-bold text-brand-red">
                   {communities.length}
                 </div>
                 <div className="text-sm text-gray-600 font-medium">Total Communities</div>
               </div>
               <div>
-                <div className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
+                <div className="text-3xl font-bold text-brand-black">
                   {myCommunities.length}
                 </div>
                 <div className="text-sm text-gray-600 font-medium">Your Communities</div>

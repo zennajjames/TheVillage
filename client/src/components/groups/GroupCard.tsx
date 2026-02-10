@@ -46,7 +46,7 @@ const GroupCard: React.FC<GroupCardProps> = ({ group, onMembershipChange }) => {
         <div className="flex justify-between items-start mb-3">
           <div className="flex-1">
             <h3 className="text-lg font-bold text-gray-900 mb-1">{group.name}</h3>
-            <p className="text-sm text-purple-600 font-medium">{group.category}</p>
+            <p className="text-sm text-red-600 font-medium">{group.category}</p>
           </div>
           {group.isPrivate && (
             <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">
@@ -70,7 +70,7 @@ const GroupCard: React.FC<GroupCardProps> = ({ group, onMembershipChange }) => {
               className="w-6 h-6 rounded-full object-cover"
             />
           ) : (
-            <div className="w-6 h-6 rounded-full bg-purple-200 flex items-center justify-center text-xs font-bold text-purple-600">
+            <div className="w-6 h-6 rounded-full bg-red-200 flex items-center justify-center text-xs font-bold text-red-600">
               {group.createdBy.firstName[0]}{group.createdBy.lastName[0]}
             </div>
           )}
@@ -88,7 +88,7 @@ const GroupCard: React.FC<GroupCardProps> = ({ group, onMembershipChange }) => {
           className={`w-full py-2 px-4 rounded-lg font-medium transition ${
             isMember
               ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700'
+              : 'bg-brand-red text-white hover:bg-brand-red-dark'
           } disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           {isLoading ? 'Loading...' : isMember ? 'Leave Group' : 'Join Group'}

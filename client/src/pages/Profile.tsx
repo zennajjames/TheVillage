@@ -1,13 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import Header from '../components/layout/Header';
 import AddressAutocomplete from '../components/forms/AddressAutocomplete';
 
+const MAX_IMAGE_SIZE = 512;
+
+function resizeImage(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.width;
+        let h = img.height;
+        if (w > h) {
+          if (w > MAX_IMAGE_SIZE) { h = (h * MAX_IMAGE_SIZE) / w; w = MAX_IMAGE_SIZE; }
+        } else {
+          if (h > MAX_IMAGE_SIZE) { w = (w * MAX_IMAGE_SIZE) / h; h = MAX_IMAGE_SIZE; }
+        }
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d')!;
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.8));
+      };
+      img.onerror = reject;
+      img.src = e.target?.result as string;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 const Profile: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     firstName: user?.firstName || '',
@@ -21,6 +52,29 @@ const Profile: React.FC = () => {
   });
   const [message, setMessage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+
+  const handlePhotoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setMessage('Please select an image file');
+      return;
+    }
+    try {
+      setIsUploadingPhoto(true);
+      const base64 = await resizeImage(file);
+      await api.patch('/auth/profile', { profilePicture: base64 });
+      setMessage('Profile photo updated!');
+      setTimeout(() => setMessage(''), 3000);
+      window.location.reload();
+    } catch {
+      setMessage('Failed to upload photo');
+    } finally {
+      setIsUploadingPhoto(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,25 +95,46 @@ const Profile: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+    <div className="min-h-screen bg-neutral-50">
       <Header />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header Card */}
-        <div className="bg-gradient-to-br from-purple-600 via-pink-600 to-purple-600 rounded-3xl p-8 text-white relative overflow-hidden mb-8 shadow-xl">
+        <div className="bg-neutral-900 rounded-3xl p-8 text-white relative overflow-hidden mb-8 shadow-xl">
           <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-24 -mt-24"></div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handlePhotoSelect}
+            className="hidden"
+          />
           <div className="relative z-10 flex items-center gap-6">
-            {user?.profilePicture ? (
-              <img
-                src={user.profilePicture}
-                alt={user.firstName}
-                className="w-24 h-24 rounded-full object-cover border-4 border-white/20 shadow-lg"
-              />
-            ) : (
-              <div className="w-24 h-24 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-4xl font-bold border-4 border-white/20">
-                {user?.firstName[0]}{user?.lastName[0]}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploadingPhoto}
+              className="relative group cursor-pointer"
+            >
+              {user?.profilePicture ? (
+                <img
+                  src={user.profilePicture}
+                  alt={user.firstName}
+                  className="w-24 h-24 rounded-full object-cover border-4 border-white/20 shadow-lg"
+                />
+              ) : (
+                <div className="w-24 h-24 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-4xl font-bold border-4 border-white/20">
+                  {user?.firstName[0]}{user?.lastName[0]}
+                </div>
+              )}
+              <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                {isUploadingPhoto ? (
+                  <div className="w-8 h-8 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <span className="text-white text-2xl">📷</span>
+                )}
               </div>
-            )}
+            </button>
             <div>
               <h1 className="text-3xl font-bold mb-1">
                 {user?.firstName} {user?.lastName}
@@ -90,7 +165,7 @@ const Profile: React.FC = () => {
                 {!isEditing && (
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="text-purple-600 hover:text-purple-700 font-semibold text-sm"
+                    className="text-brand-red hover:text-brand-red-dark font-semibold text-sm"
                   >
                     Edit Profile
                   </button>
@@ -108,7 +183,7 @@ const Profile: React.FC = () => {
                         type="text"
                         value={formData.firstName}
                         onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
                     </div>
                     <div>
@@ -119,7 +194,7 @@ const Profile: React.FC = () => {
                         type="text"
                         value={formData.lastName}
                         onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
                     </div>
                   </div>
@@ -132,7 +207,7 @@ const Profile: React.FC = () => {
                       type="text"
                       value={formData.location}
                       onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       placeholder="City, State"
                     />
                   </div>
@@ -150,7 +225,7 @@ const Profile: React.FC = () => {
                           type="text"
                           value={formData.street}
                           onChange={(e) => setFormData({ ...formData, street: e.target.value })}
-                          className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                           placeholder="123 Main St"
                         />
                       </div>
@@ -164,7 +239,7 @@ const Profile: React.FC = () => {
                             type="text"
                             value={formData.city}
                             onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                             placeholder="Minneapolis"
                           />
                         </div>
@@ -177,7 +252,7 @@ const Profile: React.FC = () => {
                             type="text"
                             value={formData.state}
                             onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                             placeholder="MN"
                             maxLength={2}
                           />
@@ -192,7 +267,7 @@ const Profile: React.FC = () => {
                           type="text"
                           value={formData.zipCode}
                           onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
-                          className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                           placeholder="55401"
                           maxLength={5}
                         />
@@ -208,7 +283,7 @@ const Profile: React.FC = () => {
                       value={formData.bio}
                       onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                       rows={4}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       placeholder="Tell us about yourself..."
                     />
                   </div>
@@ -217,7 +292,7 @@ const Profile: React.FC = () => {
                     <button
                       type="submit"
                       disabled={isSaving}
-                      className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2.5 rounded-xl hover:shadow-lg transition-all font-semibold disabled:opacity-50"
+                      className="bg-brand-red text-white px-6 py-2.5 rounded-xl hover:shadow-lg transition-all font-semibold disabled:opacity-50"
                     >
                       {isSaving ? 'Saving...' : 'Save Changes'}
                     </button>
@@ -311,7 +386,7 @@ const Profile: React.FC = () => {
             </div>
 
             {/* Member Badge */}
-            <div className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl p-6 border border-purple-200">
+            <div className="bg-brand-red/10 rounded-3xl p-6 border border-red-200">
               <div className="text-3xl mb-2">🎉</div>
               <h3 className="font-bold text-gray-900 mb-1">Village Member</h3>
               <p className="text-gray-700">

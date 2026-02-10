@@ -6,15 +6,15 @@ const About: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+    <div className="min-h-screen bg-neutral-50">
       <Header />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Hero */}
         <div className="text-center mb-16">
-          <div className="text-6xl mb-6">🏫</div>
+          <div className="text-6xl mb-6">🏘️</div>
           <h1 className="text-5xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <span className="text-brand-red">
               {t('about.title')}
             </span>
           </h1>
@@ -35,7 +35,7 @@ const About: React.FC = () => {
         </div>
 
         {/* What is Mutual Aid */}
-        <div className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl p-8 md:p-12 mb-8 border border-purple-200">
+        <div className="bg-brand-red/10 rounded-3xl p-8 md:p-12 mb-8 border border-red-200">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">{t('about.whyMutualAid')}</h2>
           <div className="space-y-4 text-lg text-gray-700 leading-relaxed">
             <p>
@@ -83,10 +83,10 @@ const About: React.FC = () => {
           <div className="space-y-6">
             <div>
               <h3 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
-                <span>🏫</span> {t('about.schoolCentered')}
+                <span>🏘️</span> {t('about.communityCentered')}
               </h3>
               <p className="text-gray-700 leading-relaxed">
-                {t('about.schoolCenteredDesc')}
+                {t('about.communityCenteredDesc')}
               </p>
             </div>
             <div>
@@ -107,10 +107,10 @@ const About: React.FC = () => {
             </div>
             <div>
               <h3 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
-                <span>💜</span> {t('about.parentLed')}
+                <span>❤️</span> {t('about.communityLed')}
               </h3>
               <p className="text-gray-700 leading-relaxed">
-                {t('about.parentLedDesc')}
+                {t('about.communityLedDesc')}
               </p>
             </div>
             <div>

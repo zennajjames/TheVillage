@@ -74,7 +74,7 @@ const FindYourCommunity: React.FC<FindYourCommunityProps> = ({ onClose }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4">
       <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -98,13 +98,13 @@ const FindYourCommunity: React.FC<FindYourCommunityProps> = ({ onClose }) => {
                 value={zipCode}
                 onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
                 placeholder="55401"
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                 maxLength={5}
               />
               <button
                 type="submit"
                 disabled={loading || zipCode.length !== 5}
-                className="px-6 py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                className="px-6 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
                 {loading ? 'Searching...' : 'Search'}
               </button>
@@ -138,7 +138,7 @@ const FindYourCommunity: React.FC<FindYourCommunityProps> = ({ onClose }) => {
               {communities.map((community) => (
                 <div
                   key={community.id}
-                  className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:shadow-md transition"
+                  className="p-4 border border-gray-200 rounded-lg hover:border-red-300 hover:shadow-md transition"
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
@@ -162,7 +162,7 @@ const FindYourCommunity: React.FC<FindYourCommunityProps> = ({ onClose }) => {
                     </div>
                     <button
                       onClick={() => handleJoinCommunity(community.id)}
-                      className="ml-4 px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition whitespace-nowrap"
+                      className="ml-4 px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition whitespace-nowrap"
                     >
                       {community.isMember ? 'View' : 'Join Community'}
                     </button>
@@ -192,7 +192,7 @@ const FindYourCommunity: React.FC<FindYourCommunityProps> = ({ onClose }) => {
           </p>
           <button
             onClick={() => navigate('/browse-communities')}
-            className="text-purple-600 hover:text-purple-700 font-medium text-sm"
+            className="text-red-600 hover:text-red-700 font-medium text-sm"
           >
             Browse all communities →
           </button>

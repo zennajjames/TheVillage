@@ -68,7 +68,7 @@ const SubGroupCard: React.FC<SubGroupCardProps> = ({ subGroup, onMembershipChang
         className={`w-full py-2 px-4 rounded-lg font-medium transition text-sm ${
           isMember
             ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700'
+            : 'bg-brand-red text-white hover:bg-brand-red-dark'
         } disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         {isLoading ? 'Loading...' : isMember ? 'Leave Class' : 'Join Class'}

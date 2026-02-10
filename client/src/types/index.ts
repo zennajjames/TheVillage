@@ -284,3 +284,43 @@ export interface ConversationDetail {
     };
   }>;
 }
+
+// Help Request types
+export enum RequestVisibility {
+  PUBLIC = 'PUBLIC',
+  SEMI_ANONYMOUS = 'SEMI_ANONYMOUS',
+  ADMIN_ONLY = 'ADMIN_ONLY',
+}
+
+export interface HelpRequest {
+  id: string;
+  communityId: string;
+  userId: string | null;
+  title: string;
+  description: string;
+  category: string;
+  visibility: RequestVisibility;
+  status: PostStatus;
+  proxyPostId?: string | null;
+  isAnonymousToPublic?: boolean;
+  createdAt: string;
+  updatedAt: string;
+  user: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    profilePicture?: string;
+  } | null;
+  community: {
+    id: string;
+    name: string;
+  };
+}
+
+export interface CreateHelpRequestData {
+  communityId: string;
+  title: string;
+  description: string;
+  category: string;
+  visibility: RequestVisibility;
+}

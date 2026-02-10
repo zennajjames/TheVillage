@@ -18,14 +18,14 @@ const Landing: React.FC = () => {
                 alt="The Village Logo"
                 className="w-10 h-10"
               />
-              <span className="text-2xl font-bold text-brand-navy">
+              <span className="text-2xl font-bold text-brand-black">
                 The Village
               </span>
             </div>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => navigate('/login')}
-                className="text-neutral-700 hover:text-brand-teal font-medium transition px-4 py-2 rounded-lg hover:bg-brand-teal/10"
+                className="text-neutral-700 hover:text-brand-red font-medium transition px-4 py-2 rounded-lg hover:bg-brand-red/10"
               >
                 {t('common.login')}
               </button>
@@ -43,16 +43,16 @@ const Landing: React.FC = () => {
       {/* Hero Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">
         <div className="text-center max-w-4xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 bg-brand-teal/10 text-brand-teal px-4 py-2 rounded-full text-sm font-medium mb-6 border border-brand-teal/20">
-            <span className="w-2 h-2 bg-brand-teal rounded-full animate-pulse"></span>
+          <div className="inline-flex items-center gap-2 bg-brand-red/10 text-brand-red px-4 py-2 rounded-full text-sm font-medium mb-6 border border-brand-red/20">
+            <span className="w-2 h-2 bg-brand-red rounded-full animate-pulse"></span>
             Community Platform
           </div>
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-            <span className="text-brand-teal">
+            <span className="text-brand-red">
               Find Your Community,
             </span>
             <br />
-            <span className="text-brand-navy">Connected</span>
+            <span className="text-brand-black">Connected</span>
           </h1>
           <p className="text-xl text-neutral-600 mb-8 max-w-2xl mx-auto leading-relaxed">
             A hyperlocal platform for neighborhoods and schools to organize, communicate, and support each other—built on mutual aid and genuine community connection.
@@ -78,7 +78,7 @@ const Landing: React.FC = () => {
         {/* Bento Grid - Main Features */}
         <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-16">
           {/* Large Feature - School Groups */}
-          <div className="md:col-span-4 md:row-span-2 bg-gradient-to-br from-brand-teal to-brand-blue rounded-3xl p-8 md:p-10 text-white relative overflow-hidden group hover:scale-[1.01] transition-transform">
+          <div className="md:col-span-4 md:row-span-2 bg-brand-red rounded-3xl p-8 md:p-10 text-white relative overflow-hidden group hover:scale-[1.01] transition-transform">
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 group-hover:scale-110 transition-transform"></div>
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full -ml-24 -mb-24 group-hover:scale-110 transition-transform"></div>
             <div className="relative z-10">
@@ -99,31 +99,31 @@ const Landing: React.FC = () => {
           </div>
 
           {/* Messages */}
-          <div className="md:col-span-2 bg-white rounded-3xl p-6 border border-neutral-200 hover:border-brand-teal hover:shadow-xl transition-all group">
+          <div className="md:col-span-2 bg-white rounded-3xl p-6 border border-neutral-200 hover:border-brand-red hover:shadow-xl transition-all group">
             <div className="text-4xl mb-3">💬</div>
-            <h3 className="text-xl font-bold text-brand-navy mb-2">Direct Messages</h3>
+            <h3 className="text-xl font-bold text-brand-black mb-2">Direct Messages</h3>
             <p className="text-neutral-600 text-sm leading-relaxed mb-4">
               Chat with other parents, coordinate carpools, and organize playdates.
             </p>
-            <div className="flex items-center gap-2 text-brand-teal text-sm font-medium group-hover:gap-3 transition-all">
+            <div className="flex items-center gap-2 text-brand-red text-sm font-medium group-hover:gap-3 transition-all">
               Connect <span>→</span>
             </div>
           </div>
 
           {/* Classroom Groups */}
-          <div className="md:col-span-2 bg-white rounded-3xl p-6 border border-neutral-200 hover:border-brand-teal hover:shadow-xl transition-all group">
+          <div className="md:col-span-2 bg-white rounded-3xl p-6 border border-neutral-200 hover:border-brand-red hover:shadow-xl transition-all group">
             <div className="text-4xl mb-3">👨‍🏫</div>
-            <h3 className="text-xl font-bold text-brand-navy mb-2">Classroom Groups</h3>
+            <h3 className="text-xl font-bold text-brand-black mb-2">Classroom Groups</h3>
             <p className="text-neutral-600 text-sm leading-relaxed mb-4">
               Join your child's class group to stay in the loop and coordinate support.
             </p>
-            <div className="flex items-center gap-2 text-brand-teal text-sm font-medium group-hover:gap-3 transition-all">
+            <div className="flex items-center gap-2 text-brand-red text-sm font-medium group-hover:gap-3 transition-all">
               Join class <span>→</span>
             </div>
           </div>
 
           {/* Requests & Offers */}
-          <div className="md:col-span-3 bg-gradient-to-br from-green-400 to-emerald-500 rounded-3xl p-8 text-white relative overflow-hidden hover:scale-[1.01] transition-transform">
+          <div className="md:col-span-3 bg-neutral-900 rounded-3xl p-8 text-white relative overflow-hidden hover:scale-[1.01] transition-transform">
             <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20"></div>
             <div className="relative z-10">
               <div className="text-5xl mb-3">🤝</div>
@@ -145,7 +145,7 @@ const Landing: React.FC = () => {
           </div>
 
           {/* Privacy */}
-          <div className="bg-white rounded-3xl p-6 border border-neutral-200 hover:border-brand-teal hover:shadow-xl transition-all">
+          <div className="bg-white rounded-3xl p-6 border border-neutral-200 hover:border-brand-red hover:shadow-xl transition-all">
             <div className="text-4xl mb-3">🔒</div>
             <h3 className="text-lg font-bold text-neutral-900 mb-2">Safe & Private</h3>
             <p className="text-neutral-600 text-sm leading-relaxed">
@@ -154,7 +154,7 @@ const Landing: React.FC = () => {
           </div>
 
           {/* Hyperlocal */}
-          <div className="bg-white rounded-3xl p-6 border border-neutral-200 hover:border-brand-teal hover:shadow-xl transition-all">
+          <div className="bg-white rounded-3xl p-6 border border-neutral-200 hover:border-brand-red hover:shadow-xl transition-all">
             <div className="text-4xl mb-3">📍</div>
             <h3 className="text-lg font-bold text-neutral-900 mb-2">Hyperlocal</h3>
             <p className="text-neutral-600 text-sm leading-relaxed">
@@ -163,8 +163,8 @@ const Landing: React.FC = () => {
           </div>
 
           {/* Free Always */}
-          <div className="bg-white rounded-3xl p-6 border border-neutral-200 hover:border-brand-teal hover:shadow-xl transition-all">
-            <div className="text-4xl mb-3">💜</div>
+          <div className="bg-white rounded-3xl p-6 border border-neutral-200 hover:border-brand-red hover:shadow-xl transition-all">
+            <div className="text-4xl mb-3">❤️</div>
             <h3 className="text-lg font-bold text-neutral-900 mb-2">Always Free</h3>
             <p className="text-neutral-600 text-sm leading-relaxed">
               No ads, no fees. Built for community, not profit.
@@ -185,7 +185,7 @@ const Landing: React.FC = () => {
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="relative group">
-              <div className="bg-gradient-to-br from-brand-teal to-brand-coral w-20 h-20 rounded-2xl flex items-center justify-center text-white text-3xl font-bold mb-4 shadow-xl group-hover:scale-110 transition-transform">
+              <div className="bg-brand-red w-20 h-20 rounded-lg flex items-center justify-center text-white text-3xl font-bold mb-4 group-hover:scale-110 transition-transform">
                 1
               </div>
               <h3 className="text-2xl font-bold text-neutral-900 mb-3">Find Your Community</h3>
@@ -195,7 +195,7 @@ const Landing: React.FC = () => {
             </div>
 
             <div className="relative group">
-              <div className="bg-gradient-to-br from-green-500 to-emerald-500 w-20 h-20 rounded-2xl flex items-center justify-center text-white text-3xl font-bold mb-4 shadow-xl group-hover:scale-110 transition-transform">
+              <div className="bg-neutral-900 w-20 h-20 rounded-lg flex items-center justify-center text-white text-3xl font-bold mb-4 group-hover:scale-110 transition-transform">
                 2
               </div>
               <h3 className="text-2xl font-bold text-neutral-900 mb-3">Join Classroom Groups</h3>
@@ -205,7 +205,7 @@ const Landing: React.FC = () => {
             </div>
 
             <div className="relative group">
-              <div className="bg-gradient-to-br from-blue-500 to-cyan-500 w-20 h-20 rounded-2xl flex items-center justify-center text-white text-3xl font-bold mb-4 shadow-xl group-hover:scale-110 transition-transform">
+              <div className="bg-brand-red w-20 h-20 rounded-lg flex items-center justify-center text-white text-3xl font-bold mb-4 group-hover:scale-110 transition-transform">
                 3
               </div>
               <h3 className="text-2xl font-bold text-neutral-900 mb-3">Support Each Other</h3>
@@ -223,7 +223,7 @@ const Landing: React.FC = () => {
           </h2>
 
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="p-6 bg-gradient-to-br from-brand-teal/10 to-brand-coral/10 rounded-2xl border border-brand-teal/20">
+            <div className="p-6 bg-brand-red/10 rounded-2xl border border-brand-red/20">
               <div className="text-3xl mb-3">🎒</div>
               <h3 className="font-bold text-lg text-neutral-900 mb-2">Room Parents</h3>
               <p className="text-neutral-600 text-sm">
@@ -231,7 +231,7 @@ const Landing: React.FC = () => {
               </p>
             </div>
 
-            <div className="p-6 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl border border-blue-100">
+            <div className="p-6 bg-neutral-100 rounded-2xl border border-gray-100">
               <div className="text-3xl mb-3">🚗</div>
               <h3 className="font-bold text-lg text-neutral-900 mb-2">Carpool Coordination</h3>
               <p className="text-neutral-600 text-sm">
@@ -239,7 +239,7 @@ const Landing: React.FC = () => {
               </p>
             </div>
 
-            <div className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border border-green-100">
+            <div className="p-6 bg-neutral-100 rounded-2xl border border-green-100">
               <div className="text-3xl mb-3">📚</div>
               <h3 className="font-bold text-lg text-neutral-900 mb-2">Classroom Supplies</h3>
               <p className="text-neutral-600 text-sm">
@@ -247,7 +247,7 @@ const Landing: React.FC = () => {
               </p>
             </div>
 
-            <div className="p-6 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl border border-yellow-100">
+            <div className="p-6 bg-neutral-100 rounded-2xl border border-yellow-100">
               <div className="text-3xl mb-3">🎉</div>
               <h3 className="font-bold text-lg text-neutral-900 mb-2">Events & Field Trips</h3>
               <p className="text-neutral-600 text-sm">
@@ -255,7 +255,7 @@ const Landing: React.FC = () => {
               </p>
             </div>
 
-            <div className="p-6 bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl border border-pink-100">
+            <div className="p-6 bg-brand-red/10 rounded-2xl border border-red-100">
               <div className="text-3xl mb-3">👶</div>
               <h3 className="font-bold text-lg text-neutral-900 mb-2">Childcare Swaps</h3>
               <p className="text-neutral-600 text-sm">
@@ -263,7 +263,7 @@ const Landing: React.FC = () => {
               </p>
             </div>
 
-            <div className="p-6 bg-gradient-to-br from-indigo-50 to-brand-blue/10 rounded-2xl border border-indigo-100">
+            <div className="p-6 bg-neutral-100 rounded-2xl border border-gray-100">
               <div className="text-3xl mb-3">🤝</div>
               <h3 className="font-bold text-lg text-neutral-900 mb-2">Family Support</h3>
               <p className="text-neutral-600 text-sm">
@@ -310,19 +310,19 @@ const Landing: React.FC = () => {
         </div>
 
         {/* Final CTA */}
-        <div className="bg-gradient-to-br from-brand-teal via-brand-coral to-brand-blue rounded-3xl p-12 md:p-16 text-center text-white relative overflow-hidden shadow-2xl">
+        <div className="bg-brand-red rounded-3xl p-12 md:p-16 text-center text-white relative overflow-hidden shadow-2xl">
           <div className="absolute top-0 right-0 w-72 h-72 bg-white/10 rounded-full -mr-36 -mt-36"></div>
           <div className="absolute bottom-0 left-0 w-72 h-72 bg-white/10 rounded-full -ml-36 -mb-36"></div>
           <div className="relative z-10">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
               Ready to Find Your Community?
             </h2>
-            <p className="text-xl text-brand-teal/20 mb-8 max-w-2xl mx-auto">
+            <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
               Join your community today. It's free, always.
             </p>
             <button
               onClick={() => navigate('/signup')}
-              className="bg-white text-brand-teal px-10 py-4 rounded-xl hover:scale-105 transition-all font-bold text-lg shadow-2xl hover:shadow-xl"
+              className="bg-white text-brand-red px-10 py-4 rounded-xl hover:scale-105 transition-all font-bold text-lg shadow-2xl hover:shadow-xl"
             >
               Get Started Now
             </button>
@@ -341,7 +341,7 @@ const Landing: React.FC = () => {
                   alt="The Village Logo"
                   className="w-8 h-8"
                 />
-                <span className="font-bold bg-gradient-to-r from-brand-teal to-brand-coral bg-clip-text text-transparent">
+                <span className="font-bold text-brand-red">
                   The Village
                 </span>
               </div>
@@ -352,27 +352,27 @@ const Landing: React.FC = () => {
             <div>
               <h4 className="font-semibold text-neutral-900 mb-3">Platform</h4>
               <ul className="space-y-2 text-sm text-neutral-600">
-                <li><button onClick={() => navigate('/signup')} className="hover:text-brand-teal">Join Now</button></li>
-                <li><button onClick={() => navigate('/login')} className="hover:text-brand-teal">Log In</button></li>
+                <li><button onClick={() => navigate('/signup')} className="hover:text-brand-red">Join Now</button></li>
+                <li><button onClick={() => navigate('/login')} className="hover:text-brand-red">Log In</button></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold text-neutral-900 mb-3">Community</h4>
               <ul className="space-y-2 text-sm text-neutral-600">
-                <li><a href="#" className="hover:text-brand-teal">Guidelines</a></li>
-                <li><a href="#" className="hover:text-brand-teal">Support</a></li>
+                <li><a href="#" className="hover:text-brand-red">Guidelines</a></li>
+                <li><a href="#" className="hover:text-brand-red">Support</a></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold text-neutral-900 mb-3">Legal</h4>
               <ul className="space-y-2 text-sm text-neutral-600">
-                <li><a href="#" className="hover:text-brand-teal">Privacy</a></li>
-                <li><a href="#" className="hover:text-brand-teal">Terms</a></li>
+                <li><a href="#" className="hover:text-brand-red">Privacy</a></li>
+                <li><a href="#" className="hover:text-brand-red">Terms</a></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-neutral-200 pt-8 text-center">
-            <p className="text-neutral-600 text-sm">© 2024 The Village. Built with 💜 for communities everywhere.</p>
+            <p className="text-neutral-600 text-sm">© 2024 The Village. Built with ❤️ for communities everywhere.</p>
           </div>
         </div>
       </footer>

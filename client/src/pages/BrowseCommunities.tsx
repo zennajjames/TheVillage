@@ -36,7 +36,7 @@ const BrowseCommunities: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+    <div className="min-h-screen bg-neutral-50">
       <Header />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -49,7 +49,7 @@ const BrowseCommunities: React.FC = () => {
             <span>←</span>
             <span>Back</span>
           </button>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-4xl font-bold text-brand-red mb-2">
             Browse All Communities
           </h1>
           <p className="text-gray-600">
@@ -90,7 +90,7 @@ const BrowseCommunities: React.FC = () => {
                 className="bg-white rounded-3xl border border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all overflow-hidden"
               >
                 {community.coverImage && (
-                  <div className="h-32 bg-gradient-to-br from-purple-400 to-pink-400">
+                  <div className="h-32 bg-brand-red">
                     <img
                       src={community.coverImage}
                       alt={community.name}
@@ -99,7 +99,7 @@ const BrowseCommunities: React.FC = () => {
                   </div>
                 )}
                 {!community.coverImage && (
-                  <div className="h-32 bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
+                  <div className="h-32 bg-brand-red flex items-center justify-center">
                     <span className="text-5xl">🏫</span>
                   </div>
                 )}
@@ -129,7 +129,7 @@ const BrowseCommunities: React.FC = () => {
                   {!community.isMember ? (
                     <button
                       onClick={() => handleJoinCommunity(community.id)}
-                      className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2 px-4 rounded-lg font-medium hover:from-purple-700 hover:to-pink-700 transition text-sm"
+                      className="w-full bg-brand-red text-white py-2 px-4 rounded-md font-medium hover:bg-brand-red-dark transition text-sm"
                     >
                       Join This Community
                     </button>

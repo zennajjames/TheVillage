@@ -10,9 +10,9 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
   const navigate = useNavigate();
 
   const isRequest = post.type === PostType.REQUEST;
-  const bgColor = isRequest ? 'bg-purple-50' : 'bg-green-50';
-  const borderColor = isRequest ? 'border-purple-200' : 'border-green-200';
-  const textColor = isRequest ? 'text-purple-700' : 'text-green-700';
+  const bgColor = isRequest ? 'bg-red-50' : 'bg-green-50';
+  const borderColor = isRequest ? 'border-red-200' : 'border-green-200';
+  const textColor = isRequest ? 'text-red-700' : 'text-green-700';
 
   return (
     <div
@@ -44,7 +44,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
               className="w-6 h-6 rounded-full object-cover border border-gray-300"
             />
           ) : (
-            <div className="w-6 h-6 rounded-full bg-purple-200 flex items-center justify-center text-xs font-bold text-purple-600">
+            <div className="w-6 h-6 rounded-full bg-red-200 flex items-center justify-center text-xs font-bold text-red-600">
               {post.user.firstName[0]}{post.user.lastName[0]}
             </div>
           )}

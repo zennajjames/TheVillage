@@ -58,7 +58,7 @@ const Privacy: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+      <div className="min-h-screen bg-neutral-50">
         <Header />
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-center h-64">
@@ -70,7 +70,7 @@ const Privacy: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+    <div className="min-h-screen bg-neutral-50">
       <Header />
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -192,7 +192,7 @@ const Privacy: React.FC = () => {
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl hover:shadow-lg transition-all font-semibold disabled:opacity-50"
+              className="w-full bg-brand-red text-white px-6 py-3 rounded-md hover:bg-brand-red-dark transition-all font-semibold disabled:opacity-50"
             >
               {isSaving ? 'Saving...' : 'Save Privacy Settings'}
             </button>

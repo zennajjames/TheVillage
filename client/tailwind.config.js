@@ -6,39 +6,40 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Primary brand colors from logo
+        // Primary brand colors — stark red, black, white
         brand: {
-          navy: '#2D3748',
-          teal: '#4FD1C5',
-          coral: '#FF6B9D',
-          blue: '#4299E1',
-          gold: '#F6AD55',
-          peach: '#FEB2B2',
+          red: '#EF0000',
+          'red-dark': '#CC0000',
+          'red-light': '#1A0000',
+          black: '#000000',
+          white: '#FFFFFF',
+          gray: '#888888',
         },
-        // Neutral palette for modern minimalism
+        // Neutral palette — high contrast terminal aesthetic
         neutral: {
-          50: '#FAFAFA',
-          100: '#F5F5F5',
-          200: '#E5E5E5',
-          300: '#D4D4D4',
-          400: '#A3A3A3',
-          500: '#737373',
-          600: '#525252',
-          700: '#404040',
-          800: '#262626',
-          900: '#171717',
+          50: '#F5F5F5',
+          100: '#E8E8E8',
+          200: '#D0D0D0',
+          300: '#A0A0A0',
+          400: '#787878',
+          500: '#555555',
+          600: '#333333',
+          700: '#222222',
+          800: '#111111',
+          900: '#000000',
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        sans: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       borderRadius: {
-        '2xl': '1rem',
-        '3xl': '1.5rem',
+        '2xl': '0.5rem',
+        '3xl': '0.75rem',
       },
       boxShadow: {
-        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
-        'soft-lg': '0 10px 40px -10px rgba(0, 0, 0, 0.1)',
+        'soft': '0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08)',
+        'soft-lg': '0 4px 12px rgba(0, 0, 0, 0.15)',
       }
     },
   },

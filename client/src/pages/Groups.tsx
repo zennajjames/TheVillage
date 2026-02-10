@@ -54,7 +54,7 @@ const Groups: React.FC = () => {
   const displayedGroups = filterByCategory(activeTab === 'all' ? groups : myGroups);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+    <div className="min-h-screen bg-neutral-50">
       <Header />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -62,7 +62,7 @@ const Groups: React.FC = () => {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+              <h1 className="text-4xl font-bold text-brand-red mb-2">
                 Groups
               </h1>
               <p className="text-gray-600">
@@ -78,7 +78,7 @@ const Groups: React.FC = () => {
                   onClick={() => setActiveTab('all')}
                   className={`px-6 py-2.5 rounded-xl font-semibold transition-all ${
                     activeTab === 'all'
-                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                      ? 'bg-brand-red text-white'
                       : 'bg-white text-gray-700 border border-gray-200 hover:border-purple-300'
                   }`}
                 >
@@ -88,7 +88,7 @@ const Groups: React.FC = () => {
                   onClick={() => setActiveTab('my')}
                   className={`px-6 py-2.5 rounded-xl font-semibold transition-all ${
                     activeTab === 'my'
-                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                      ? 'bg-brand-red text-white'
                       : 'bg-white text-gray-700 border border-gray-200 hover:border-purple-300'
                   }`}
                 >
@@ -108,7 +108,7 @@ const Groups: React.FC = () => {
                       onClick={() => setSelectedCategory(category)}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                         selectedCategory === category
-                          ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md'
+                          ? 'bg-brand-red text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
@@ -165,13 +165,13 @@ const Groups: React.FC = () => {
           <div className="mt-8 bg-white rounded-3xl border border-gray-200 p-6">
             <div className="grid grid-cols-2 gap-4 text-center">
               <div>
-                <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                <div className="text-3xl font-bold text-brand-red">
                   {groups.length}
                 </div>
                 <div className="text-sm text-gray-600 font-medium">Total Groups</div>
               </div>
               <div>
-                <div className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
+                <div className="text-3xl font-bold text-brand-black">
                   {myGroups.length}
                 </div>
                 <div className="text-sm text-gray-600 font-medium">Your Groups</div>

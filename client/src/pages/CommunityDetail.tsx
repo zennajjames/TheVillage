@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { communitiesService } from '../services/communities.service';
 import { groupsService } from '../services/groups.service';
-import { Community, Group } from '../types';
+import { helpRequestsService } from '../services/helpRequests.service';
+import { Community, Group, HelpRequest, CreateHelpRequestData } from '../types';
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/layout/Header';
 import CreateGroupForm from '../components/groups/CreateGroupForm';
+import HelpRequestCard from '../components/posts/HelpRequestCard';
+import CreateHelpRequestForm from '../components/posts/CreateHelpRequestForm';
+import AdminInbox from '../components/community/AdminInbox';
 
 const CommunityDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [community, setCommunity] = useState<Community | null>(null);
@@ -17,6 +22,15 @@ const CommunityDetail: React.FC = () => {
   const [error, setError] = useState('');
   const [showCreateGroupForm, setShowCreateGroupForm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('All');
+
+  // Tabs: groups, help-requests, admin-inbox
+  const initialTab = searchParams.get('tab') || 'groups';
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  // Help requests state
+  const [helpRequests, setHelpRequests] = useState<HelpRequest[]>([]);
+  const [helpLoading, setHelpLoading] = useState(false);
+  const [showHelpForm, setShowHelpForm] = useState(false);
 
   const CATEGORIES = [
     'All',
@@ -36,7 +50,6 @@ const CommunityDetail: React.FC = () => {
       const data = await communitiesService.getCommunityById(id);
       setCommunity(data);
 
-      // Fetch groups for this community
       const communityGroups = await groupsService.getGroups({ communityId: id });
       setGroups(communityGroups);
     } catch (err: any) {
@@ -46,9 +59,28 @@ const CommunityDetail: React.FC = () => {
     }
   };
 
+  const fetchHelpRequests = async () => {
+    if (!id) return;
+    try {
+      setHelpLoading(true);
+      const data = await helpRequestsService.getCommunityRequests(id);
+      setHelpRequests(data);
+    } catch {
+      // silent
+    } finally {
+      setHelpLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchCommunity();
   }, [id]);
+
+  useEffect(() => {
+    if (activeTab === 'help-requests' && id) {
+      fetchHelpRequests();
+    }
+  }, [activeTab, id]);
 
   const handleJoin = async () => {
     if (!id) return;
@@ -74,6 +106,21 @@ const CommunityDetail: React.FC = () => {
     await groupsService.createGroup(data);
     setShowCreateGroupForm(false);
     fetchCommunity();
+  };
+
+  const handleCreateHelpRequest = async (data: CreateHelpRequestData) => {
+    await helpRequestsService.create(data);
+    setShowHelpForm(false);
+    fetchHelpRequests();
+  };
+
+  const handleStatusChange = async (requestId: string, status: string) => {
+    try {
+      await helpRequestsService.updateStatus(requestId, status);
+      fetchHelpRequests();
+    } catch (err: any) {
+      alert(err.response?.data?.error || 'Failed to update status');
+    }
   };
 
   const filterByCategory = (groupsList: Group[]) => {
@@ -109,33 +156,34 @@ const CommunityDetail: React.FC = () => {
 
   const isMember = community.isMember;
   const isAdmin = community.userRole === 'ADMIN';
+  const isMod = community.userRole === 'MODERATOR';
+  const isAdminOrMod = isAdmin || isMod;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+    <div className="min-h-screen bg-neutral-50">
       <Header />
 
       <div className="max-w-6xl mx-auto px-4 py-8">
         <button
           onClick={() => navigate('/communities')}
-          className="text-purple-600 hover:text-purple-700 mb-6 font-medium flex items-center gap-2"
+          className="text-brand-red hover:text-brand-red-dark mb-6 font-medium flex items-center gap-2"
         >
           ← Back to Communities
         </button>
 
         {/* Community Header */}
         <div className="bg-white rounded-3xl shadow-lg overflow-hidden mb-8">
-          {community.coverImage && (
-            <div className="h-48 bg-gradient-to-br from-purple-400 to-pink-400">
+          {community.coverImage ? (
+            <div className="h-48 bg-brand-red">
               <img
                 src={community.coverImage}
                 alt={community.name}
                 className="w-full h-full object-cover"
               />
             </div>
-          )}
-          {!community.coverImage && (
-            <div className="h-48 bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
-              <span className="text-8xl">🏫</span>
+          ) : (
+            <div className="h-48 bg-brand-red flex items-center justify-center">
+              <span className="text-8xl">🏘️</span>
             </div>
           )}
 
@@ -149,6 +197,11 @@ const CommunityDetail: React.FC = () => {
                       🔒 Private
                     </span>
                   )}
+                  {isAdmin && (
+                    <span className="bg-red-100 text-red-700 text-xs px-2.5 py-1 rounded-lg font-semibold">
+                      Admin
+                    </span>
+                  )}
                 </div>
                 {community.location && (
                   <p className="text-gray-600 mb-2">📍 {community.location}</p>
@@ -158,7 +211,7 @@ const CommunityDetail: React.FC = () => {
                 {!isMember && (
                   <button
                     onClick={handleJoin}
-                    className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl hover:shadow-lg transition font-semibold"
+                    className="bg-brand-red text-white px-6 py-3 rounded-md hover:bg-brand-red-dark transition font-semibold"
                   >
                     Join Community
                   </button>
@@ -183,103 +236,211 @@ const CommunityDetail: React.FC = () => {
           </div>
         </div>
 
-        {/* Groups Section */}
+        {/* Member Content */}
         {isMember && (
           <>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Groups</h2>
-              {!showCreateGroupForm && (
+            {/* Tab Navigation */}
+            <div className="flex items-center gap-3 mb-6 flex-wrap">
+              <button
+                onClick={() => setActiveTab('groups')}
+                className={`px-5 py-2.5 rounded-xl font-semibold transition-all ${
+                  activeTab === 'groups'
+                    ? 'bg-brand-red text-white'
+                    : 'bg-white text-gray-700 border border-gray-200 hover:border-red-300'
+                }`}
+              >
+                Groups
+              </button>
+              <button
+                onClick={() => setActiveTab('help-requests')}
+                className={`px-5 py-2.5 rounded-xl font-semibold transition-all ${
+                  activeTab === 'help-requests'
+                    ? 'bg-brand-red text-white'
+                    : 'bg-white text-gray-700 border border-gray-200 hover:border-red-300'
+                }`}
+              >
+                Help Requests
+              </button>
+              {isAdminOrMod && (
                 <button
-                  onClick={() => setShowCreateGroupForm(true)}
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl hover:shadow-lg transition font-semibold"
+                  onClick={() => setActiveTab('admin-inbox')}
+                  className={`px-5 py-2.5 rounded-xl font-semibold transition-all ${
+                    activeTab === 'admin-inbox'
+                      ? 'bg-brand-red text-white'
+                      : 'bg-white text-gray-700 border border-gray-200 hover:border-red-300'
+                  }`}
                 >
-                  + Create Group
+                  🔐 Admin Inbox
                 </button>
               )}
             </div>
 
-            {/* Create Group Form */}
-            {showCreateGroupForm && (
-              <div className="mb-8 bg-white rounded-3xl border border-gray-200 shadow-lg overflow-hidden">
-                <div className="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-4">
-                  <h3 className="text-xl font-bold text-white">Create New Group</h3>
-                </div>
-                <div className="p-6">
-                  <CreateGroupForm
-                    communityId={id!}
-                    onSubmit={handleCreateGroup}
-                    onCancel={() => setShowCreateGroupForm(false)}
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Category Filter */}
-            {!showCreateGroupForm && groups.length > 0 && (
-              <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm mb-6">
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="text-sm font-semibold text-gray-700">Filter by Category:</span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {CATEGORIES.map(category => (
-                    <button
-                      key={category}
-                      onClick={() => setSelectedCategory(category)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                        selectedCategory === category
-                          ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {category}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Groups Grid */}
-            {!showCreateGroupForm && (
+            {/* ===== GROUPS TAB ===== */}
+            {activeTab === 'groups' && (
               <>
-                {displayedGroups.length === 0 ? (
-                  <div className="bg-white rounded-3xl border border-gray-200 p-12 text-center">
-                    <div className="text-6xl mb-4">📚</div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">No groups yet</h3>
-                    <p className="text-gray-600 mb-6">
-                      Be the first to create a group in this community!
-                    </p>
-                  </div>
-                ) : (
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {displayedGroups.map((group) => (
-                      <div
-                        key={group.id}
-                        onClick={() => navigate(`/groups/${group.id}`)}
-                        className="bg-white rounded-3xl border border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all cursor-pointer p-6"
-                      >
-                        <div className="flex justify-between items-start mb-3">
-                          <div className="flex-1">
-                            <h3 className="text-lg font-bold text-gray-900 mb-1">{group.name}</h3>
-                            <p className="text-sm text-purple-600 font-medium">{group.category}</p>
-                          </div>
-                          {group.isPrivate && (
-                            <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">
-                              🔒 Private
-                            </span>
-                          )}
-                        </div>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">Groups</h2>
+                  {!showCreateGroupForm && (
+                    <button
+                      onClick={() => setShowCreateGroupForm(true)}
+                      className="bg-brand-red text-white px-6 py-3 rounded-md hover:bg-brand-red-dark transition font-semibold"
+                    >
+                      + Create Group
+                    </button>
+                  )}
+                </div>
 
-                        <p className="text-gray-700 text-sm mb-3 line-clamp-2">{group.description}</p>
-
-                        <div className="flex items-center gap-4 text-sm text-gray-600">
-                          <span>👥 {group._count?.members || 0} members</span>
-                          <span>💬 {group._count?.posts || 0} posts</span>
-                        </div>
-                      </div>
-                    ))}
+                {showCreateGroupForm && (
+                  <div className="mb-8 bg-white rounded-3xl border border-gray-200 shadow-lg overflow-hidden">
+                    <div className="bg-neutral-900 px-6 py-4">
+                      <h3 className="text-xl font-bold text-white">Create New Group</h3>
+                    </div>
+                    <div className="p-6">
+                      <CreateGroupForm
+                        communityId={id!}
+                        onSubmit={handleCreateGroup}
+                        onCancel={() => setShowCreateGroupForm(false)}
+                      />
+                    </div>
                   </div>
                 )}
+
+                {!showCreateGroupForm && groups.length > 0 && (
+                  <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm mb-6">
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="text-sm font-semibold text-gray-700">Filter by Category:</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {CATEGORIES.map(category => (
+                        <button
+                          key={category}
+                          onClick={() => setSelectedCategory(category)}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                            selectedCategory === category
+                              ? 'bg-brand-red text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          {category}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {!showCreateGroupForm && (
+                  <>
+                    {displayedGroups.length === 0 ? (
+                      <div className="bg-white rounded-3xl border border-gray-200 p-12 text-center">
+                        <div className="text-6xl mb-4">📚</div>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">No groups yet</h3>
+                        <p className="text-gray-600 mb-6">
+                          Be the first to create a group in this community!
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="grid md:grid-cols-2 gap-4">
+                        {displayedGroups.map((group) => (
+                          <div
+                            key={group.id}
+                            onClick={() => navigate(`/groups/${group.id}`)}
+                            className="bg-white rounded-3xl border border-gray-200 hover:border-red-300 hover:shadow-lg transition-all cursor-pointer p-6"
+                          >
+                            <div className="flex justify-between items-start mb-3">
+                              <div className="flex-1">
+                                <h3 className="text-lg font-bold text-gray-900 mb-1">{group.name}</h3>
+                                <p className="text-sm text-brand-red font-medium">{group.category}</p>
+                              </div>
+                              {group.isPrivate && (
+                                <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">
+                                  🔒 Private
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-gray-700 text-sm mb-3 line-clamp-2">{group.description}</p>
+                            <div className="flex items-center gap-4 text-sm text-gray-600">
+                              <span>👥 {group._count?.members || 0} members</span>
+                              <span>💬 {group._count?.posts || 0} posts</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
               </>
+            )}
+
+            {/* ===== HELP REQUESTS TAB ===== */}
+            {activeTab === 'help-requests' && (
+              <>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">Help Requests</h2>
+                  {!showHelpForm && (
+                    <button
+                      onClick={() => setShowHelpForm(true)}
+                      className="bg-brand-red text-white px-6 py-3 rounded-md hover:bg-brand-red-dark transition font-semibold"
+                    >
+                      Request Help
+                    </button>
+                  )}
+                </div>
+
+                {showHelpForm && (
+                  <div className="mb-8 bg-white rounded-3xl border border-gray-200 shadow-lg overflow-hidden">
+                    <div className="bg-neutral-900 px-6 py-4">
+                      <h3 className="text-xl font-bold text-white">Request Help</h3>
+                    </div>
+                    <div className="p-6">
+                      <CreateHelpRequestForm
+                        onSubmit={handleCreateHelpRequest}
+                        onCancel={() => setShowHelpForm(false)}
+                        preselectedCommunityId={id}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {!showHelpForm && (
+                  <>
+                    {helpLoading ? (
+                      <div className="flex items-center justify-center py-16">
+                        <div className="w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                    ) : helpRequests.length === 0 ? (
+                      <div className="bg-white rounded-3xl border border-gray-200 p-12 text-center">
+                        <div className="text-6xl mb-4">🤝</div>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">No help requests yet</h3>
+                        <p className="text-gray-600 mb-6">
+                          When someone in your community needs help, requests will appear here.
+                        </p>
+                        <button
+                          onClick={() => setShowHelpForm(true)}
+                          className="bg-brand-red text-white px-8 py-3 rounded-md hover:bg-brand-red-dark transition font-semibold"
+                        >
+                          Request Help
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {helpRequests.map(hr => (
+                          <HelpRequestCard
+                            key={hr.id}
+                            helpRequest={hr}
+                            isAdmin={isAdminOrMod}
+                            onStatusChange={handleStatusChange}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </>
+            )}
+
+            {/* ===== ADMIN INBOX TAB ===== */}
+            {activeTab === 'admin-inbox' && isAdminOrMod && (
+              <AdminInbox communityId={id!} communityName={community.name} />
             )}
           </>
         )}
@@ -294,7 +455,7 @@ const CommunityDetail: React.FC = () => {
             </p>
             <button
               onClick={handleJoin}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-xl hover:shadow-lg transition font-semibold"
+              className="bg-brand-red text-white px-8 py-3 rounded-md hover:bg-brand-red-dark transition font-semibold"
             >
               Join Community
             </button>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MapView from './MapView';
-import { getUserLocation, getSchoolCoordinates, MINNEAPOLIS_CENTER } from '../../utils/geocoding';
+import { getUserLocation, getSchoolCoordinates, calculateDistance, MINNEAPOLIS_CENTER } from '../../utils/geocoding';
 import { useAuth } from '../../context/AuthContext';
 
 interface Group {
@@ -10,6 +10,10 @@ interface Group {
   description: string;
   category?: string;
   location?: string;
+  community?: {
+    id: string;
+    name: string;
+  };
   _count?: {
     members: number;
   };
@@ -19,6 +23,25 @@ interface DashboardMapProps {
   groups: Group[];
   radius: number;
 }
+
+// SVG marker icons as data URIs
+const schoolIconUrl = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+  <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="20" cy="20" r="18" fill="#dc2626" stroke="white" stroke-width="3"/>
+    <path d="M20 11 L12 16 L12 26 L28 26 L28 16 Z" fill="none" stroke="white" stroke-width="1.8" stroke-linejoin="round"/>
+    <rect x="18" y="22" width="4" height="4" fill="white" rx="0.5"/>
+    <polygon points="20,8 10,14 20,14 30,14" fill="white"/>
+  </svg>
+`);
+
+const neighborhoodIconUrl = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+  <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="20" cy="20" r="18" fill="#f87171" stroke="white" stroke-width="3"/>
+    <path d="M20 12 L12 18 L12 28 L28 28 L28 18 Z" fill="none" stroke="white" stroke-width="1.8" stroke-linejoin="round"/>
+    <rect x="16" y="21" width="3" height="3" fill="white" rx="0.5"/>
+    <rect x="21" y="21" width="3" height="3" fill="white" rx="0.5"/>
+  </svg>
+`);
 
 const DashboardMap: React.FC<DashboardMapProps> = ({ groups, radius }) => {
   const navigate = useNavigate();
@@ -49,14 +72,15 @@ const DashboardMap: React.FC<DashboardMapProps> = ({ groups, radius }) => {
     fetchUserLocation();
   }, [user?.zipCode, user?.street, user?.city, user?.state]);
 
-  // Convert groups to map markers
+  // Convert groups to map markers, filtering by distance from user
   useEffect(() => {
     const markers = groups
       .map((group) => {
-        // Try to get coordinates from school name or location
         const coords = getSchoolCoordinates(group.name) || getSchoolCoordinates(group.location || '');
-
         if (!coords) return null;
+
+        const distance = calculateDistance(mapCenter.lat, mapCenter.lng, coords.lat, coords.lng);
+        if (distance > radius) return null;
 
         return {
           id: group.id,
@@ -65,12 +89,13 @@ const DashboardMap: React.FC<DashboardMapProps> = ({ groups, radius }) => {
           position: coords,
           memberCount: group._count?.members || 0,
           category: group.category,
+          iconUrl: group.category === 'School' ? schoolIconUrl : neighborhoodIconUrl,
         };
       })
       .filter((marker): marker is NonNullable<typeof marker> => marker !== null);
 
     setMapMarkers(markers);
-  }, [groups]);
+  }, [groups, mapCenter, radius]);
 
   // Calculate zoom based on radius
   const getZoomLevel = () => {
@@ -113,8 +138,12 @@ const DashboardMap: React.FC<DashboardMapProps> = ({ groups, radius }) => {
             <span className="text-gray-700 font-medium">You</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-pink-500 rounded-full border-2 border-white"></div>
-            <span className="text-gray-700 font-medium">Groups</span>
+            <div className="w-4 h-4 bg-red-600 rounded-full border-2 border-white"></div>
+            <span className="text-gray-700 font-medium">School</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-red-400 rounded-full border-2 border-white"></div>
+            <span className="text-gray-700 font-medium">Neighborhood</span>
           </div>
         </div>
       </div>

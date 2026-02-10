@@ -129,11 +129,11 @@ const NotificationBell: React.FC = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-xl hover:bg-purple-50 transition group"
+        className="relative p-2 rounded-xl hover:bg-red-50 transition group"
         title="Notifications"
       >
         <svg
-          className="w-6 h-6 text-gray-700 group-hover:text-purple-600"
+          className="w-6 h-6 text-gray-700 group-hover:text-red-600"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -146,7 +146,7 @@ const NotificationBell: React.FC = () => {
           />
         </svg>
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-gradient-to-r from-pink-500 to-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg">
+          <span className="absolute -top-1 -right-1 bg-brand-red text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -159,7 +159,7 @@ const NotificationBell: React.FC = () => {
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllRead}
-                className="text-sm text-purple-600 hover:text-purple-700 font-medium"
+                className="text-sm text-red-600 hover:text-red-700 font-medium"
               >
                 Mark all read
               </button>
@@ -184,7 +184,7 @@ const NotificationBell: React.FC = () => {
                     onClick={() => handleNotificationClick(notification)}
                     className={`p-4 cursor-pointer transition ${
                       !notification.read
-                        ? 'bg-purple-50 hover:bg-purple-100'
+                        ? 'bg-red-50 hover:bg-red-100'
                         : 'hover:bg-gray-50'
                     }`}
                   >
@@ -200,7 +200,7 @@ const NotificationBell: React.FC = () => {
                             {notification.title}
                           </p>
                           {!notification.read && (
-                            <div className="w-2 h-2 bg-purple-600 rounded-full flex-shrink-0 mt-1"></div>
+                            <div className="w-2 h-2 bg-red-600 rounded-full flex-shrink-0 mt-1"></div>
                           )}
                         </div>
                         <p className="text-sm text-gray-600 mt-1 line-clamp-2">
@@ -224,7 +224,7 @@ const NotificationBell: React.FC = () => {
                   navigate('/notifications');
                   setIsOpen(false);
                 }}
-                className="w-full text-center text-sm text-purple-600 hover:text-purple-700 font-medium"
+                className="w-full text-center text-sm text-red-600 hover:text-red-700 font-medium"
               >
                 View all notifications
               </button>
