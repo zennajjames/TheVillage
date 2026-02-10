@@ -3,6 +3,7 @@
 > Find Your Community, Connected
 
 A hyperlocal platform for neighborhoods and schools to organize, communicate, and support each other—built on mutual aid and genuine community connection.
+Launching soon.
 
 ## Table of Contents
 
