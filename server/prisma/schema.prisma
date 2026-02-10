@@ -10,7 +10,7 @@ datasource db {
 model User {
   id              String    @id @default(uuid())
   email           String    @unique
-  passwordHash    String
+  passwordHash    String?
   firstName       String
   lastName        String
   profilePicture  String?
@@ -29,6 +29,11 @@ model User {
 
   notifications       Notification[]
 
+  // OAuth fields
+  googleId        String?   @unique
+  facebookId      String?   @unique
+  provider        String?   // 'google', 'facebook', 'local'
+  providerId      String?
 
   // Password reset
   resetPasswordToken   String?

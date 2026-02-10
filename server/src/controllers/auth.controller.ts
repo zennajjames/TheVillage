@@ -93,6 +93,11 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    // Check if user signed up with OAuth (no password)
+    if (!user.passwordHash) {
+      return res.status(401).json({ error: 'Please log in using your social account (Google or Facebook)' });
+    }
+
     // Check password
     const isValidPassword = await bcrypt.compare(password, user.passwordHash);
 
@@ -250,6 +255,7 @@ export const getUserProfile = async (req: Request, res: Response) => {
 export const forgotPassword = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
+    console.log('🔍 Forgot password request for:', email);
 
     if (!email) {
       return res.status(400).json({ error: 'Email is required' });
@@ -261,13 +267,18 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
     if (!user) {
       // Don't reveal if user exists or not
+      console.log('⚠️ User not found for email:', email);
       return res.json({ message: 'If that email exists, a reset link has been sent' });
     }
+
+    console.log('✅ User found:', user.email, user.firstName);
 
     // Generate reset token
     const resetToken = crypto.randomBytes(32).toString('hex');
     const resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
     const resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour
+
+    console.log('🔑 Generated reset token');
 
     // Save token to database
     await prisma.user.update({
@@ -278,16 +289,21 @@ export const forgotPassword = async (req: Request, res: Response) => {
       }
     });
 
+    console.log('💾 Token saved to database');
+
     // Send email
+    console.log('📧 Attempting to send email to:', user.email);
     await emailService.sendPasswordResetEmail(
       user.email,
       user.firstName,
       resetToken
     );
 
+    console.log('✅ Email sent successfully');
+
     res.json({ message: 'If that email exists, a reset link has been sent' });
   } catch (error) {
-    console.error('Forgot password error:', error);
+    console.error('❌ Forgot password error:', error);
     res.status(500).json({ error: 'Failed to process request' });
   }
 };
@@ -297,12 +313,18 @@ export const resetPassword = async (req: Request, res: Response) => {
     const { token } = req.params;
     const { password } = req.body;
 
+    console.log('🔄 Reset password request received');
+    console.log('Token from URL:', token ? `${token.substring(0, 10)}...` : 'MISSING');
+    console.log('Password provided:', password ? 'YES' : 'NO');
+
     if (!password || password.length < 6) {
+      console.log('❌ Password validation failed');
       return res.status(400).json({ error: 'Password must be at least 6 characters' });
     }
 
     // Hash the token to compare with database
     const resetPasswordToken = crypto.createHash('sha256').update(token).digest('hex');
+    console.log('🔑 Hashed token:', resetPasswordToken.substring(0, 10) + '...');
 
     // Find user with valid token
     const user = await prisma.user.findFirst({
@@ -314,9 +336,15 @@ export const resetPassword = async (req: Request, res: Response) => {
       }
     });
 
+    console.log('👤 User found:', user ? `${user.email}` : 'NO');
+    console.log('⏰ Current time:', new Date().toISOString());
+
     if (!user) {
+      console.log('❌ No user found with valid token');
       return res.status(400).json({ error: 'Invalid or expired reset token' });
     }
+
+    console.log('⏰ Token expires:', user.resetPasswordExpires);
 
     // Hash new password
     const passwordHash = await bcrypt.hash(password, 10);
@@ -331,9 +359,11 @@ export const resetPassword = async (req: Request, res: Response) => {
       }
     });
 
+    console.log('✅ Password reset successful for:', user.email);
+
     res.json({ message: 'Password reset successful' });
   } catch (error) {
-    console.error('Reset password error:', error);
+    console.error('❌ Reset password error:', error);
     res.status(500).json({ error: 'Failed to reset password' });
   }
 };

@@ -53,7 +53,7 @@ const BrowseCommunities: React.FC = () => {
             Browse All Communities
           </h1>
           <p className="text-gray-600">
-            Explore all available school communities
+            Explore all available communities
           </p>
         </div>
 
@@ -131,12 +131,12 @@ const BrowseCommunities: React.FC = () => {
                       onClick={() => handleJoinCommunity(community.id)}
                       className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2 px-4 rounded-lg font-medium hover:from-purple-700 hover:to-pink-700 transition text-sm"
                     >
-                      Switch to This School
+                      Join This Community
                     </button>
                   ) : (
                     <div className="flex items-center justify-center gap-2 text-green-600 font-medium py-2 text-sm">
                       <span>✓</span>
-                      <span>Your Current School</span>
+                      <span>Your Current Community</span>
                     </div>
                   )}
                 </div>

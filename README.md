@@ -1,8 +1,8 @@
 # The Village
 
-> Your School Community, Connected
+> Find Your Community, Connected
 
-A hyperlocal platform for school PTAs to organize, communicate, and support each other—built on mutual aid and genuine community connection.
+A hyperlocal platform for neighborhoods and schools to organize, communicate, and support each other—built on mutual aid and genuine community connection.
 
 ## Table of Contents
 
@@ -19,60 +19,61 @@ A hyperlocal platform for school PTAs to organize, communicate, and support each
 
 ## Overview
 
-The Village is a community platform designed specifically for school PTAs and parent communities. It enables schools to create organized digital spaces where parents, teachers, and families can coordinate activities, share resources, and build meaningful connections based on mutual aid principles.
+The Village is a community platform that helps neighborhoods and schools build stronger, more connected communities. Whether you're a parent looking for carpool partners, a neighbor offering to help with groceries, or a PTA organizing a fundraiser—The Village gives your community a home. Members can create and join communities based on where they live or where their kids go to school, then coordinate activities, share resources, and support each other through mutual aid.
 
 ## Purpose & Vision
 
 ### Mission
 
-The Village strengthens school communities through mutual aid and genuine connection. We empower PTAs, parents, and educators to organize, coordinate, and support each other in the daily work of raising and educating children together.
+The Village strengthens local communities through mutual aid and genuine connection. We empower neighbors, parents, and families to organize, coordinate, and support each other—because it takes a village.
 
 ### Core Principles
 
 - **Mutual Aid**: Voluntary, reciprocal exchange of resources and services for mutual benefit
 - **Reciprocity**: Give when you can, receive when you need—both are equally valuable
-- **Equality**: Everyone is a school community member helping each other as equals
+- **Equality**: Everyone is a community member helping each other as equals
 - **Solidarity**: We help each other because we're in this together, not out of charity
-- **Community-Led**: Parents and families decide what their community needs and how to meet those needs
+- **Community-Led**: Members decide what their community needs and how to meet those needs
 
 ### Perfect For
 
 - **Carpool Coordination**: Organize safe, reliable transportation with families you trust
+- **Neighborhood Help**: Share tools, lend a hand with yard work, or check in on a neighbor
 - **Classroom Supplies**: Share and coordinate materials to support teachers and students
-- **Events & Field Trips**: Plan and organize school activities and volunteer coordination
+- **Events & Activities**: Plan and organize community events, school field trips, and volunteer coordination
 - **Childcare Swaps**: Help each other out with pickups, playdates, and emergency coverage
 - **Family Support**: Meal trains, moving help, and showing up when families need it most
-- **Room Parents**: Coordinate classroom activities and communicate with families
 
 ## Features
 
-### 1. Communities (Schools)
+### 1. Communities (Neighborhoods & Schools)
 
-- **Browse & Join Schools**: Discover and join your school's community
-- **School Profiles**: View school information, member count, and group count
-- **Location-Based**: Find schools by location, address, or zip code
-- **Public & Private**: Schools can be public (anyone can join) or private (approval required)
+- **Find Your Community**: Discover and join communities by zip code—whether it's your neighborhood or your child's school
+- **Community Profiles**: View community information, member count, and group count
+- **Location-Based**: Find communities near you by address or zip code
+- **Public & Private**: Communities can be public (anyone can join) or private (approval required)
 - **Role-Based Access**: ADMIN, MODERATOR, and MEMBER roles with different permissions
 
-### 2. Groups (Categories)
+### 2. Groups
 
-Within each school community, create topic-based groups:
+Within each community, create topic-based groups:
 
-- **Fundraising**: Coordinate fundraising efforts and campaigns
-- **Events**: Plan school events, field trips, and activities
-- **Classroom Parents**: Room parent coordination and communication
-- **Volunteer Coordination**: Organize and manage volunteers
-- **Board/Leadership**: PTA board and leadership discussions
+- **Neighborhood**: Block-level or street-level groups for hyperlocal coordination
+- **School**: School-specific groups for parents and families
+- **Playgroup**: Connect families with kids of similar ages
+- **Activities**: Sports, arts, music, and after-school coordination
+- **Special Needs**: Support groups for families with special needs children
+- **Working Parents**: Coordinate around work schedules
 - **General Discussion**: Open forum for community topics
 - **Other**: Custom categories for specific needs
 
-### 3. SubGroups (Classrooms)
+### 3. SubGroups
 
-Within groups, create classroom-specific spaces:
+Within groups, create more specific spaces:
 
-- **By Grade & Teacher**: Organize by grade level and teacher name
-- **Classroom Communication**: Direct communication with classroom families
-- **Class-Specific Activities**: Coordinate classroom-specific events and needs
+- **By Grade & Teacher**: Organize by grade level and teacher name for school groups
+- **By Block or Street**: Hyperlocal neighborhood coordination
+- **Activity-Specific**: Coordinate around specific shared activities or needs
 
 ### 4. Posts & Communication
 
@@ -120,10 +121,10 @@ Within groups, create classroom-specific spaces:
 
 ### 10. Multi-Language Support
 
-Full internationalization support for diverse school communities:
+Full internationalization support for diverse communities:
 
 - **English** (en)
-- **Spanish** (es) - Español
+- **Spanish** (es) - Espa&ntilde;ol
 - **Somali** (so) - Soomaali
 - **Hmong** (hmn) - Hmoob
 
@@ -131,7 +132,7 @@ All content, navigation, and UI elements are fully translated.
 
 ### 11. Friendship System
 
-- **Send Friend Requests**: Connect with other parents
+- **Send Friend Requests**: Connect with neighbors and other parents
 - **Accept/Reject Requests**: Manage your friend connections
 - **Friend Status**: Track pending, accepted, and declined requests
 - **Friend Lists**: View and manage your connections
@@ -141,18 +142,18 @@ All content, navigation, and UI elements are fully translated.
 ### Three-Tier Hierarchy
 
 ```
-Communities (Schools)
-└── Groups (Categories: Fundraising, Events, Classroom Parents, etc.)
-    └── SubGroups (Classrooms: By Grade & Teacher)
+Communities (Neighborhoods & Schools)
+  Groups (Neighborhood, School, Playgroup, Activities, etc.)
+    SubGroups (By classroom, by block, by activity)
 ```
 
 ### User Flow
 
 1. **Sign Up/Login**: Create an account or log in
-2. **Browse Communities**: Find and join your school
-3. **Explore Groups**: Join groups within your school community
-4. **Create/Join Classrooms**: Connect with your child's specific classroom
-5. **Participate**: Post, comment, message, and coordinate with other families
+2. **Find Your Community**: Search by zip code to find your neighborhood or school
+3. **Explore Groups**: Join groups within your community
+4. **Create/Join SubGroups**: Connect with specific classrooms, blocks, or interests
+5. **Participate**: Post, comment, message, and coordinate with your community
 
 ## Tech Stack
 
@@ -295,100 +296,103 @@ The application will be available at:
 
 ```
 the-village/
-├── client/                      # Frontend application
-│   ├── public/                  # Static assets
-│   ├── src/
-│   │   ├── components/          # React components
-│   │   │   ├── auth/           # Authentication components
-│   │   │   ├── groups/         # Group-related components
-│   │   │   ├── layout/         # Layout components (Header, Footer)
-│   │   │   └── posts/          # Post components
-│   │   ├── contexts/           # React contexts
-│   │   │   └── AuthContext.tsx # Authentication context
-│   │   ├── i18n/               # Internationalization
-│   │   │   ├── config.ts       # i18n configuration
-│   │   │   └── locales/        # Translation files
-│   │   │       ├── en.json     # English
-│   │   │       ├── es.json     # Spanish
-│   │   │       ├── so.json     # Somali
-│   │   │       └── hmn.json    # Hmong
-│   │   ├── pages/              # Page components
-│   │   │   ├── About.tsx
-│   │   │   ├── Communities.tsx
-│   │   │   ├── CommunityDetail.tsx
-│   │   │   ├── GroupDetail.tsx
-│   │   │   ├── Groups.tsx
-│   │   │   ├── Home.tsx
-│   │   │   ├── Landing.tsx
-│   │   │   ├── Login.tsx
-│   │   │   ├── Messages.tsx
-│   │   │   ├── Notifications.tsx
-│   │   │   ├── Privacy.tsx
-│   │   │   ├── Profile.tsx
-│   │   │   └── Signup.tsx
-│   │   ├── services/           # API service layer
-│   │   │   ├── api.ts          # Axios configuration
-│   │   │   ├── auth.service.ts
-│   │   │   ├── communities.service.ts
-│   │   │   ├── friendships.service.ts
-│   │   │   ├── groups.service.ts
-│   │   │   ├── messages.service.ts
-│   │   │   ├── notifications.service.ts
-│   │   │   ├── posts.service.ts
-│   │   │   ├── search.service.ts
-│   │   │   ├── subgroups.service.ts
-│   │   │   └── users.service.ts
-│   │   ├── types/              # TypeScript type definitions
-│   │   │   └── index.ts
-│   │   ├── utils/              # Utility functions
-│   │   ├── App.tsx             # Main App component
-│   │   └── main.tsx            # Entry point
-│   ├── index.html
-│   ├── package.json
-│   ├── tailwind.config.js
-│   ├── tsconfig.json
-│   └── vite.config.ts
-│
-└── server/                      # Backend application
-    ├── prisma/
-    │   ├── migrations/         # Database migrations
-    │   └── schema.prisma       # Database schema
-    ├── src/
-    │   ├── controllers/        # Request handlers
-    │   │   ├── auth.controller.ts
-    │   │   ├── communities.controller.ts
-    │   │   ├── friendships.controller.ts
-    │   │   ├── groups.controller.ts
-    │   │   ├── messages.controller.ts
-    │   │   ├── notifications.controller.ts
-    │   │   ├── posts.controller.ts
-    │   │   ├── search.controller.ts
-    │   │   ├── subgroups.controller.ts
-    │   │   └── users.controller.ts
-    │   ├── middleware/         # Express middleware
-    │   │   ├── auth.middleware.ts
-    │   │   └── upload.middleware.ts
-    │   ├── routes/             # API routes
-    │   │   ├── auth.routes.ts
-    │   │   ├── communities.routes.ts
-    │   │   ├── friendships.routes.ts
-    │   │   ├── groups.routes.ts
-    │   │   ├── messages.routes.ts
-    │   │   ├── notifications.routes.ts
-    │   │   ├── posts.routes.ts
-    │   │   ├── search.routes.ts
-    │   │   ├── subgroups.routes.ts
-    │   │   └── users.routes.ts
-    │   ├── services/           # Business logic services
-    │   │   ├── cloudinary.service.ts
-    │   │   ├── email.service.ts
-    │   │   └── sms.service.ts
-    │   ├── types/              # TypeScript type definitions
-    │   │   └── express.d.ts
-    │   └── index.ts            # Server entry point
-    ├── .env                    # Environment variables
-    ├── package.json
-    └── tsconfig.json
+  client/                        # Frontend application
+    public/                      # Static assets
+    src/
+      components/                # React components
+        auth/                    # Authentication components
+        communities/             # Community components (FindYourCommunity, etc.)
+        groups/                  # Group-related components
+        layout/                  # Layout components (Header, Footer)
+        posts/                   # Post components
+      context/                   # React contexts
+        AuthContext.tsx           # Authentication context
+      i18n/                      # Internationalization
+        config.ts                # i18n configuration
+        locales/                 # Translation files
+          en.json                # English
+          es.json                # Spanish
+          so.json                # Somali
+          hmn.json               # Hmong
+      pages/                     # Page components
+        About.tsx
+        BrowseCommunities.tsx
+        Communities.tsx
+        CommunityDetail.tsx
+        Dashboard.tsx
+        GroupDetail.tsx
+        Groups.tsx
+        Landing.tsx
+        Login.tsx
+        Messages.tsx
+        Notifications.tsx
+        Onboarding.tsx
+        Privacy.tsx
+        Profile.tsx
+        Signup.tsx
+      services/                  # API service layer
+        api.ts                   # Axios configuration
+        auth.service.ts
+        communities.service.ts
+        friendships.service.ts
+        groups.service.ts
+        messages.service.ts
+        notifications.service.ts
+        posts.service.ts
+        search.service.ts
+        subgroups.service.ts
+        users.service.ts
+      types/                     # TypeScript type definitions
+        index.ts
+      utils/                     # Utility functions
+      App.tsx                    # Main App component
+      main.tsx                   # Entry point
+    index.html
+    package.json
+    tailwind.config.js
+    tsconfig.json
+    vite.config.ts
+
+  server/                        # Backend application
+    prisma/
+      migrations/                # Database migrations
+      schema.prisma              # Database schema
+    src/
+      controllers/               # Request handlers
+        auth.controller.ts
+        communities.controller.ts
+        friendships.controller.ts
+        groups.controller.ts
+        messages.controller.ts
+        notifications.controller.ts
+        posts.controller.ts
+        search.controller.ts
+        subgroups.controller.ts
+        users.controller.ts
+      middleware/                 # Express middleware
+        auth.middleware.ts
+        upload.middleware.ts
+      routes/                    # API routes
+        auth.routes.ts
+        communities.routes.ts
+        friendships.routes.ts
+        groups.routes.ts
+        messages.routes.ts
+        notifications.routes.ts
+        posts.routes.ts
+        search.routes.ts
+        subgroups.routes.ts
+        users.routes.ts
+      services/                  # Business logic services
+        cloudinary.service.ts
+        email.service.ts
+        sms.service.ts
+      types/                     # TypeScript type definitions
+        express.d.ts
+      index.ts                   # Server entry point
+    .env                         # Environment variables
+    package.json
+    tsconfig.json
 ```
 
 ## API Documentation
@@ -440,7 +444,7 @@ Authorization: Bearer <token>
 - `POST /groups/:id/join` - Join a group
 - `POST /groups/:id/leave` - Leave a group
 
-#### SubGroups (Classrooms)
+#### SubGroups
 
 - `GET /groups/:groupId/subgroups` - Get all subgroups for a group
 - `GET /subgroups/:id` - Get subgroup by ID
@@ -535,19 +539,19 @@ function MyComponent() {
 - Privacy settings
 - Relationships: Communities, Groups, SubGroups, Posts, Messages, Friendships
 
-#### Community (School)
-- School information and settings
-- Location data
+#### Community (Neighborhood or School)
+- Community information and settings
+- Location data (address, zip code)
 - Relationships: Members (CommunityMember), Groups
 
-#### Group (Category)
+#### Group
 - Group information within a community
-- Category classification
+- Category classification (Neighborhood, School, Playgroup, Activities, etc.)
 - Relationships: Community, Members (GroupMember), Posts, SubGroups
 
-#### SubGroup (Classroom)
-- Classroom-specific information
-- Teacher and grade details
+#### SubGroup
+- Specific sub-spaces within a group (classrooms, blocks, etc.)
+- Optional teacher and grade details for school groups
 - Relationships: Group, Members (SubGroupMember)
 
 #### Post
@@ -643,4 +647,4 @@ For questions, issues, or feedback, please open an issue on GitHub.
 
 ---
 
-**Built with ❤️ for school communities everywhere**
+**Built with love for communities everywhere**

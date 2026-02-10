@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import passport from 'passport';
 import { createServer } from 'http';
 import { prisma } from './config/database';
 import { authenticate } from './middleware/auth.middleware';
@@ -14,8 +15,10 @@ import adminRoutes from './routes/admin.routes';
 import friendshipsRoutes from './routes/friendships.routes';
 import searchRoutes from './routes/search.routes';
 import notificationsRoutes from './routes/notifications.routes';
+import oauthRoutes from './routes/oauth.routes';
 
 import { setupSocketServer } from './socket/socketHandler';
+import './config/passport'; // Initialize passport strategies
 
 dotenv.config();
 
@@ -79,7 +82,11 @@ app.post('/api/test-notification', authenticate, async (req, res) => {
 });
 
 // Routes
+// Initialize Passport
+app.use(passport.initialize());
+
 app.use('/api/auth', authRoutes);
+app.use('/api/oauth', oauthRoutes);
 app.use('/api/posts', postsRoutes);
 app.use('/api/communities', communitiesRoutes);
 app.use('/api/groups', groupsRoutes);

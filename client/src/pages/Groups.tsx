@@ -66,7 +66,7 @@ const Groups: React.FC = () => {
                 Groups
               </h1>
               <p className="text-gray-600">
-                Connect with neighbors who share your interests
+                Connect with your community through shared interests
               </p>
             </div>
           </div>

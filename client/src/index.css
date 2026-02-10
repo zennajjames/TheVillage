@@ -1,12 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer base {
+  * {
+    @apply border-neutral-200;
+  }
+
+  body {
+    @apply bg-neutral-50 text-neutral-800 font-sans antialiased;
+    margin: 0;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-brand-navy font-semibold;
+  }
+}
+
+@layer components {
+  /* Modern Button Styles */
+  .btn-primary {
+    @apply bg-brand-teal text-white px-6 py-3 rounded-xl font-medium
+           hover:bg-brand-teal/90 active:scale-[0.98]
+           transition-all duration-200 shadow-soft
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-brand-navy px-6 py-3 rounded-xl font-medium border-2 border-neutral-200
+           hover:border-brand-teal hover:text-brand-teal active:scale-[0.98]
+           transition-all duration-200
+           disabled:opacity-50 disabled:cursor-not-allowed
+           flex items-center justify-center gap-3;
+  }
+
+  .btn-coral {
+    @apply bg-brand-coral text-white px-6 py-3 rounded-xl font-medium
+           hover:bg-brand-coral/90 active:scale-[0.98]
+           transition-all duration-200 shadow-soft
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Modern Input Styles */
+  .input-modern {
+    @apply w-full px-4 py-3 rounded-xl border-2 border-neutral-200
+           focus:border-brand-teal focus:ring-4 focus:ring-brand-teal/10 focus:outline-none
+           transition-all duration-200 bg-white;
+  }
+
+  /* Card Styles */
+  .card-modern {
+    @apply bg-white rounded-3xl shadow-soft p-8 border border-neutral-100;
+  }
+
+  /* Gradient Background */
+  .bg-gradient-community {
+    background: linear-gradient(135deg, #E0F2FE 0%, #FCE7F3 50%, #FEF3C7 100%);
+  }
+
+  /* Modern Link Styles */
+  .link-modern {
+    @apply text-brand-teal hover:text-brand-teal/80 font-medium transition-colors duration-200;
+  }
 }

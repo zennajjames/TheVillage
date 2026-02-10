@@ -32,10 +32,10 @@ const Communities: React.FC = () => {
     fetchCommunities();
   }, []);
 
-  // If no communities, redirect to find your school
+  // If no communities, redirect to find your community
   useEffect(() => {
     if (!isLoading && myCommunities.length === 0 && activeTab === 'my') {
-      navigate('/find-your-school');
+      navigate('/find-your-community');
     }
   }, [isLoading, myCommunities, activeTab, navigate]);
 
@@ -63,7 +63,7 @@ const Communities: React.FC = () => {
                 My Communities
               </h1>
               <p className="text-gray-600">
-                Your school communities
+                Your communities
               </p>
             </div>
           </div>
@@ -116,15 +116,15 @@ const Communities: React.FC = () => {
             </h3>
             <p className="text-gray-600 mb-6">
               {activeTab === 'my'
-                ? 'Join a school community to get started!'
+                ? 'Join a community to get started!'
                 : 'Be the first to create a community!'}
             </p>
             {activeTab === 'my' && (
               <button
-                onClick={() => navigate('/find-your-school')}
+                onClick={() => navigate('/find-your-community')}
                 className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition"
               >
-                Find Your School
+                Find Your Community
               </button>
             )}
           </div>

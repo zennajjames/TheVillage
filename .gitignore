@@ -4,3 +4,4 @@ dist
 .env
 GOOGLE_MAPS_INTEGRATION.md
 theVillageApp.pages
+/seeds/

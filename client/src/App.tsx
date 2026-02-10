@@ -23,8 +23,10 @@ import Landing from './pages/Landing';
 import About from './pages/About';
 import Notifications from './pages/Notifications';
 import Privacy from './pages/Privacy';
-import FindYourSchool from './components/communities/FindYourSchool';
+import FindYourCommunity from './components/communities/FindYourCommunity';
 import BrowseCommunities from './pages/BrowseCommunities';
+import AuthCallback from './pages/AuthCallback';
+import Onboarding from './pages/Onboarding';
 
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -57,14 +59,16 @@ const AppRoutes = () => {
       <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Landing />} />
       <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} />
       <Route path="/signup" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Signup />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
+      <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
       <Route path="/about" element={<About />} />
       <Route
-        path="/find-your-school"
+        path="/find-your-community"
         element={
           <ProtectedRoute>
-            <FindYourSchool />
+            <FindYourCommunity />
           </ProtectedRoute>
         }
       />

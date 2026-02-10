@@ -5,16 +5,16 @@ import { useAuth } from '../../context/AuthContext';
 import { communitiesService } from '../../services/communities.service';
 import { Community } from '../../types';
 
-interface FindYourSchoolProps {
+interface FindYourCommunityProps {
   onClose?: () => void;
 }
 
-const FindYourSchool: React.FC<FindYourSchoolProps> = ({ onClose }) => {
+const FindYourCommunity: React.FC<FindYourCommunityProps> = ({ onClose }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [zipCode, setZipCode] = useState('');
-  const [schools, setSchools] = useState<Community[]>([]);
+  const [communities, setCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [searching, setSearching] = useState(false);
@@ -31,17 +31,17 @@ const FindYourSchool: React.FC<FindYourSchoolProps> = ({ onClose }) => {
 
     try {
       const allCommunities = await communitiesService.getAllCommunities();
-      const filteredSchools = allCommunities.filter(
+      const filtered = allCommunities.filter(
         (community) => community.zipCode === zip
       );
 
-      setSchools(filteredSchools);
+      setCommunities(filtered);
 
-      if (filteredSchools.length === 0) {
-        setError(`No schools found for zip code ${zip}. Try a nearby zip code or contact us to add your school.`);
+      if (filtered.length === 0) {
+        setError(`No communities found for zip code ${zip}. Try a nearby zip code or contact us to add your community.`);
       }
     } catch (err) {
-      setError('Failed to search for schools. Please try again.');
+      setError('Failed to search for communities. Please try again.');
       console.error('Search error:', err);
     } finally {
       setLoading(false);
@@ -69,7 +69,7 @@ const FindYourSchool: React.FC<FindYourSchoolProps> = ({ onClose }) => {
       if (onClose) onClose();
     } catch (err) {
       console.error('Failed to join community:', err);
-      setError('Failed to join school. Please try again.');
+      setError('Failed to join community. Please try again.');
     }
   };
 
@@ -82,7 +82,7 @@ const FindYourSchool: React.FC<FindYourSchoolProps> = ({ onClose }) => {
             Welcome to The Village! 👋
           </h1>
           <p className="text-lg text-gray-600">
-            Let's find your school community
+            Let's find your community
           </p>
         </div>
 
@@ -110,7 +110,7 @@ const FindYourSchool: React.FC<FindYourSchoolProps> = ({ onClose }) => {
               </button>
             </div>
             <p className="text-sm text-gray-500 mt-2">
-              We'll find schools in the Minneapolis area for your zip code
+              We'll find communities in your area for your zip code
             </p>
           </form>
         )}
@@ -123,48 +123,48 @@ const FindYourSchool: React.FC<FindYourSchoolProps> = ({ onClose }) => {
         )}
 
         {/* Search Results */}
-        {searching && schools.length > 0 && (
+        {searching && communities.length > 0 && (
           <div>
             <div className="mb-4">
               <h2 className="text-xl font-semibold text-gray-900">
-                Schools in {zipCode}
+                Communities in {zipCode}
               </h2>
               <p className="text-sm text-gray-600">
-                Found {schools.length} school{schools.length !== 1 ? 's' : ''}
+                Found {communities.length} communit{communities.length !== 1 ? 'ies' : 'y'}
               </p>
             </div>
 
             <div className="space-y-3 max-h-96 overflow-y-auto">
-              {schools.map((school) => (
+              {communities.map((community) => (
                 <div
-                  key={school.id}
+                  key={community.id}
                   className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:shadow-md transition"
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <h3 className="font-semibold text-gray-900 mb-1">
-                        {school.name}
+                        {community.name}
                       </h3>
                       <p className="text-sm text-gray-600 mb-2">
-                        {school.description}
+                        {community.description}
                       </p>
                       <div className="flex items-center gap-4 text-xs text-gray-500">
-                        {school.address && (
-                          <span>📍 {school.address}</span>
+                        {community.address && (
+                          <span>📍 {community.address}</span>
                         )}
-                        {school._count && (
+                        {community._count && (
                           <>
-                            <span>👥 {school._count.members} members</span>
-                            <span>📚 {school._count.groups} groups</span>
+                            <span>👥 {community._count.members} members</span>
+                            <span>📚 {community._count.groups} groups</span>
                           </>
                         )}
                       </div>
                     </div>
                     <button
-                      onClick={() => handleJoinCommunity(school.id)}
+                      onClick={() => handleJoinCommunity(community.id)}
                       className="ml-4 px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition whitespace-nowrap"
                     >
-                      {school.isMember ? 'View' : 'Join School'}
+                      {community.isMember ? 'View' : 'Join Community'}
                     </button>
                   </div>
                 </div>
@@ -174,7 +174,7 @@ const FindYourSchool: React.FC<FindYourSchoolProps> = ({ onClose }) => {
             <button
               onClick={() => {
                 setSearching(false);
-                setSchools([]);
+                setCommunities([]);
                 setZipCode('');
                 setError('');
               }}
@@ -188,7 +188,7 @@ const FindYourSchool: React.FC<FindYourSchoolProps> = ({ onClose }) => {
         {/* Footer */}
         <div className="mt-8 pt-6 border-t border-gray-200 text-center">
           <p className="text-sm text-gray-600 mb-2">
-            Don't see your school?
+            Don't see your community?
           </p>
           <button
             onClick={() => navigate('/browse-communities')}
@@ -202,4 +202,4 @@ const FindYourSchool: React.FC<FindYourSchoolProps> = ({ onClose }) => {
   );
 };
 
-export default FindYourSchool;
+export default FindYourCommunity;

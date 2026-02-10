@@ -347,7 +347,683 @@ async function main() {
     },
   ];
 
-  console.log('Creating Minneapolis Public Schools...');
+  // Neighborhood communities - Minneapolis, St. Paul, and surrounding suburbs (30-mile radius)
+  const neighborhoods = [
+    // === MINNEAPOLIS NEIGHBORHOODS ===
+    {
+      name: 'Downtown Minneapolis',
+      description: 'The heart of Minneapolis — connect with neighbors in the downtown core for mutual aid, events, and community support.',
+      address: 'Downtown Minneapolis',
+      zipCode: '55401',
+      location: 'Downtown Minneapolis',
+    },
+    {
+      name: 'North Loop',
+      description: 'The trendy North Loop warehouse district neighborhood. Share resources, coordinate events, and support your neighbors.',
+      address: 'North Loop, Minneapolis',
+      zipCode: '55401',
+      location: 'Downtown Minneapolis',
+    },
+    {
+      name: 'Northeast Minneapolis',
+      description: 'The arts district of Minneapolis. Connect with your creative neighbors for community support, events, and mutual aid.',
+      address: 'Northeast Minneapolis',
+      zipCode: '55418',
+      location: 'Northeast Minneapolis',
+    },
+    {
+      name: 'St. Anthony Main',
+      description: 'Historic riverfront neighborhood in Northeast Minneapolis. Build connections with neighbors along the Mississippi.',
+      address: 'St. Anthony Main, Minneapolis',
+      zipCode: '55418',
+      location: 'Northeast Minneapolis',
+    },
+    {
+      name: 'Uptown Minneapolis',
+      description: 'The vibrant Uptown neighborhood around Lake Calhoun and Lake of the Isles. Connect with neighbors and build community.',
+      address: 'Uptown, Minneapolis',
+      zipCode: '55408',
+      location: 'Uptown Minneapolis',
+    },
+    {
+      name: 'Lyn-Lake',
+      description: 'The Lyn-Lake neighborhood at Lyndale and Lake Street. A diverse, walkable community ready to support each other.',
+      address: 'Lyn-Lake, Minneapolis',
+      zipCode: '55408',
+      location: 'South Minneapolis',
+    },
+    {
+      name: 'Whittier',
+      description: 'One of the most diverse neighborhoods in Minneapolis. Connect with your Whittier neighbors for mutual aid and community building.',
+      address: 'Whittier, Minneapolis',
+      zipCode: '55404',
+      location: 'South Minneapolis',
+    },
+    {
+      name: 'Stevens Square',
+      description: 'A small, tight-knit neighborhood in the heart of Minneapolis. Support your neighbors and build lasting connections.',
+      address: 'Stevens Square, Minneapolis',
+      zipCode: '55404',
+      location: 'South Minneapolis',
+    },
+    {
+      name: 'Loring Park',
+      description: 'The Loring Park neighborhood near downtown. Connect with neighbors for community events, mutual aid, and support.',
+      address: 'Loring Park, Minneapolis',
+      zipCode: '55403',
+      location: 'Downtown Minneapolis',
+    },
+    {
+      name: 'Lowry Hill',
+      description: 'The historic Lowry Hill neighborhood between downtown and the lakes. Build community with your neighbors.',
+      address: 'Lowry Hill, Minneapolis',
+      zipCode: '55403',
+      location: 'South Minneapolis',
+    },
+    {
+      name: 'Kenwood',
+      description: 'The leafy Kenwood neighborhood near Lake of the Isles. Connect with families and neighbors for mutual support.',
+      address: 'Kenwood, Minneapolis',
+      zipCode: '55405',
+      location: 'Southwest Minneapolis',
+    },
+    {
+      name: 'Bryn Mawr',
+      description: 'The Bryn Mawr neighborhood near Theodore Wirth Park. A family-friendly community ready to help each other out.',
+      address: 'Bryn Mawr, Minneapolis',
+      zipCode: '55405',
+      location: 'Southwest Minneapolis',
+    },
+    {
+      name: 'Linden Hills',
+      description: 'The charming Linden Hills neighborhood between Lake Harriet and Lake Calhoun. Families helping families.',
+      address: 'Linden Hills, Minneapolis',
+      zipCode: '55410',
+      location: 'Southwest Minneapolis',
+    },
+    {
+      name: 'Fulton',
+      description: 'The Fulton neighborhood in Southwest Minneapolis. A quiet, residential community where neighbors look out for each other.',
+      address: 'Fulton, Minneapolis',
+      zipCode: '55410',
+      location: 'Southwest Minneapolis',
+    },
+    {
+      name: 'Lynnhurst',
+      description: 'The family-friendly Lynnhurst neighborhood. Connect with neighbors for carpools, childcare swaps, and community events.',
+      address: 'Lynnhurst, Minneapolis',
+      zipCode: '55419',
+      location: 'Southwest Minneapolis',
+    },
+    {
+      name: 'Tangletown',
+      description: 'The winding streets of Tangletown in Southwest Minneapolis. A close-knit neighborhood where community thrives.',
+      address: 'Tangletown, Minneapolis',
+      zipCode: '55419',
+      location: 'Southwest Minneapolis',
+    },
+    {
+      name: 'Kenny',
+      description: 'The Kenny neighborhood near Minnehaha Creek. Families and neighbors supporting each other through mutual aid.',
+      address: 'Kenny, Minneapolis',
+      zipCode: '55419',
+      location: 'Southwest Minneapolis',
+    },
+    {
+      name: 'Nokomis',
+      description: 'The Nokomis neighborhood on the shores of Lake Nokomis. A diverse, family-oriented community building connections.',
+      address: 'Nokomis, Minneapolis',
+      zipCode: '55417',
+      location: 'South Minneapolis',
+    },
+    {
+      name: 'Minnehaha',
+      description: 'The Minnehaha neighborhood near Minnehaha Falls. Connect with neighbors along the creek and parkway.',
+      address: 'Minnehaha, Minneapolis',
+      zipCode: '55417',
+      location: 'South Minneapolis',
+    },
+    {
+      name: 'Hiawatha',
+      description: 'The Hiawatha neighborhood along the light rail corridor. A growing, diverse community supporting each other.',
+      address: 'Hiawatha, Minneapolis',
+      zipCode: '55406',
+      location: 'South Minneapolis',
+    },
+    {
+      name: 'Longfellow',
+      description: 'The Longfellow neighborhood between Minnehaha Parkway and Lake Street. Neighbors helping neighbors.',
+      address: 'Longfellow, Minneapolis',
+      zipCode: '55406',
+      location: 'South Minneapolis',
+    },
+    {
+      name: 'Seward',
+      description: 'The Seward neighborhood, home to the Seward Co-op. A community with deep roots in mutual aid and cooperation.',
+      address: 'Seward, Minneapolis',
+      zipCode: '55406',
+      location: 'Southeast Minneapolis',
+    },
+    {
+      name: 'Prospect Park',
+      description: 'The Prospect Park neighborhood near the U of M. Connect with neighbors in this historic, walkable community.',
+      address: 'Prospect Park, Minneapolis',
+      zipCode: '55414',
+      location: 'Southeast Minneapolis',
+    },
+    {
+      name: 'Marcy-Holmes',
+      description: 'The Marcy-Holmes neighborhood near the University of Minnesota. A mix of students and long-time residents building community.',
+      address: 'Marcy-Holmes, Minneapolis',
+      zipCode: '55413',
+      location: 'Northeast Minneapolis',
+    },
+    {
+      name: 'Powderhorn',
+      description: 'The Powderhorn neighborhood around Powderhorn Park. One of the most diverse and community-minded neighborhoods in the city.',
+      address: 'Powderhorn, Minneapolis',
+      zipCode: '55407',
+      location: 'South Minneapolis',
+    },
+    {
+      name: 'Corcoran',
+      description: 'The Corcoran neighborhood in South Minneapolis. A tight-knit community with a strong tradition of mutual support.',
+      address: 'Corcoran, Minneapolis',
+      zipCode: '55407',
+      location: 'South Minneapolis',
+    },
+    {
+      name: 'Phillips',
+      description: 'The Phillips neighborhood, one of the most culturally diverse areas in Minneapolis. Community support across cultures.',
+      address: 'Phillips, Minneapolis',
+      zipCode: '55404',
+      location: 'South Minneapolis',
+    },
+    {
+      name: 'Elliot Park',
+      description: 'The Elliot Park neighborhood near downtown. A growing community of residents building new connections.',
+      address: 'Elliot Park, Minneapolis',
+      zipCode: '55404',
+      location: 'Downtown Minneapolis',
+    },
+    {
+      name: 'North Minneapolis - Camden',
+      description: 'The Camden neighborhood in North Minneapolis along the river. Connect with neighbors for mutual aid and community events.',
+      address: 'Camden, Minneapolis',
+      zipCode: '55412',
+      location: 'North Minneapolis',
+    },
+    {
+      name: 'North Minneapolis - Victory',
+      description: 'The Victory neighborhood in North Minneapolis. Families and neighbors supporting each other and building community.',
+      address: 'Victory, Minneapolis',
+      zipCode: '55412',
+      location: 'North Minneapolis',
+    },
+    {
+      name: 'North Minneapolis - Willard-Hay',
+      description: 'The Willard-Hay neighborhood in North Minneapolis. A resilient community committed to mutual aid and support.',
+      address: 'Willard-Hay, Minneapolis',
+      zipCode: '55411',
+      location: 'North Minneapolis',
+    },
+    {
+      name: 'Harrison',
+      description: 'The Harrison neighborhood in North Minneapolis. Neighbors coming together to support and uplift each other.',
+      address: 'Harrison, Minneapolis',
+      zipCode: '55411',
+      location: 'North Minneapolis',
+    },
+    {
+      name: 'Diamond Lake',
+      description: 'The Diamond Lake neighborhood in South Minneapolis. A family-friendly area where neighbors help neighbors.',
+      address: 'Diamond Lake, Minneapolis',
+      zipCode: '55417',
+      location: 'South Minneapolis',
+    },
+    {
+      name: 'Kingfield',
+      description: 'The Kingfield neighborhood between Lyndale and Nicollet. An active, engaged community with strong neighborhood spirit.',
+      address: 'Kingfield, Minneapolis',
+      zipCode: '55409',
+      location: 'South Minneapolis',
+    },
+
+    // === ST. PAUL NEIGHBORHOODS ===
+    {
+      name: 'Downtown St. Paul',
+      description: 'The capital city downtown core. Connect with neighbors in Lowertown, Rice Park, and the greater downtown area.',
+      address: 'Downtown St. Paul',
+      zipCode: '55101',
+      location: 'Downtown St. Paul',
+    },
+    {
+      name: 'Cathedral Hill',
+      description: 'The historic Cathedral Hill neighborhood near the St. Paul Cathedral. A walkable community with deep roots.',
+      address: 'Cathedral Hill, St. Paul',
+      zipCode: '55102',
+      location: 'St. Paul',
+    },
+    {
+      name: 'Summit Hill',
+      description: 'The stately Summit Hill neighborhood along Summit Avenue. Families and neighbors supporting each other.',
+      address: 'Summit Hill, St. Paul',
+      zipCode: '55105',
+      location: 'St. Paul',
+    },
+    {
+      name: 'Highland Park',
+      description: 'The Highland Park neighborhood in St. Paul. A family-oriented community with great parks and strong neighborhood bonds.',
+      address: 'Highland Park, St. Paul',
+      zipCode: '55116',
+      location: 'St. Paul',
+    },
+    {
+      name: 'Mac-Groveland',
+      description: 'The Macalester-Groveland neighborhood near Macalester College. A community of families, students, and long-time residents.',
+      address: 'Macalester-Groveland, St. Paul',
+      zipCode: '55105',
+      location: 'St. Paul',
+    },
+    {
+      name: 'Merriam Park',
+      description: 'The Merriam Park neighborhood between Minneapolis and downtown St. Paul. A diverse, engaged community.',
+      address: 'Merriam Park, St. Paul',
+      zipCode: '55104',
+      location: 'St. Paul',
+    },
+    {
+      name: 'Snelling-Hamline',
+      description: 'The Snelling-Hamline neighborhood near Hamline University. Neighbors connecting for mutual support and community building.',
+      address: 'Snelling-Hamline, St. Paul',
+      zipCode: '55104',
+      location: 'St. Paul',
+    },
+    {
+      name: 'Como Park',
+      description: 'The Como Park neighborhood near Como Zoo and Conservatory. A family-friendly community with strong neighborhood spirit.',
+      address: 'Como Park, St. Paul',
+      zipCode: '55108',
+      location: 'St. Paul',
+    },
+    {
+      name: 'St. Anthony Park',
+      description: 'The charming St. Anthony Park neighborhood. A tight-knit community known for its village feel and mutual support.',
+      address: 'St. Anthony Park, St. Paul',
+      zipCode: '55108',
+      location: 'St. Paul',
+    },
+    {
+      name: 'Hamline-Midway',
+      description: 'The Hamline-Midway neighborhood along University Avenue. A diverse community building connections across cultures.',
+      address: 'Hamline-Midway, St. Paul',
+      zipCode: '55104',
+      location: 'St. Paul',
+    },
+    {
+      name: 'Frogtown',
+      description: 'The Frogtown neighborhood, one of the most diverse communities in St. Paul. Neighbors supporting neighbors across cultures.',
+      address: 'Frogtown, St. Paul',
+      zipCode: '55104',
+      location: 'St. Paul',
+    },
+    {
+      name: 'Payne-Phalen',
+      description: 'The Payne-Phalen neighborhood on the east side of St. Paul. A diverse, family-oriented community.',
+      address: 'Payne-Phalen, St. Paul',
+      zipCode: '55106',
+      location: 'East St. Paul',
+    },
+    {
+      name: 'Dayton\'s Bluff',
+      description: 'The historic Dayton\'s Bluff neighborhood overlooking downtown St. Paul. A community with deep roots and strong bonds.',
+      address: 'Dayton\'s Bluff, St. Paul',
+      zipCode: '55106',
+      location: 'East St. Paul',
+    },
+    {
+      name: 'West Side St. Paul',
+      description: 'The West Side neighborhood across the river from downtown. A vibrant, culturally rich community.',
+      address: 'West Side, St. Paul',
+      zipCode: '55107',
+      location: 'St. Paul',
+    },
+    {
+      name: 'West 7th - Fort Road',
+      description: 'The West 7th / Fort Road neighborhood. A historic community with a mix of longtime residents and newcomers.',
+      address: 'West 7th, St. Paul',
+      zipCode: '55102',
+      location: 'St. Paul',
+    },
+    {
+      name: 'Battle Creek - Highwood',
+      description: 'The Battle Creek and Highwood Hills area on St. Paul\'s east side. Families connecting through nature and community.',
+      address: 'Battle Creek, St. Paul',
+      zipCode: '55119',
+      location: 'East St. Paul',
+    },
+    {
+      name: 'North End St. Paul',
+      description: 'The North End neighborhood of St. Paul. A diverse community where neighbors help each other thrive.',
+      address: 'North End, St. Paul',
+      zipCode: '55117',
+      location: 'North St. Paul',
+    },
+
+    // === FIRST-RING SUBURBS ===
+    {
+      name: 'Richfield',
+      description: 'The city of Richfield, a first-ring suburb south of Minneapolis. A welcoming community of families and neighbors.',
+      address: 'Richfield, MN',
+      zipCode: '55423',
+      location: 'Richfield',
+    },
+    {
+      name: 'St. Louis Park',
+      description: 'St. Louis Park, just west of Minneapolis. A diverse, family-friendly suburb with strong community connections.',
+      address: 'St. Louis Park, MN',
+      zipCode: '55426',
+      location: 'St. Louis Park',
+    },
+    {
+      name: 'Golden Valley',
+      description: 'The city of Golden Valley, known for its parks and trails. Neighbors connecting for mutual aid and community events.',
+      address: 'Golden Valley, MN',
+      zipCode: '55427',
+      location: 'Golden Valley',
+    },
+    {
+      name: 'Robbinsdale',
+      description: 'The "Birdtown" community of Robbinsdale. A charming suburb with a strong sense of neighborhood and community spirit.',
+      address: 'Robbinsdale, MN',
+      zipCode: '55422',
+      location: 'Robbinsdale',
+    },
+    {
+      name: 'Crystal',
+      description: 'The city of Crystal in the northwest suburbs. Families and neighbors supporting each other and building community.',
+      address: 'Crystal, MN',
+      zipCode: '55428',
+      location: 'Crystal',
+    },
+    {
+      name: 'New Hope',
+      description: 'The city of New Hope. A welcoming suburban community where neighbors come together for mutual support.',
+      address: 'New Hope, MN',
+      zipCode: '55428',
+      location: 'New Hope',
+    },
+    {
+      name: 'Columbia Heights',
+      description: 'Columbia Heights, just north of Minneapolis. A diverse community with a small-town feel and big community spirit.',
+      address: 'Columbia Heights, MN',
+      zipCode: '55421',
+      location: 'Columbia Heights',
+    },
+    {
+      name: 'Fridley',
+      description: 'The city of Fridley along the Mississippi River. Neighbors connecting for community support and mutual aid.',
+      address: 'Fridley, MN',
+      zipCode: '55432',
+      location: 'Fridley',
+    },
+    {
+      name: 'South St. Paul',
+      description: 'South St. Paul, a community along the river bluffs. A proud, tight-knit community with strong neighborhood bonds.',
+      address: 'South St. Paul, MN',
+      zipCode: '55075',
+      location: 'South St. Paul',
+    },
+    {
+      name: 'West St. Paul',
+      description: 'West St. Paul, just south of the river. A welcoming community where neighbors look out for each other.',
+      address: 'West St. Paul, MN',
+      zipCode: '55118',
+      location: 'West St. Paul',
+    },
+    {
+      name: 'Mendota Heights',
+      description: 'Mendota Heights, a scenic community along the river bluffs. Families and neighbors building community together.',
+      address: 'Mendota Heights, MN',
+      zipCode: '55120',
+      location: 'Mendota Heights',
+    },
+    {
+      name: 'Roseville',
+      description: 'The city of Roseville, between Minneapolis and St. Paul. A family-friendly community with great parks and schools.',
+      address: 'Roseville, MN',
+      zipCode: '55113',
+      location: 'Roseville',
+    },
+    {
+      name: 'Maplewood',
+      description: 'The city of Maplewood, east of St. Paul. A diverse suburban community where neighbors support each other.',
+      address: 'Maplewood, MN',
+      zipCode: '55109',
+      location: 'Maplewood',
+    },
+
+    // === SECOND-RING SUBURBS (within ~30 miles) ===
+    {
+      name: 'Edina',
+      description: 'The city of Edina, a southwest suburb known for great schools and community. Neighbors connecting and supporting each other.',
+      address: 'Edina, MN',
+      zipCode: '55424',
+      location: 'Edina',
+    },
+    {
+      name: 'Bloomington',
+      description: 'The city of Bloomington, home to the Mall of America. A large, diverse community with neighborhoods ready to connect.',
+      address: 'Bloomington, MN',
+      zipCode: '55431',
+      location: 'Bloomington',
+    },
+    {
+      name: 'Eden Prairie',
+      description: 'Eden Prairie, a southwest suburb with beautiful trails and parks. Families building community and supporting each other.',
+      address: 'Eden Prairie, MN',
+      zipCode: '55344',
+      location: 'Eden Prairie',
+    },
+    {
+      name: 'Minnetonka',
+      description: 'The city of Minnetonka near Lake Minnetonka. A family-oriented community where neighbors help neighbors.',
+      address: 'Minnetonka, MN',
+      zipCode: '55345',
+      location: 'Minnetonka',
+    },
+    {
+      name: 'Hopkins',
+      description: 'The charming city of Hopkins, known as "Raspberry Capital." A walkable, community-minded suburb.',
+      address: 'Hopkins, MN',
+      zipCode: '55343',
+      location: 'Hopkins',
+    },
+    {
+      name: 'Plymouth',
+      description: 'The city of Plymouth in the western suburbs. A growing community of families and neighbors supporting each other.',
+      address: 'Plymouth, MN',
+      zipCode: '55441',
+      location: 'Plymouth',
+    },
+    {
+      name: 'Maple Grove',
+      description: 'Maple Grove in the northwest suburbs. A fast-growing community where families connect and support each other.',
+      address: 'Maple Grove, MN',
+      zipCode: '55369',
+      location: 'Maple Grove',
+    },
+    {
+      name: 'Brooklyn Park',
+      description: 'Brooklyn Park, one of the most diverse suburbs in Minnesota. A vibrant community building connections across cultures.',
+      address: 'Brooklyn Park, MN',
+      zipCode: '55445',
+      location: 'Brooklyn Park',
+    },
+    {
+      name: 'Brooklyn Center',
+      description: 'Brooklyn Center, a diverse northwest suburb. Neighbors coming together for mutual aid and community building.',
+      address: 'Brooklyn Center, MN',
+      zipCode: '55430',
+      location: 'Brooklyn Center',
+    },
+    {
+      name: 'Blaine',
+      description: 'The city of Blaine in the northern suburbs. A family-friendly community with strong neighborhood connections.',
+      address: 'Blaine, MN',
+      zipCode: '55434',
+      location: 'Blaine',
+    },
+    {
+      name: 'Coon Rapids',
+      description: 'Coon Rapids along the Mississippi River. A large suburban community where neighbors support each other.',
+      address: 'Coon Rapids, MN',
+      zipCode: '55433',
+      location: 'Coon Rapids',
+    },
+    {
+      name: 'Burnsville',
+      description: 'The city of Burnsville in the south metro. A diverse community with great parks and strong neighborhood bonds.',
+      address: 'Burnsville, MN',
+      zipCode: '55337',
+      location: 'Burnsville',
+    },
+    {
+      name: 'Eagan',
+      description: 'The city of Eagan in the south metro. Families and neighbors building community through mutual aid and support.',
+      address: 'Eagan, MN',
+      zipCode: '55122',
+      location: 'Eagan',
+    },
+    {
+      name: 'Apple Valley',
+      description: 'Apple Valley, home to the Minnesota Zoo. A family-oriented community where neighbors connect and help each other.',
+      address: 'Apple Valley, MN',
+      zipCode: '55124',
+      location: 'Apple Valley',
+    },
+    {
+      name: 'Lakeville',
+      description: 'The city of Lakeville in the south metro. A growing community of families supporting each other.',
+      address: 'Lakeville, MN',
+      zipCode: '55044',
+      location: 'Lakeville',
+    },
+    {
+      name: 'Inver Grove Heights',
+      description: 'Inver Grove Heights in the southeast metro. Neighbors connecting for community events and mutual support.',
+      address: 'Inver Grove Heights, MN',
+      zipCode: '55076',
+      location: 'Inver Grove Heights',
+    },
+    {
+      name: 'Cottage Grove',
+      description: 'Cottage Grove on the east side of the metro. A growing community with strong family and neighborhood connections.',
+      address: 'Cottage Grove, MN',
+      zipCode: '55016',
+      location: 'Cottage Grove',
+    },
+    {
+      name: 'Woodbury',
+      description: 'The city of Woodbury, one of the fastest-growing cities in Minnesota. Families building new community connections.',
+      address: 'Woodbury, MN',
+      zipCode: '55125',
+      location: 'Woodbury',
+    },
+    {
+      name: 'Oakdale',
+      description: 'The city of Oakdale in the eastern suburbs. A welcoming community where neighbors support each other.',
+      address: 'Oakdale, MN',
+      zipCode: '55128',
+      location: 'Oakdale',
+    },
+    {
+      name: 'White Bear Lake',
+      description: 'The city of White Bear Lake in the northeast suburbs. A lakeside community with a charming downtown and strong bonds.',
+      address: 'White Bear Lake, MN',
+      zipCode: '55110',
+      location: 'White Bear Lake',
+    },
+    {
+      name: 'Shoreview',
+      description: 'The city of Shoreview in the north suburbs. A community of families and neighbors connected through shared values.',
+      address: 'Shoreview, MN',
+      zipCode: '55126',
+      location: 'Shoreview',
+    },
+    {
+      name: 'Arden Hills',
+      description: 'Arden Hills in the northern suburbs. A peaceful community where neighbors look out for each other.',
+      address: 'Arden Hills, MN',
+      zipCode: '55112',
+      location: 'Arden Hills',
+    },
+    {
+      name: 'New Brighton',
+      description: 'The city of New Brighton. A family-friendly community with great parks and active neighborhood connections.',
+      address: 'New Brighton, MN',
+      zipCode: '55112',
+      location: 'New Brighton',
+    },
+    {
+      name: 'Mounds View',
+      description: 'Mounds View in the north suburbs. A welcoming community where neighbors come together for mutual support.',
+      address: 'Mounds View, MN',
+      zipCode: '55112',
+      location: 'Mounds View',
+    },
+    {
+      name: 'Wayzata',
+      description: 'The lakeside city of Wayzata on Lake Minnetonka. A charming community with strong neighborhood bonds.',
+      address: 'Wayzata, MN',
+      zipCode: '55391',
+      location: 'Wayzata',
+    },
+    {
+      name: 'Excelsior',
+      description: 'The charming lakeside town of Excelsior on Lake Minnetonka. A tight-knit community with a village atmosphere.',
+      address: 'Excelsior, MN',
+      zipCode: '55331',
+      location: 'Excelsior',
+    },
+    {
+      name: 'Chanhassen',
+      description: 'The city of Chanhassen in the southwest metro. Families and neighbors building community in a beautiful setting.',
+      address: 'Chanhassen, MN',
+      zipCode: '55317',
+      location: 'Chanhassen',
+    },
+    {
+      name: 'Savage',
+      description: 'The city of Savage along the Minnesota River. A growing community where neighbors connect and support each other.',
+      address: 'Savage, MN',
+      zipCode: '55378',
+      location: 'Savage',
+    },
+    {
+      name: 'Prior Lake',
+      description: 'Prior Lake in the southwest metro. A lakeside community where families and neighbors build lasting connections.',
+      address: 'Prior Lake, MN',
+      zipCode: '55372',
+      location: 'Prior Lake',
+    },
+    {
+      name: 'Shakopee',
+      description: 'The city of Shakopee along the Minnesota River. A diverse, growing community ready to connect and support each other.',
+      address: 'Shakopee, MN',
+      zipCode: '55379',
+      location: 'Shakopee',
+    },
+    {
+      name: 'Stillwater',
+      description: 'The historic river town of Stillwater on the St. Croix. A charming community with deep roots and strong bonds.',
+      address: 'Stillwater, MN',
+      zipCode: '55082',
+      location: 'Stillwater',
+    },
+  ];
+
+  console.log('\nCreating Minneapolis Public Schools...');
 
   let createdCount = 0;
   for (const school of minneapolisSchools) {
@@ -391,12 +1067,63 @@ async function main() {
     });
 
     createdCount++;
-    console.log(`✓ Created: ${school.name}`);
+    console.log(`  ✓ School: ${school.name}`);
   }
 
-  console.log(`\n✅ Successfully seeded ${createdCount} Minneapolis Public Schools`);
-  console.log(`\nYou can now search for schools by zip code:`);
-  console.log(`- 55405, 55419, 55410, 55407, 55409, 55408, 55418, 55411, 55406, 55417, 55414, 55403, 55404, 55413`);
+  console.log(`\n✅ Seeded ${createdCount} schools`);
+
+  console.log('\nCreating neighborhood communities...');
+
+  let neighborhoodCount = 0;
+  for (const neighborhood of neighborhoods) {
+    const community = await prisma.community.upsert({
+      where: {
+        name_zipCode: {
+          name: neighborhood.name,
+          zipCode: neighborhood.zipCode,
+        },
+      },
+      update: {
+        description: neighborhood.description,
+        address: neighborhood.address,
+        location: neighborhood.location,
+      },
+      create: {
+        name: neighborhood.name,
+        description: neighborhood.description,
+        address: neighborhood.address,
+        location: neighborhood.location,
+        zipCode: neighborhood.zipCode,
+        isPrivate: false,
+        createdById: systemUser.id,
+      },
+    });
+
+    // Create system user as admin of the community
+    await prisma.communityMember.upsert({
+      where: {
+        communityId_userId: {
+          communityId: community.id,
+          userId: systemUser.id,
+        },
+      },
+      update: {},
+      create: {
+        communityId: community.id,
+        userId: systemUser.id,
+        role: 'ADMIN',
+      },
+    });
+
+    neighborhoodCount++;
+    console.log(`  ✓ Neighborhood: ${neighborhood.name}`);
+  }
+
+  console.log(`\n✅ Seeded ${neighborhoodCount} neighborhoods`);
+  console.log(`\n🏘️  Total communities seeded: ${createdCount + neighborhoodCount}`);
+  console.log(`   - ${createdCount} schools`);
+  console.log(`   - ${neighborhoodCount} neighborhoods`);
+  console.log(`\nCoverage: Minneapolis, St. Paul, and suburbs within ~30 mile radius`);
 }
 
 main()
