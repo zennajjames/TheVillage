@@ -2,6 +2,5 @@ node_modules
 build
 dist
 .env
-GOOGLE_MAPS_INTEGRATION.md
 theVillageApp.pages
 /seeds/
