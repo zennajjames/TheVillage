@@ -9,8 +9,11 @@ export const googleAuth = passport.authenticate('google', {
 
 // Helper function to handle OAuth callback logic
 const handleOAuthCallback = (provider: string) => (req: Request, res: Response, next: NextFunction) => {
-  passport.authenticate(provider, { session: false }, (err: any, user: any) => {
+  passport.authenticate(provider, { session: false }, (err: any, user: any, info: any) => {
     if (err || !user) {
+      console.error(`OAuth ${provider} callback error:`, err);
+      console.error(`OAuth ${provider} user:`, user);
+      console.error(`OAuth ${provider} info:`, info);
       return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:3000'}/login?error=oauth_failed`);
     }
 
