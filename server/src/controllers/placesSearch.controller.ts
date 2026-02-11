@@ -11,14 +11,27 @@ interface PlaceResult {
   category: string;
 }
 
+// Only search for neighborhoods, towns, and schools — no businesses
 const COMMUNITY_SEARCH_QUERIES = [
-  { query: 'community center near', category: 'Community Center' },
-  { query: 'neighborhood association near', category: 'Neighborhood Association' },
-  { query: 'community organization near', category: 'Community Organization' },
-  { query: 'parent group near', category: 'Parent Group' },
-  { query: 'youth center near', category: 'Youth Center' },
-  { query: 'recreation center near', category: 'Recreation Center' },
+  { query: 'neighborhood in', category: 'Neighborhood', type: 'neighborhood' },
+  { query: 'elementary school in', category: 'School', type: 'school' },
+  { query: 'middle school in', category: 'School', type: 'school' },
+  { query: 'high school in', category: 'School', type: 'school' },
 ];
+
+// Google Places types that are allowed — filter out businesses
+const ALLOWED_TYPES = new Set([
+  'neighborhood',
+  'locality',
+  'sublocality',
+  'sublocality_level_1',
+  'sublocality_level_2',
+  'administrative_area_level_3',
+  'school',
+  'primary_school',
+  'secondary_school',
+  'university',
+]);
 
 export const searchLocalCommunities = async (req: Request, res: Response) => {
   try {
@@ -34,28 +47,35 @@ export const searchLocalCommunities = async (req: Request, res: Response) => {
     }
 
     // Run all search queries in parallel
-    const searchPromises = COMMUNITY_SEARCH_QUERIES.map(async ({ query, category }) => {
+    const searchPromises = COMMUNITY_SEARCH_QUERIES.map(async ({ query, category, type }) => {
       try {
         const response = await axios.get(
           'https://maps.googleapis.com/maps/api/place/textsearch/json',
           {
             params: {
               query: `${query} ${zipCode}`,
+              type,
               key: apiKey,
             },
           }
         );
 
         if (response.data.status === 'OK') {
-          return response.data.results.map((place: any) => ({
-            placeId: place.place_id,
-            name: place.name,
-            address: place.formatted_address || '',
-            types: place.types || [],
-            rating: place.rating,
-            userRatingsTotal: place.user_ratings_total,
-            category,
-          }));
+          // Filter results to only include allowed place types
+          return response.data.results
+            .filter((place: any) => {
+              const placeTypes: string[] = place.types || [];
+              return placeTypes.some((t: string) => ALLOWED_TYPES.has(t));
+            })
+            .map((place: any) => ({
+              placeId: place.place_id,
+              name: place.name,
+              address: place.formatted_address || '',
+              types: place.types || [],
+              rating: place.rating,
+              userRatingsTotal: place.user_ratings_total,
+              category,
+            }));
         }
         return [];
       } catch (err) {
@@ -77,12 +97,13 @@ export const searchLocalCommunities = async (req: Request, res: Response) => {
       }
     }
 
-    // Sort by rating (highest first), then by number of ratings
+    // Sort: Schools first, then neighborhoods, alphabetically within each
     deduplicated.sort((a, b) => {
-      const ratingA = a.rating || 0;
-      const ratingB = b.rating || 0;
-      if (ratingB !== ratingA) return ratingB - ratingA;
-      return (b.userRatingsTotal || 0) - (a.userRatingsTotal || 0);
+      // Schools before neighborhoods
+      if (a.category === 'School' && b.category !== 'School') return -1;
+      if (a.category !== 'School' && b.category === 'School') return 1;
+      // Alphabetical within same category
+      return a.name.localeCompare(b.name);
     });
 
     // Return top 20 results
