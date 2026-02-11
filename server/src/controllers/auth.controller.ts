@@ -95,7 +95,7 @@ export const login = async (req: Request, res: Response) => {
 
     // Check if user signed up with OAuth (no password)
     if (!user.passwordHash) {
-      return res.status(401).json({ error: 'Please log in using your social account (Google or Facebook)' });
+      return res.status(401).json({ error: 'Please log in using your Google account' });
     }
 
     // Check password

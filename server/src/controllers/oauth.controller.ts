@@ -44,13 +44,6 @@ const handleOAuthCallback = (provider: string) => (req: Request, res: Response, 
 
 export const googleCallback = handleOAuthCallback('google');
 
-export const facebookAuth = passport.authenticate('facebook', {
-  scope: ['email', 'public_profile'],
-  session: false,
-});
-
-export const facebookCallback = handleOAuthCallback('facebook');
-
 export const completeOnboarding = async (req: Request, res: Response) => {
   try {
     const { zipCode, agreedToGuidelines } = req.body;
