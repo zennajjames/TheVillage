@@ -7,9 +7,14 @@ interface AuthenticatedSocket extends Socket {
 }
 
 export const setupSocketServer = (httpServer: HttpServer) => {
+  const allowedOrigins = [
+    'http://localhost:3000',
+    process.env.CLIENT_URL,
+  ].filter(Boolean) as string[];
+
   const io = new SocketServer(httpServer, {
     cors: {
-      origin: 'http://localhost:3000',
+      origin: allowedOrigins,
       methods: ['GET', 'POST']
     }
   });

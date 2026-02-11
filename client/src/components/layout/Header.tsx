@@ -83,16 +83,6 @@ const Header: React.FC = () => {
                 {t('nav.about')}
               </button>
               <button
-                onClick={() => navigate('/posts')}
-                className={`px-3 lg:px-4 py-2 rounded-xl text-sm lg:text-base font-medium transition ${
-                  isActive('/posts')
-                    ? 'bg-brand-red/10 text-brand-red'
-                    : 'text-neutral-700 hover:bg-neutral-100'
-                }`}
-              >
-                Posts
-              </button>
-              <button
                 onClick={() => navigate('/communities')}
                 className={`px-3 lg:px-4 py-2 rounded-xl text-sm lg:text-base font-medium transition ${
                   isActive('/communities')

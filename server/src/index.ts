@@ -35,8 +35,13 @@ app.use((req, res, next) => {
   next();
 });
 
+const allowedOrigins = [
+  'http://localhost:3000',
+  process.env.CLIENT_URL,
+].filter(Boolean) as string[];
+
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: allowedOrigins,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
@@ -103,7 +108,7 @@ app.use('/api/places', placesSearchRoutes);
 
 httpServer.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
-  console.log('CORS enabled for http://localhost:3000');
+  console.log(`CORS enabled for: ${allowedOrigins.join(', ')}`);
   console.log('Socket.io enabled');
   console.log('📬 Notifications enabled');
 });

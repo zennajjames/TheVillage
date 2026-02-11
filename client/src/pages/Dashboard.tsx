@@ -2,23 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/layout/Header';
-import DashboardMap from '../components/map/DashboardMap';
 import { communitiesService } from '../services/communities.service';
 import { postsService } from '../services/posts.service';
 import { eventsService } from '../services/events.service';
 import { helpRequestsService } from '../services/helpRequests.service';
 import { Community, Post, HelpRequest, Event as EventType } from '../types';
-import { getSchoolCoordinates, calculateDistance, getUserLocation } from '../utils/geocoding';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [nearbyCommunities, setNearbyCommunities] = useState<Community[]>([]);
-  const [closestCommunities, setClosestCommunities] = useState<Community[]>([]);
   const [recentPosts, setRecentPosts] = useState<Post[]>([]);
   const [recentRequests, setRecentRequests] = useState<HelpRequest[]>([]);
   const [upcomingEvents, setUpcomingEvents] = useState<EventType[]>([]);
-  const [radius, setRadius] = useState(10);
   const [isLoading, setIsLoading] = useState(true);
   const [hasCommunities, setHasCommunities] = useState<boolean | null>(null);
   const [userCommunities, setUserCommunities] = useState<Community[]>([]);
@@ -31,7 +26,7 @@ const Dashboard: React.FC = () => {
     if (hasCommunities !== null && hasCommunities) {
       fetchDashboardData();
     }
-  }, [radius, hasCommunities]);
+  }, [hasCommunities]);
 
   const checkUserCommunities = async () => {
     try {
@@ -51,10 +46,6 @@ const Dashboard: React.FC = () => {
   const fetchDashboardData = async () => {
     try {
       setIsLoading(true);
-
-      // Fetch all communities for the map
-      const allCommunities = await communitiesService.getAllCommunities();
-      setNearbyCommunities(allCommunities);
 
       // Fetch community-scoped posts, events, and help requests
       const allPosts: Post[] = [];
@@ -91,35 +82,12 @@ const Dashboard: React.FC = () => {
       // Help requests — sort by newest and take 5
       allRequests.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       setRecentRequests(allRequests.slice(0, 5));
-
-      // Sort communities by distance
-      const userCoords = await getUserLocation(
-        user?.zipCode,
-        user?.street,
-        user?.city,
-        user?.state
-      );
-      const sorted = allCommunities
-        .map((community) => {
-          const coords = getSchoolCoordinates(community.name);
-          const distance = coords
-            ? calculateDistance(userCoords.lat, userCoords.lng, coords.lat, coords.lng)
-            : Infinity;
-          return { community, distance };
-        })
-        .filter(({ distance }) => distance <= radius)
-        .sort((a, b) => a.distance - b.distance)
-        .slice(0, 5)
-        .map(({ community }) => community);
-      setClosestCommunities(sorted);
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
     } finally {
       setIsLoading(false);
     }
   };
-
-  const radiusOptions = [5, 10, 25, 50];
 
   const timeAgo = (dateStr: string) => {
     const now = new Date();
@@ -392,106 +360,15 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Map + Sidebar Grid */}
+        {/* Quick Actions + Tip */}
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Local Communities Map */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-3xl border-2 border-neutral-200 shadow-soft overflow-hidden">
-              {/* Header */}
-              <div className="p-6 border-b border-neutral-100">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h2 className="text-2xl font-bold text-neutral-900 mb-1">
-                      Local Communities Near You
-                    </h2>
-                    <p className="text-neutral-600 text-sm flex items-center gap-1">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                      </svg>
-                      {user?.location || 'Your area'}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => navigate('/communities')}
-                    className="text-brand-red hover:text-brand-red-dark font-semibold text-sm transition-colors"
-                  >
-                    View All →
-                  </button>
-                </div>
-
-                {/* Radius Filter */}
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-neutral-600 font-medium">Radius:</span>
-                  {radiusOptions.map((r) => (
-                    <button
-                      key={r}
-                      onClick={() => setRadius(r)}
-                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
-                        radius === r
-                          ? 'bg-brand-red text-white'
-                          : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
-                      }`}
-                    >
-                      {r} mi
-                    </button>
-                  ))}
-                </div>
-              </div>
-              {/* Map Visualization */}
-              <DashboardMap communities={nearbyCommunities} radius={radius} />
-
-              {/* Communities List */}
-              <div className="p-6">
-                <h3 className="font-bold text-neutral-900 mb-4">Nearby Communities</h3>
-                {isLoading ? (
-                  <div className="text-center py-8">
-                    <div className="w-8 h-8 border-3 border-brand-red border-t-transparent rounded-full animate-spin mx-auto"></div>
-                  </div>
-                ) : closestCommunities.length > 0 ? (
-                  <div className="space-y-3">
-                    {closestCommunities.map((community) => (
-                      <button
-                        key={community.id}
-                        onClick={() => navigate(`/communities/${community.id}`)}
-                        className="w-full text-left p-4 rounded-2xl border-2 border-brand-red/20 hover:border-brand-red hover:shadow-md transition-all"
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-neutral-900 mb-1">{community.name}</h4>
-                            <div className="flex items-center gap-3 mt-2 text-xs text-neutral-500">
-                              <span className="flex items-center gap-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3 h-3">
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-                                </svg>
-                                {community._count?.members || 0} members
-                              </span>
-                              {community.category && <span>• {community.category}</span>}
-                            </div>
-                          </div>
-                          <span className="text-brand-red ml-4">→</span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-neutral-500">
-                    No communities found nearby. Be the first to create one!
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Quick Actions */}
             <div className="bg-white rounded-3xl border-2 border-neutral-200 p-6 shadow-soft">
               <h3 className="font-bold text-neutral-900 mb-4">Quick Actions</h3>
-              <div className="space-y-2">
+              <div className="grid sm:grid-cols-3 gap-3">
                 <button
                   onClick={() => navigate('/posts')}
-                  className="w-full text-left px-4 py-3 bg-brand-red/10 rounded-xl hover:bg-brand-red/20 transition flex items-center gap-3 border-2 border-brand-red/20"
+                  className="text-left px-4 py-3 bg-brand-red/10 rounded-xl hover:bg-brand-red/20 transition flex items-center gap-3 border-2 border-brand-red/20"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6 text-brand-red flex-shrink-0">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 110-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 01-1.44-4.282m3.102.069a18.03 18.03 0 01-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 018.835 2.535M10.34 6.66a23.847 23.847 0 008.835-2.535m0 0A23.74 23.74 0 0018.795 3m.38 1.125a23.91 23.91 0 011.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 001.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 010 3.46" />
@@ -504,7 +381,7 @@ const Dashboard: React.FC = () => {
 
                 <button
                   onClick={() => navigate('/events')}
-                  className="w-full text-left px-4 py-3 bg-neutral-100 rounded-xl hover:bg-neutral-200 transition flex items-center gap-3 border-2 border-neutral-300"
+                  className="text-left px-4 py-3 bg-neutral-100 rounded-xl hover:bg-neutral-200 transition flex items-center gap-3 border-2 border-neutral-300"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6 text-neutral-700 flex-shrink-0">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
@@ -517,7 +394,7 @@ const Dashboard: React.FC = () => {
 
                 <button
                   onClick={() => navigate('/search')}
-                  className="w-full text-left px-4 py-3 bg-brand-red/10 rounded-xl hover:bg-brand-red/20 transition flex items-center gap-3 border-2 border-brand-red/20"
+                  className="text-left px-4 py-3 bg-brand-red/10 rounded-xl hover:bg-brand-red/20 transition flex items-center gap-3 border-2 border-brand-red/20"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6 text-brand-red flex-shrink-0">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
@@ -529,17 +406,17 @@ const Dashboard: React.FC = () => {
                 </button>
               </div>
             </div>
+          </div>
 
-            {/* Community Tips */}
-            <div className="bg-brand-red/10 rounded-3xl p-6 border-2 border-brand-red/30">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-brand-black mb-3">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
-              </svg>
-              <h3 className="font-bold text-neutral-900 mb-2">Community Tip</h3>
-              <p className="text-sm text-neutral-700 leading-relaxed">
-                The best way to build trust in your community is to start small. Offer to help a neighbor with something simple!
-              </p>
-            </div>
+          {/* Community Tips */}
+          <div className="bg-brand-red/10 rounded-3xl p-6 border-2 border-brand-red/30">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-brand-black mb-3">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
+            </svg>
+            <h3 className="font-bold text-neutral-900 mb-2">Community Tip</h3>
+            <p className="text-sm text-neutral-700 leading-relaxed">
+              The best way to build trust in your community is to start small. Offer to help a neighbor with something simple!
+            </p>
           </div>
         </div>
       </div>
