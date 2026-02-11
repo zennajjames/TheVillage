@@ -151,6 +151,7 @@ export const getMe = async (req: Request, res: Response) => {
         zipCode: true,
         profilePicture: true,
         bio: true,
+        isAdmin: true,
         showEmail: true,
         showAddress: true,
         allowMessages: true,
