@@ -170,7 +170,7 @@ const Communities: React.FC = () => {
 
                   <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
                     <span>👥 {community._count?.members || 0} members</span>
-                    <span>📚 {community._count?.groups || 0} groups</span>
+                    <span>📝 {community._count?.communityPosts || 0} posts</span>
                   </div>
 
                   {!community.isMember && (

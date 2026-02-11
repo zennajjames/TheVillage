@@ -6,20 +6,29 @@ import { notificationService } from '../services/notification.service';
 
 export const createPost = async (req: Request, res: Response) => {
   try {
-    const { type, title, description, location } = req.body;
+    const { type, title, description, location, communityId } = req.body;
     const userId = req.user!.id;
 
-    if (!type || !title || !description || !location) {
-      return res.status(400).json({ error: 'All fields are required' });
+    if (!type || !title || !description || !location || !communityId) {
+      return res.status(400).json({ error: 'All fields are required including communityId' });
     }
 
     if (type !== 'REQUEST' && type !== 'OFFER') {
       return res.status(400).json({ error: 'Type must be REQUEST or OFFER' });
     }
 
+    // Verify user is a member of the community
+    const membership = await prisma.communityMember.findUnique({
+      where: { communityId_userId: { communityId, userId } }
+    });
+    if (!membership) {
+      return res.status(403).json({ error: 'You must be a member of this community to post' });
+    }
+
     const post = await prisma.post.create({
       data: {
         userId,
+        communityId,
         type,
         title,
         description,
@@ -36,30 +45,40 @@ export const createPost = async (req: Request, res: Response) => {
             profilePicture: true,
             zipCode: true
           }
+        },
+        community: {
+          select: {
+            id: true,
+            name: true
+          }
         }
       }
     });
 
-    // Get nearby users (same zip code) to notify
-    const nearbyUsers = await prisma.user.findMany({
+    // Get community members to notify (not the poster)
+    const communityMembers = await prisma.communityMember.findMany({
       where: {
-        zipCode: post.user.zipCode,
-        id: { not: userId }
+        communityId,
+        userId: { not: userId }
       },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        emailNotifications: true,
-        notifyOnPosts: true
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            emailNotifications: true,
+            notifyOnPosts: true
+          }
+        }
       },
-      take: 50 // Limit to avoid sending too many notifications
+      take: 50
     });
 
     const posterName = post.user.firstName + ' ' + post.user.lastName;
 
     // Send notifications async
-    nearbyUsers.forEach(user => {
+    communityMembers.forEach(({ user }) => {
       // Create in-app notification
       notificationService.notifyNewPost(
         user.id,
@@ -94,18 +113,22 @@ export const createPost = async (req: Request, res: Response) => {
 
 export const getPosts = async (req: Request, res: Response) => {
   try {
-    const { type, status } = req.query;
+    const { type, status, communityId } = req.query;
 
     const where: any = {};
-    
+
     if (type) {
       where.type = type;
     }
-    
+
     if (status) {
       where.status = status;
     } else {
       where.status = 'OPEN';
+    }
+
+    if (communityId && typeof communityId === 'string') {
+      where.communityId = communityId;
     }
 
     const posts = await prisma.post.findMany({
@@ -117,8 +140,14 @@ export const getPosts = async (req: Request, res: Response) => {
             firstName: true,
             lastName: true,
             location: true,
-            profilePicture: true  // Add this line
+            profilePicture: true
             }
+        },
+        community: {
+          select: {
+            id: true,
+            name: true
+          }
         }
       },
       orderBy: {
@@ -147,8 +176,14 @@ export const getPost = async (req: Request, res: Response) => {
                 lastName: true,
                 location: true,
                 email: true,
-                profilePicture: true  // Add this line
+                profilePicture: true
                 }
+            },
+            community: {
+              select: {
+                id: true,
+                name: true
+              }
             }
         }
     });
@@ -192,6 +227,12 @@ export const updatePostStatus = async (req: Request, res: Response) => {
             firstName: true,
             lastName: true,
             location: true
+          }
+        },
+        community: {
+          select: {
+            id: true,
+            name: true
           }
         }
       }

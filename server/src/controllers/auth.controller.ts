@@ -153,7 +153,8 @@ export const getMe = async (req: Request, res: Response) => {
         bio: true,
         showEmail: true,
         showAddress: true,
-        allowMessages: true
+        allowMessages: true,
+        appearInSearch: true
       }
     });
 
@@ -371,7 +372,7 @@ export const resetPassword = async (req: Request, res: Response) => {
 export const updateNotificationPreferences = async (req: Request, res: Response) => {
   try {
     const userId = req.user!.id;
-    const { emailNotifications, notifyOnMessages, notifyOnPosts, notifyOnGroups } = req.body;
+    const { emailNotifications, notifyOnMessages, notifyOnPosts, notifyOnCommunities } = req.body;
 
     const user = await prisma.user.update({
       where: { id: userId },
@@ -379,14 +380,14 @@ export const updateNotificationPreferences = async (req: Request, res: Response)
         emailNotifications: emailNotifications ?? undefined,
         notifyOnMessages: notifyOnMessages ?? undefined,
         notifyOnPosts: notifyOnPosts ?? undefined,
-        notifyOnGroups: notifyOnGroups ?? undefined
+        notifyOnCommunities: notifyOnCommunities ?? undefined
       },
       select: {
         id: true,
         emailNotifications: true,
         notifyOnMessages: true,
         notifyOnPosts: true,
-        notifyOnGroups: true
+        notifyOnCommunities: true
       }
     });
 
@@ -400,20 +401,22 @@ export const updateNotificationPreferences = async (req: Request, res: Response)
 export const updatePrivacySettings = async (req: Request, res: Response) => {
   try {
     const userId = req.user!.id;
-    const { showEmail, showAddress, allowMessages } = req.body;
+    const { showEmail, showAddress, allowMessages, appearInSearch } = req.body;
 
     const user = await prisma.user.update({
       where: { id: userId },
       data: {
         showEmail: showEmail ?? undefined,
         showAddress: showAddress ?? undefined,
-        allowMessages: allowMessages ?? undefined
+        allowMessages: allowMessages ?? undefined,
+        appearInSearch: appearInSearch ?? undefined
       },
       select: {
         id: true,
         showEmail: true,
         showAddress: true,
-        allowMessages: true
+        allowMessages: true,
+        appearInSearch: true
       }
     });
 
@@ -433,7 +436,8 @@ export const getPrivacySettings = async (req: Request, res: Response) => {
       select: {
         showEmail: true,
         showAddress: true,
-        allowMessages: true
+        allowMessages: true,
+        appearInSearch: true
       }
     });
 

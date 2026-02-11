@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { communitiesService } from '../services/communities.service';
-import { groupsService } from '../services/groups.service';
+import { subgroupsService } from '../services/subgroups.service';
 import { helpRequestsService } from '../services/helpRequests.service';
-import { Community, Group, HelpRequest, CreateHelpRequestData } from '../types';
+import { Community, SubGroup, CommunityPost, HelpRequest, CreateHelpRequestData, CreateSubGroupData } from '../types';
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/layout/Header';
-import CreateGroupForm from '../components/groups/CreateGroupForm';
+import SubGroupCard from '../components/communities/SubGroupCard';
+import CreateSubGroupForm from '../components/communities/CreateSubGroupForm';
 import HelpRequestCard from '../components/posts/HelpRequestCard';
 import CreateHelpRequestForm from '../components/posts/CreateHelpRequestForm';
 import AdminInbox from '../components/community/AdminInbox';
@@ -17,31 +18,25 @@ const CommunityDetail: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [community, setCommunity] = useState<Community | null>(null);
-  const [groups, setGroups] = useState<Group[]>([]);
+  const [subGroups, setSubGroups] = useState<SubGroup[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showCreateGroupForm, setShowCreateGroupForm] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('All');
 
-  // Tabs: groups, help-requests, admin-inbox
-  const initialTab = searchParams.get('tab') || 'groups';
+  // Tabs: posts, classes, help-requests, admin-inbox
+  const initialTab = searchParams.get('tab') || 'posts';
   const [activeTab, setActiveTab] = useState(initialTab);
+
+  // Posts state
+  const [newPostContent, setNewPostContent] = useState('');
+  const [isPostingPost, setIsPostingPost] = useState(false);
+
+  // SubGroups state
+  const [showCreateSubGroupForm, setShowCreateSubGroupForm] = useState(false);
 
   // Help requests state
   const [helpRequests, setHelpRequests] = useState<HelpRequest[]>([]);
   const [helpLoading, setHelpLoading] = useState(false);
   const [showHelpForm, setShowHelpForm] = useState(false);
-
-  const CATEGORIES = [
-    'All',
-    'Fundraising',
-    'Events',
-    'Classroom Parents',
-    'Volunteer Coordination',
-    'Board/Leadership',
-    'General Discussion',
-    'Other'
-  ];
 
   const fetchCommunity = async () => {
     try {
@@ -50,8 +45,11 @@ const CommunityDetail: React.FC = () => {
       const data = await communitiesService.getCommunityById(id);
       setCommunity(data);
 
-      const communityGroups = await groupsService.getGroups({ communityId: id });
-      setGroups(communityGroups);
+      // Fetch subgroups for school communities
+      if (data.category === 'School') {
+        const subs = await subgroupsService.getSubGroups(id);
+        setSubGroups(subs);
+      }
     } catch (err: any) {
       setError('Failed to load community');
     } finally {
@@ -102,10 +100,29 @@ const CommunityDetail: React.FC = () => {
     }
   };
 
-  const handleCreateGroup = async (data: any) => {
-    await groupsService.createGroup(data);
-    setShowCreateGroupForm(false);
-    fetchCommunity();
+  const handleCreatePost = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!id || !newPostContent.trim()) return;
+
+    setIsPostingPost(true);
+    try {
+      await communitiesService.createCommunityPost(id, newPostContent.trim());
+      setNewPostContent('');
+      fetchCommunity(); // Refresh to get new post
+    } catch (err: any) {
+      alert(err.response?.data?.error || 'Failed to create post');
+    } finally {
+      setIsPostingPost(false);
+    }
+  };
+
+  const handleCreateSubGroup = async (data: CreateSubGroupData) => {
+    await subgroupsService.createSubGroup(data);
+    setShowCreateSubGroupForm(false);
+    if (id) {
+      const subs = await subgroupsService.getSubGroups(id);
+      setSubGroups(subs);
+    }
   };
 
   const handleCreateHelpRequest = async (data: CreateHelpRequestData) => {
@@ -122,13 +139,6 @@ const CommunityDetail: React.FC = () => {
       alert(err.response?.data?.error || 'Failed to update status');
     }
   };
-
-  const filterByCategory = (groupsList: Group[]) => {
-    if (selectedCategory === 'All') return groupsList;
-    return groupsList.filter(group => group.category === selectedCategory);
-  };
-
-  const displayedGroups = filterByCategory(groups);
 
   if (isLoading) {
     return (
@@ -158,6 +168,7 @@ const CommunityDetail: React.FC = () => {
   const isAdmin = community.userRole === 'ADMIN';
   const isMod = community.userRole === 'MODERATOR';
   const isAdminOrMod = isAdmin || isMod;
+  const isSchool = community.category === 'School';
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -197,6 +208,11 @@ const CommunityDetail: React.FC = () => {
                       🔒 Private
                     </span>
                   )}
+                  {community.category && (
+                    <span className="bg-blue-100 text-blue-700 text-sm px-3 py-1 rounded">
+                      {community.category}
+                    </span>
+                  )}
                   {isAdmin && (
                     <span className="bg-red-100 text-red-700 text-xs px-2.5 py-1 rounded-lg font-semibold">
                       Admin
@@ -231,7 +247,8 @@ const CommunityDetail: React.FC = () => {
 
             <div className="flex items-center gap-6 text-sm text-gray-600 border-t pt-4">
               <span>👥 {community._count?.members || 0} members</span>
-              <span>📚 {community._count?.groups || 0} groups</span>
+              <span>📝 {community._count?.communityPosts || 0} posts</span>
+              {isSchool && <span>📚 {community._count?.subGroups || 0} classes</span>}
             </div>
           </div>
         </div>
@@ -242,15 +259,27 @@ const CommunityDetail: React.FC = () => {
             {/* Tab Navigation */}
             <div className="flex items-center gap-3 mb-6 flex-wrap">
               <button
-                onClick={() => setActiveTab('groups')}
+                onClick={() => setActiveTab('posts')}
                 className={`px-5 py-2.5 rounded-xl font-semibold transition-all ${
-                  activeTab === 'groups'
+                  activeTab === 'posts'
                     ? 'bg-brand-red text-white'
                     : 'bg-white text-gray-700 border border-gray-200 hover:border-red-300'
                 }`}
               >
-                Groups
+                Posts
               </button>
+              {isSchool && (
+                <button
+                  onClick={() => setActiveTab('classes')}
+                  className={`px-5 py-2.5 rounded-xl font-semibold transition-all ${
+                    activeTab === 'classes'
+                      ? 'bg-brand-red text-white'
+                      : 'bg-white text-gray-700 border border-gray-200 hover:border-red-300'
+                  }`}
+                >
+                  Classes
+                </button>
+              )}
               <button
                 onClick={() => setActiveTab('help-requests')}
                 className={`px-5 py-2.5 rounded-xl font-semibold transition-all ${
@@ -275,94 +304,109 @@ const CommunityDetail: React.FC = () => {
               )}
             </div>
 
-            {/* ===== GROUPS TAB ===== */}
-            {activeTab === 'groups' && (
+            {/* ===== POSTS TAB ===== */}
+            {activeTab === 'posts' && (
+              <>
+                {/* Create Post Form */}
+                <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
+                  <form onSubmit={handleCreatePost}>
+                    <textarea
+                      value={newPostContent}
+                      onChange={(e) => setNewPostContent(e.target.value)}
+                      placeholder="Share something with the community..."
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
+                      rows={3}
+                    />
+                    <div className="flex justify-end mt-3">
+                      <button
+                        type="submit"
+                        disabled={isPostingPost || !newPostContent.trim()}
+                        className="bg-brand-red text-white px-6 py-2.5 rounded-md hover:bg-brand-red-dark transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isPostingPost ? 'Posting...' : 'Post'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                {/* Posts Feed */}
+                {community.posts && community.posts.length > 0 ? (
+                  <div className="space-y-4">
+                    {community.posts.map((post: CommunityPost) => (
+                      <div key={post.id} className="bg-white rounded-2xl border border-gray-200 p-6">
+                        <p className="text-gray-800 mb-3">{post.content}</p>
+                        <div className="text-sm text-gray-500">
+                          {new Date(post.createdAt).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit'
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-3xl border border-gray-200 p-12 text-center">
+                    <div className="text-6xl mb-4">📝</div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">No posts yet</h3>
+                    <p className="text-gray-600">
+                      Be the first to share something with the community!
+                    </p>
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* ===== CLASSES TAB (School communities only) ===== */}
+            {activeTab === 'classes' && isSchool && (
               <>
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">Groups</h2>
-                  {!showCreateGroupForm && (
+                  <h2 className="text-2xl font-bold text-gray-900">Classes</h2>
+                  {!showCreateSubGroupForm && (
                     <button
-                      onClick={() => setShowCreateGroupForm(true)}
+                      onClick={() => setShowCreateSubGroupForm(true)}
                       className="bg-brand-red text-white px-6 py-3 rounded-md hover:bg-brand-red-dark transition font-semibold"
                     >
-                      + Create Group
+                      + Add Class
                     </button>
                   )}
                 </div>
 
-                {showCreateGroupForm && (
+                {showCreateSubGroupForm && (
                   <div className="mb-8 bg-white rounded-3xl border border-gray-200 shadow-lg overflow-hidden">
                     <div className="bg-neutral-900 px-6 py-4">
-                      <h3 className="text-xl font-bold text-white">Create New Group</h3>
+                      <h3 className="text-xl font-bold text-white">Add New Class</h3>
                     </div>
                     <div className="p-6">
-                      <CreateGroupForm
-                        communityId={id!}
-                        onSubmit={handleCreateGroup}
-                        onCancel={() => setShowCreateGroupForm(false)}
+                      <CreateSubGroupForm
+                        parentCommunityId={id!}
+                        onSubmit={handleCreateSubGroup}
+                        onCancel={() => setShowCreateSubGroupForm(false)}
                       />
                     </div>
                   </div>
                 )}
 
-                {!showCreateGroupForm && groups.length > 0 && (
-                  <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm mb-6">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="text-sm font-semibold text-gray-700">Filter by Category:</span>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {CATEGORIES.map(category => (
-                        <button
-                          key={category}
-                          onClick={() => setSelectedCategory(category)}
-                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                            selectedCategory === category
-                              ? 'bg-brand-red text-white'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                          }`}
-                        >
-                          {category}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {!showCreateGroupForm && (
+                {!showCreateSubGroupForm && (
                   <>
-                    {displayedGroups.length === 0 ? (
+                    {subGroups.length === 0 ? (
                       <div className="bg-white rounded-3xl border border-gray-200 p-12 text-center">
                         <div className="text-6xl mb-4">📚</div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">No groups yet</h3>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">No classes yet</h3>
                         <p className="text-gray-600 mb-6">
-                          Be the first to create a group in this community!
+                          Add a class to help parents connect!
                         </p>
                       </div>
                     ) : (
-                      <div className="grid md:grid-cols-2 gap-4">
-                        {displayedGroups.map((group) => (
-                          <div
-                            key={group.id}
-                            onClick={() => navigate(`/groups/${group.id}`)}
-                            className="bg-white rounded-3xl border border-gray-200 hover:border-red-300 hover:shadow-lg transition-all cursor-pointer p-6"
-                          >
-                            <div className="flex justify-between items-start mb-3">
-                              <div className="flex-1">
-                                <h3 className="text-lg font-bold text-gray-900 mb-1">{group.name}</h3>
-                                <p className="text-sm text-brand-red font-medium">{group.category}</p>
-                              </div>
-                              {group.isPrivate && (
-                                <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">
-                                  🔒 Private
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-gray-700 text-sm mb-3 line-clamp-2">{group.description}</p>
-                            <div className="flex items-center gap-4 text-sm text-gray-600">
-                              <span>👥 {group._count?.members || 0} members</span>
-                              <span>💬 {group._count?.posts || 0} posts</span>
-                            </div>
-                          </div>
+                      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {subGroups.map((sub) => (
+                          <SubGroupCard
+                            key={sub.id}
+                            subGroup={sub}
+                            onMembershipChange={fetchCommunity}
+                          />
                         ))}
                       </div>
                     )}
@@ -449,9 +493,9 @@ const CommunityDetail: React.FC = () => {
         {!isMember && (
           <div className="bg-white rounded-3xl border border-gray-200 p-12 text-center">
             <div className="text-6xl mb-4">🔒</div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">Join to see groups</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">Join to see content</h3>
             <p className="text-gray-600 mb-6">
-              Become a member of this community to view and join groups
+              Become a member of this community to view posts and participate
             </p>
             <button
               onClick={handleJoin}

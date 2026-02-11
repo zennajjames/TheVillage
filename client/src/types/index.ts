@@ -16,10 +16,11 @@ export interface User {
   emailNotifications?: boolean;
   notifyOnMessages?: boolean;
   notifyOnPosts?: boolean;
-  notifyOnGroups?: boolean;
+  notifyOnCommunities?: boolean;
   showEmail?: boolean;
   showAddress?: boolean;
   allowMessages?: boolean;
+  appearInSearch?: boolean;
 }
 
 export interface AuthResponse {
@@ -58,6 +59,7 @@ export enum PostStatus {
 export interface Post {
   id: string;
   userId: string;
+  communityId: string;
   type: PostType;
   title: string;
   description: string;
@@ -71,6 +73,10 @@ export interface Post {
     lastName: string;
     location: string;
   };
+  community: {
+    id: string;
+    name: string;
+  };
 }
 
 export interface CreatePostData {
@@ -78,6 +84,7 @@ export interface CreatePostData {
   title: string;
   description: string;
   location: string;
+  communityId: string;
 }
 
 // Community types
@@ -89,6 +96,7 @@ export interface Community {
   address?: string;
   zipCode?: string;
   coverImage?: string;
+  category?: string | null;
   isPrivate: boolean;
   createdById: string;
   createdAt: string;
@@ -101,12 +109,14 @@ export interface Community {
   };
   _count?: {
     members: number;
-    groups: number;
+    communityPosts: number;
+    subGroups?: number;
   };
   isMember?: boolean;
   userRole?: string | null;
   members?: CommunityMember[];
-  groups?: Group[];
+  posts?: CommunityPost[];
+  subGroups?: SubGroup[];
 }
 
 export interface CommunityMember {
@@ -132,58 +142,24 @@ export interface CreateCommunityData {
   zipCode?: string;
   isPrivate: boolean;
   coverImage?: string;
+  category?: string;
 }
 
-// Group types
-export interface Group {
+// Place suggestion types (Google Places results)
+export interface PlaceSuggestion {
+  placeId: string;
+  name: string;
+  address: string;
+  types: string[];
+  rating?: number;
+  userRatingsTotal?: number;
+  category: string;
+}
+
+// Community Post types
+export interface CommunityPost {
   id: string;
   communityId: string;
-  name: string;
-  description: string;
-  category: string;
-  isPrivate: boolean;
-  coverImage?: string;
-  createdById: string;
-  createdAt: string;
-  updatedAt: string;
-  community?: {
-    id: string;
-    name: string;
-  };
-  createdBy: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    profilePicture?: string;
-  };
-  _count?: {
-    members: number;
-    posts: number;
-  };
-  isMember?: boolean;
-  userRole?: string | null;
-  members?: GroupMember[];
-  posts?: GroupPost[];
-}
-
-export interface GroupMember {
-  id: string;
-  groupId: string;
-  userId: string;
-  role: 'ADMIN' | 'MODERATOR' | 'MEMBER';
-  joinedAt: string;
-  user: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    profilePicture?: string;
-    location: string;
-  };
-}
-
-export interface GroupPost {
-  id: string;
-  groupId: string;
   userId: string;
   content: string;
   images: string[];
@@ -191,18 +167,10 @@ export interface GroupPost {
   updatedAt: string;
 }
 
-export interface CreateGroupData {
-  communityId: string;
-  name: string;
-  description: string;
-  category: string;
-  isPrivate: boolean;
-}
-
 // SubGroup types
 export interface SubGroup {
   id: string;
-  parentGroupId: string;
+  parentCommunityId: string;
   name: string;
   description?: string;
   teacherName?: string;
@@ -231,7 +199,7 @@ export interface SubGroupMember {
 }
 
 export interface CreateSubGroupData {
-  parentGroupId: string;
+  parentCommunityId: string;
   name: string;
   description?: string;
   teacherName?: string;
@@ -323,4 +291,50 @@ export interface CreateHelpRequestData {
   description: string;
   category: string;
   visibility: RequestVisibility;
+}
+
+// Event types
+export enum EventStatus {
+  PENDING_REVIEW = 'PENDING_REVIEW',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+}
+
+export interface Event {
+  id: string;
+  title: string;
+  description: string;
+  location?: string | null;
+  address?: string | null;
+  zipCode?: string | null;
+  startDate: string;
+  endDate: string;
+  communityId: string;
+  userId: string;
+  status: EventStatus;
+  adminNotes?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  user: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    profilePicture?: string;
+    email?: string;
+  };
+  community: {
+    id: string;
+    name: string;
+  };
+}
+
+export interface CreateEventData {
+  title: string;
+  description: string;
+  location?: string;
+  address?: string;
+  zipCode?: string;
+  startDate: string;
+  endDate: string;
+  communityId: string;
 }

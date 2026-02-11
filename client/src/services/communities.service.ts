@@ -1,10 +1,13 @@
 import { api } from './api';
-import { Community, CreateCommunityData } from '../types';
+import { Community, CommunityPost, CreateCommunityData, PlaceSuggestion } from '../types';
 
 export const communitiesService = {
-  // Get all communities
-  getAllCommunities: async (): Promise<Community[]> => {
-    const response = await api.get('/communities');
+  // Get all communities with optional category filter
+  getAllCommunities: async (filters?: { category?: string }): Promise<Community[]> => {
+    const params = new URLSearchParams();
+    if (filters?.category) params.append('category', filters.category);
+    const queryStr = params.toString();
+    const response = await api.get(`/communities${queryStr ? `?${queryStr}` : ''}`);
     return response.data;
   },
 
@@ -55,5 +58,17 @@ export const communitiesService = {
   // Remove member from community
   removeMember: async (communityId: string, memberId: string): Promise<void> => {
     await api.delete(`/communities/${communityId}/members/${memberId}`);
+  },
+
+  // Create a post within a community
+  createCommunityPost: async (communityId: string, content: string): Promise<CommunityPost> => {
+    const response = await api.post(`/communities/${communityId}/posts`, { content });
+    return response.data;
+  },
+
+  // Search for local community places via Google Places when no communities exist
+  searchLocalPlaces: async (zipCode: string): Promise<PlaceSuggestion[]> => {
+    const response = await api.get(`/places/local-communities?zipCode=${zipCode}`);
+    return response.data;
   },
 };

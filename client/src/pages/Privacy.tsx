@@ -7,6 +7,7 @@ interface PrivacySettings {
   showEmail: boolean;
   showAddress: boolean;
   allowMessages: boolean;
+  appearInSearch: boolean;
 }
 
 const Privacy: React.FC = () => {
@@ -15,6 +16,7 @@ const Privacy: React.FC = () => {
     showEmail: true,
     showAddress: false,
     allowMessages: true,
+    appearInSearch: true,
   });
   const [message, setMessage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -162,7 +164,7 @@ const Privacy: React.FC = () => {
             </div>
 
             {/* Message Permissions */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between pb-6 border-b border-gray-200">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <span className="text-2xl">💬</span>
@@ -181,6 +183,31 @@ const Privacy: React.FC = () => {
                 <span
                   className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
                     settings.allowMessages ? 'translate-x-7' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Appear in Search */}
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-2xl">🔍</span>
+                  <h3 className="text-lg font-semibold text-gray-900">Appear in Search Results</h3>
+                </div>
+                <p className="text-gray-600 text-sm ml-11">
+                  Allow other members to find you when searching by name, location, or zip code
+                </p>
+              </div>
+              <button
+                onClick={() => toggleSetting('appearInSearch')}
+                className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
+                  settings.appearInSearch ? 'bg-purple-600' : 'bg-gray-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                    settings.appearInSearch ? 'translate-x-7' : 'translate-x-1'
                   }`}
                 />
               </button>

@@ -9,7 +9,7 @@ const Search: React.FC = () => {
   const [query, setQuery] = useState(searchParams.get('q') || '');
   const [results, setResults] = useState<SearchResults | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'all' | 'users' | 'posts' | 'groups' | 'messages'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'users' | 'posts' | 'communities' | 'messages'>('all');
 
   useEffect(() => {
     const q = searchParams.get('q');
@@ -46,23 +46,23 @@ const Search: React.FC = () => {
   const renderResults = () => {
     if (!results) return null;
 
-    const { users, posts, groups, messages } = results.results;
+    const { users, posts, communities, messages } = results.results;
 
     let items: any[] = [];
-    
+
     if (activeTab === 'all') {
       items = [
         ...users.map(u => ({ ...u, type: 'user' })),
         ...posts.map(p => ({ ...p, type: 'post' })),
-        ...groups.map(g => ({ ...g, type: 'group' })),
+        ...communities.map(c => ({ ...c, type: 'community' })),
         ...messages.map(m => ({ ...m, type: 'message' }))
       ];
     } else if (activeTab === 'users') {
       items = users;
     } else if (activeTab === 'posts') {
       items = posts;
-    } else if (activeTab === 'groups') {
-      items = groups;
+    } else if (activeTab === 'communities') {
+      items = communities;
     } else if (activeTab === 'messages') {
       items = messages;
     }
@@ -123,8 +123,8 @@ const Search: React.FC = () => {
               >
                 <div className="flex justify-between items-start mb-2">
                   <span className={`text-xs font-semibold px-2 py-1 rounded ${
-                    item.type === 'REQUEST' 
-                      ? 'bg-purple-100 text-purple-700' 
+                    item.type === 'REQUEST'
+                      ? 'bg-purple-100 text-purple-700'
                       : 'bg-green-100 text-green-700'
                   }`}>
                     {item.type}
@@ -144,25 +144,27 @@ const Search: React.FC = () => {
             );
           }
 
-          if (item.type === 'group') {
+          if (item.type === 'community') {
             return (
               <div
                 key={item.id}
-                onClick={() => navigate(`/groups/${item.id}`)}
+                onClick={() => navigate(`/communities/${item.id}`)}
                 className="bg-white p-4 rounded-lg shadow hover:shadow-md cursor-pointer transition"
               >
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-semibold text-gray-900">{item.name}</h3>
                   <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
-                    Group
+                    Community
                   </span>
                 </div>
                 <p className="text-sm text-gray-600 line-clamp-2 mb-2">{item.description}</p>
                 <div className="flex items-center gap-3 text-xs text-gray-500">
-                  <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded">
-                    {item.category}
-                  </span>
-                  <span>👥 {item._count.members} members</span>
+                  {item.category && (
+                    <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded">
+                      {item.category}
+                    </span>
+                  )}
+                  <span>👥 {item._count?.members || 0} members</span>
                   {item.location && <span>📍 {item.location}</span>}
                 </div>
               </div>
@@ -227,7 +229,7 @@ const Search: React.FC = () => {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search users, posts, groups, messages..."
+                placeholder="Search users, posts, communities, messages..."
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
               <button
@@ -273,14 +275,14 @@ const Search: React.FC = () => {
                   Posts ({results.counts.posts})
                 </button>
                 <button
-                  onClick={() => setActiveTab('groups')}
+                  onClick={() => setActiveTab('communities')}
                   className={`px-4 py-2 rounded-lg font-medium transition whitespace-nowrap ${
-                    activeTab === 'groups'
+                    activeTab === 'communities'
                       ? 'bg-purple-600 text-white'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                   }`}
                 >
-                  Groups ({results.counts.groups})
+                  Communities ({results.counts.communities})
                 </button>
                 <button
                   onClick={() => setActiveTab('messages')}

@@ -138,19 +138,19 @@ export const emailService = {
     }
   },
 
-  async sendGroupPostNotification(
+  async sendCommunityPostNotification(
     toEmail: string,
     toName: string,
-    groupName: string,
+    communityName: string,
     posterName: string,
     postContent: string,
-    groupId: string
+    communityId: string
   ) {
     try {
       const mailOptions = {
         from: process.env.EMAIL_FROM,
         to: toEmail,
-        subject: `New post in ${groupName} - The Village`,
+        subject: `New post in ${communityName} - The Village`,
         html: `
           <!DOCTYPE html>
           <html>
@@ -168,16 +168,16 @@ export const emailService = {
             <body>
               <div class="container">
                 <div class="header">
-                  <h1>👥 New Group Post</h1>
+                  <h1>👥 New Community Post</h1>
                 </div>
                 <div class="content">
                   <p>Hi ${toName},</p>
-                  <p><strong>${posterName}</strong> posted in <strong>${groupName}</strong>:</p>
+                  <p><strong>${posterName}</strong> posted in <strong>${communityName}</strong>:</p>
                   <div class="post-preview">
                     ${postContent.substring(0, 200)}${postContent.length > 200 ? '...' : ''}
                   </div>
-                  <a href="${process.env.CLIENT_URL}/groups/${groupId}" class="button">
-                    View Group
+                  <a href="${process.env.CLIENT_URL}/communities/${communityId}" class="button">
+                    View Community
                   </a>
                 </div>
                 <div class="footer">
@@ -191,7 +191,7 @@ export const emailService = {
       };
 
       await transporter.sendMail(mailOptions);
-      console.log(`Group notification sent to ${toEmail}`);
+      console.log(`Community notification sent to ${toEmail}`);
     } catch (error) {
       console.error('Error sending email:', error);
     }

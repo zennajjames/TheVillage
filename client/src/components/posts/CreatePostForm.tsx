@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { PostType } from '../../types';
+import React, { useState, useEffect } from 'react';
+import { PostType, Community } from '../../types';
+import { communitiesService } from '../../services/communities.service';
 
 interface CreatePostFormProps {
   onSubmit: (data: {
@@ -7,6 +8,7 @@ interface CreatePostFormProps {
     title: string;
     description: string;
     location: string;
+    communityId: string;
   }) => Promise<void>;
   onCancel: () => void;
 }
@@ -16,14 +18,37 @@ const CreatePostForm: React.FC<CreatePostFormProps> = ({ onSubmit, onCancel }) =
     type: PostType.REQUEST,
     title: '',
     description: '',
-    location: ''
+    location: '',
+    communityId: ''
   });
+  const [communities, setCommunities] = useState<Community[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchCommunities = async () => {
+      try {
+        const data = await communitiesService.getUserCommunities();
+        setCommunities(data);
+        if (data.length > 0 && !formData.communityId) {
+          setFormData(prev => ({ ...prev, communityId: data[0].id }));
+        }
+      } catch {
+        // ignore
+      }
+    };
+    fetchCommunities();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!formData.communityId) {
+      setError('Please select a community');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -46,6 +71,25 @@ const CreatePostForm: React.FC<CreatePostFormProps> = ({ onSubmit, onCancel }) =
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Community *
+          </label>
+          <select
+            value={formData.communityId}
+            onChange={(e) => setFormData({ ...formData, communityId: e.target.value })}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+            required
+          >
+            <option value="">Select a community</option>
+            {communities.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Post Type

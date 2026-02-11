@@ -2,12 +2,16 @@ import { Router } from 'express';
 import {
   getAllUsers,
   getAllPosts,
-  getAllGroups,
+  getAllCommunities,
   deleteUserAsAdmin,
   deletePostAsAdmin,
-  deleteGroupAsAdmin,
+  deleteCommunityAsAdmin,
   updatePostAsAdmin,
-  updateGroupAsAdmin
+  updateCommunityAsAdmin,
+  getAllEvents,
+  getPendingEvents,
+  reviewEvent,
+  deleteEventAsAdmin
 } from '../controllers/admin.controller';
 import { authenticate } from '../middleware/auth.middleware';
 import { requireAdmin } from '../middleware/admin.middleware';
@@ -20,13 +24,19 @@ router.use(requireAdmin);
 
 router.get('/users', getAllUsers);
 router.get('/posts', getAllPosts);
-router.get('/groups', getAllGroups);
+router.get('/communities', getAllCommunities);
 
 router.delete('/users/:userId', deleteUserAsAdmin);
 router.delete('/posts/:postId', deletePostAsAdmin);
-router.delete('/groups/:groupId', deleteGroupAsAdmin);
+router.delete('/communities/:communityId', deleteCommunityAsAdmin);
 
 router.patch('/posts/:postId', updatePostAsAdmin);
-router.patch('/groups/:groupId', updateGroupAsAdmin);
+router.patch('/communities/:communityId', updateCommunityAsAdmin);
+
+// Event admin routes
+router.get('/events', getAllEvents);
+router.get('/events/pending', getPendingEvents);
+router.patch('/events/:eventId/review', reviewEvent);
+router.delete('/events/:eventId', deleteEventAsAdmin);
 
 export default router;

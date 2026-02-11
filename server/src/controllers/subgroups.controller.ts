@@ -3,30 +3,30 @@ import { prisma } from '../config/database';
 
 export const createSubGroup = async (req: Request, res: Response) => {
   try {
-    const { parentGroupId, name, description, teacherName, grade } = req.body;
+    const { parentCommunityId, name, description, teacherName, grade } = req.body;
     const userId = req.user!.id;
 
     if (!name) {
       return res.status(400).json({ error: 'Name is required' });
     }
 
-    // Verify user is a member of the parent group
-    const membership = await prisma.groupMember.findUnique({
+    // Verify user is a member of the parent community
+    const membership = await prisma.communityMember.findUnique({
       where: {
-        groupId_userId: {
-          groupId: parentGroupId,
+        communityId_userId: {
+          communityId: parentCommunityId,
           userId
         }
       }
     });
 
     if (!membership) {
-      return res.status(403).json({ error: 'Must be a member of the parent group to create subgroups' });
+      return res.status(403).json({ error: 'Must be a member of the parent community to create subgroups' });
     }
 
     const subGroup = await prisma.subGroup.create({
       data: {
-        parentGroupId,
+        parentCommunityId,
         name,
         description: description || '',
         teacherName,
@@ -52,25 +52,25 @@ export const createSubGroup = async (req: Request, res: Response) => {
 
 export const getSubGroups = async (req: Request, res: Response) => {
   try {
-    const { parentGroupId } = req.params;
+    const { parentCommunityId } = req.params;
     const userId = req.user!.id;
 
-    // Verify user is a member of the parent group
-    const membership = await prisma.groupMember.findUnique({
+    // Verify user is a member of the parent community
+    const membership = await prisma.communityMember.findUnique({
       where: {
-        groupId_userId: {
-          groupId: parentGroupId,
+        communityId_userId: {
+          communityId: parentCommunityId,
           userId
         }
       }
     });
 
     if (!membership) {
-      return res.status(403).json({ error: 'Must be a member of the parent group to view subgroups' });
+      return res.status(403).json({ error: 'Must be a member of the parent community to view subgroups' });
     }
 
     const subGroups = await prisma.subGroup.findMany({
-      where: { parentGroupId },
+      where: { parentCommunityId },
       include: {
         members: {
           where: { userId },
@@ -109,7 +109,7 @@ export const getSubGroup = async (req: Request, res: Response) => {
     const subGroup = await prisma.subGroup.findUnique({
       where: { id },
       include: {
-        parentGroup: {
+        parentCommunity: {
           select: {
             id: true,
             name: true,
@@ -141,9 +141,9 @@ export const getSubGroup = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Subgroup not found' });
     }
 
-    // Verify user is a member of parent group
-    if (subGroup.parentGroup.members.length === 0) {
-      return res.status(403).json({ error: 'Must be a member of the parent group' });
+    // Verify user is a member of parent community
+    if (subGroup.parentCommunity.members.length === 0) {
+      return res.status(403).json({ error: 'Must be a member of the parent community' });
     }
 
     const isMember = subGroup.members.some(m => m.user.id === userId);
@@ -160,11 +160,11 @@ export const joinSubGroup = async (req: Request, res: Response) => {
     const { id } = req.params;
     const userId = req.user!.id;
 
-    // Check if subgroup exists and user is member of parent group
+    // Check if subgroup exists and user is member of parent community
     const subGroup = await prisma.subGroup.findUnique({
       where: { id },
       include: {
-        parentGroup: {
+        parentCommunity: {
           select: {
             members: {
               where: { userId },
@@ -179,8 +179,8 @@ export const joinSubGroup = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Subgroup not found' });
     }
 
-    if (subGroup.parentGroup.members.length === 0) {
-      return res.status(403).json({ error: 'Must be a member of the parent group to join subgroups' });
+    if (subGroup.parentCommunity.members.length === 0) {
+      return res.status(403).json({ error: 'Must be a member of the parent community to join subgroups' });
     }
 
     // Check if already a member

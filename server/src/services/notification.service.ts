@@ -1,14 +1,15 @@
 import { prisma } from '../config/database';
 import { smsService } from './sms.service';
 
-export type NotificationType = 
+export type NotificationType =
   | 'NEW_MESSAGE'
   | 'NEW_POST'
   | 'FRIEND_REQUEST'
   | 'FRIEND_ACCEPTED'
-  | 'GROUP_POST'
-  | 'GROUP_INVITE'
+  | 'COMMUNITY_POST'
+  | 'COMMUNITY_INVITE'
   | 'POST_RESPONSE'
+  | 'HELP_REQUEST'
   | 'SYSTEM';
 
 interface CreateNotificationParams {
@@ -19,7 +20,7 @@ interface CreateNotificationParams {
   actionUrl?: string;
   relatedUserId?: string;
   relatedPostId?: string;
-  relatedGroupId?: string;
+  relatedCommunityId?: string;
   relatedMessageId?: string;
 }
 
@@ -127,36 +128,47 @@ export const notificationService = {
     });
   },
 
-  async notifyGroupPost(
-    userId: string,
-    groupId: string,
-    groupName: string,
-    posterName: string,
-    contentPreview: string
+  async notifyCommunityPost(
+    communityId: string,
+    communityName: string,
+    posterId: string,
+    posterName: string
   ) {
-    return this.createNotification({
-      userId,
-      type: 'GROUP_POST',
-      title: `New Post in ${groupName}`,
-      message: `${posterName} posted: "${contentPreview.substring(0, 50)}${contentPreview.length > 50 ? '...' : ''}"`,
-      actionUrl: `/groups/${groupId}`,
-      relatedGroupId: groupId
+    // Get all community members except the poster
+    const members = await prisma.communityMember.findMany({
+      where: {
+        communityId,
+        userId: { not: posterId }
+      },
+      select: { userId: true }
     });
+
+    // Send notification to each member
+    for (const member of members) {
+      await this.createNotification({
+        userId: member.userId,
+        type: 'COMMUNITY_POST',
+        title: `New Post in ${communityName}`,
+        message: `${posterName} posted in ${communityName}`,
+        actionUrl: `/communities/${communityId}`,
+        relatedCommunityId: communityId
+      });
+    }
   },
 
-  async notifyGroupInvite(
+  async notifyCommunityInvite(
     userId: string,
-    groupId: string,
-    groupName: string,
+    communityId: string,
+    communityName: string,
     inviterName: string
   ) {
     return this.createNotification({
       userId,
-      type: 'GROUP_INVITE',
-      title: 'Group Invitation',
-      message: `${inviterName} invited you to join ${groupName}`,
-      actionUrl: `/groups/${groupId}`,
-      relatedGroupId: groupId
+      type: 'COMMUNITY_INVITE',
+      title: 'Community Invitation',
+      message: `${inviterName} invited you to join ${communityName}`,
+      actionUrl: `/communities/${communityId}`,
+      relatedCommunityId: communityId
     });
   },
 

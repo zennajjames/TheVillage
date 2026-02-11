@@ -7,11 +7,12 @@ export const postsService = {
     return response.data;
   },
 
-  async getPosts(type?: string, status?: string): Promise<Post[]> {
+  async getPosts(type?: string, status?: string, communityId?: string): Promise<Post[]> {
     const params = new URLSearchParams();
     if (type) params.append('type', type);
     if (status) params.append('status', status);
-    
+    if (communityId) params.append('communityId', communityId);
+
     const response = await api.get<Post[]>(`/posts?${params.toString()}`);
     return response.data;
   },

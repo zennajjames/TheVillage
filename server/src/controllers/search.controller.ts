@@ -11,23 +11,40 @@ export const globalSearch = async (req: Request, res: Response) => {
     }
 
     const searchTerm = query.trim();
-    
+
     if (searchTerm.length < 2) {
       return res.status(400).json({ error: 'Search query must be at least 2 characters' });
     }
 
-    // Search users
+    // Split search term into words for multi-word name matching
+    const searchWords = searchTerm.split(/\s+/).filter(w => w.length > 0);
+
+    // Search users - match individual fields OR all words match across firstName/lastName
+    // Only include users who have opted in to appearing in search results
     const users = await prisma.user.findMany({
       where: {
         AND: [
           { id: { not: userId } }, // Exclude current user
-          {
-            OR: [
-              { firstName: { contains: searchTerm, mode: 'insensitive' } },
-              { lastName: { contains: searchTerm, mode: 'insensitive' } },
-              { location: { contains: searchTerm, mode: 'insensitive' } }
-            ]
-          }
+          { appearInSearch: true }, // Respect privacy setting
+          searchWords.length > 1
+            ? {
+                // Multi-word search: every word must match either firstName or lastName
+                AND: searchWords.map(word => ({
+                  OR: [
+                    { firstName: { contains: word, mode: 'insensitive' as const } },
+                    { lastName: { contains: word, mode: 'insensitive' as const } },
+                  ]
+                }))
+              }
+            : {
+                OR: [
+                  { firstName: { contains: searchTerm, mode: 'insensitive' } },
+                  { lastName: { contains: searchTerm, mode: 'insensitive' } },
+                  { location: { contains: searchTerm, mode: 'insensitive' } },
+                  { email: { contains: searchTerm, mode: 'insensitive' } },
+                  { zipCode: { contains: searchTerm, mode: 'insensitive' } }
+                ]
+              }
         ]
       },
       select: {
@@ -70,41 +87,11 @@ export const globalSearch = async (req: Request, res: Response) => {
         OR: [
           { name: { contains: searchTerm, mode: 'insensitive' } },
           { description: { contains: searchTerm, mode: 'insensitive' } },
-          { location: { contains: searchTerm, mode: 'insensitive' } }
-        ]
-      },
-      include: {
-        createdBy: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true
-          }
-        },
-        _count: {
-          select: { members: true, groups: true }
-        }
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 10
-    });
-
-    // Search groups
-    const groups = await prisma.group.findMany({
-      where: {
-        OR: [
-          { name: { contains: searchTerm, mode: 'insensitive' } },
-          { description: { contains: searchTerm, mode: 'insensitive' } },
+          { location: { contains: searchTerm, mode: 'insensitive' } },
           { category: { contains: searchTerm, mode: 'insensitive' } }
         ]
       },
       include: {
-        community: {
-          select: {
-            id: true,
-            name: true
-          }
-        },
         createdBy: {
           select: {
             id: true,
@@ -113,7 +100,7 @@ export const globalSearch = async (req: Request, res: Response) => {
           }
         },
         _count: {
-          select: { members: true }
+          select: { members: true, communityPosts: true }
         }
       },
       orderBy: { createdAt: 'desc' },
@@ -181,16 +168,14 @@ export const globalSearch = async (req: Request, res: Response) => {
         users: users.map(u => ({ ...u, type: 'user' })),
         posts: posts.map(p => ({ ...p, type: 'post' })),
         communities: communities.map(c => ({ ...c, type: 'community' })),
-        groups: groups.map(g => ({ ...g, type: 'group' })),
         messages: formattedMessages.map(m => ({ ...m, type: 'message' }))
       },
       counts: {
         users: users.length,
         posts: posts.length,
         communities: communities.length,
-        groups: groups.length,
         messages: messages.length,
-        total: users.length + posts.length + communities.length + groups.length + messages.length
+        total: users.length + posts.length + communities.length + messages.length
       }
     });
   } catch (error) {

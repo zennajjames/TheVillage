@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { notificationService } from '../services/notification.service';
 
 const prisma = new PrismaClient();
 
@@ -7,8 +8,15 @@ const prisma = new PrismaClient();
 export const getAllCommunities = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
+    const { category } = req.query;
+
+    const where: any = {};
+    if (category) {
+      where.category = category as string;
+    }
 
     const communities = await prisma.community.findMany({
+      where,
       include: {
         createdBy: {
           select: {
@@ -21,7 +29,7 @@ export const getAllCommunities = async (req: Request, res: Response) => {
         _count: {
           select: {
             members: true,
-            groups: true,
+            communityPosts: true,
           },
         },
         members: userId
@@ -76,7 +84,7 @@ export const getUserCommunities = async (req: Request, res: Response) => {
             _count: {
               select: {
                 members: true,
-                groups: true,
+                communityPosts: true,
               },
             },
           },
@@ -133,20 +141,16 @@ export const getCommunityById = async (req: Request, res: Response) => {
             joinedAt: 'asc',
           },
         },
-        groups: {
+        communityPosts: {
+          orderBy: {
+            createdAt: 'desc',
+          },
+        },
+        subGroups: {
           include: {
-            createdBy: {
-              select: {
-                id: true,
-                firstName: true,
-                lastName: true,
-                profilePicture: true,
-              },
-            },
             _count: {
               select: {
                 members: true,
-                posts: true,
               },
             },
           },
@@ -157,7 +161,8 @@ export const getCommunityById = async (req: Request, res: Response) => {
         _count: {
           select: {
             members: true,
-            groups: true,
+            communityPosts: true,
+            subGroups: true,
           },
         },
       },
@@ -189,7 +194,7 @@ export const getCommunityById = async (req: Request, res: Response) => {
 export const createCommunity = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
-    const { name, description, location, address, zipCode, isPrivate, coverImage } = req.body;
+    const { name, description, location, address, zipCode, isPrivate, coverImage, category } = req.body;
 
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });
@@ -208,6 +213,7 @@ export const createCommunity = async (req: Request, res: Response) => {
         zipCode,
         isPrivate: isPrivate || false,
         coverImage,
+        category: category || null,
         createdById: userId,
         members: {
           create: {
@@ -228,7 +234,7 @@ export const createCommunity = async (req: Request, res: Response) => {
         _count: {
           select: {
             members: true,
-            groups: true,
+            communityPosts: true,
           },
         },
       },
@@ -250,7 +256,7 @@ export const updateCommunity = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = req.user?.id;
-    const { name, description, location, address, zipCode, isPrivate, coverImage } = req.body;
+    const { name, description, location, address, zipCode, isPrivate, coverImage, category } = req.body;
 
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });
@@ -279,6 +285,7 @@ export const updateCommunity = async (req: Request, res: Response) => {
         zipCode,
         isPrivate,
         coverImage,
+        category,
       },
       include: {
         createdBy: {
@@ -292,7 +299,7 @@ export const updateCommunity = async (req: Request, res: Response) => {
         _count: {
           select: {
             members: true,
-            groups: true,
+            communityPosts: true,
           },
         },
       },
@@ -526,5 +533,72 @@ export const removeMember = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error removing member:', error);
     res.status(500).json({ error: 'Failed to remove member' });
+  }
+};
+
+// Create a post within a community
+export const createCommunityPost = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id;
+    const { content } = req.body;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    if (!content) {
+      return res.status(400).json({ error: 'Content is required' });
+    }
+
+    // Check membership
+    const membership = await prisma.communityMember.findUnique({
+      where: {
+        communityId_userId: {
+          communityId: id,
+          userId,
+        },
+      },
+    });
+
+    if (!membership) {
+      return res.status(403).json({ error: 'You must be a member to post in this community' });
+    }
+
+    const post = await prisma.communityPost.create({
+      data: {
+        communityId: id,
+        userId,
+        content,
+        images: [],
+      },
+    });
+
+    // Notify other community members
+    const community = await prisma.community.findUnique({
+      where: { id },
+      select: { name: true },
+    });
+
+    if (community) {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { firstName: true, lastName: true },
+      });
+
+      if (user) {
+        await notificationService.notifyCommunityPost(
+          id,
+          community.name,
+          userId,
+          `${user.firstName} ${user.lastName}`
+        );
+      }
+    }
+
+    res.status(201).json(post);
+  } catch (error) {
+    console.error('Error creating community post:', error);
+    res.status(500).json({ error: 'Failed to create community post' });
   }
 };

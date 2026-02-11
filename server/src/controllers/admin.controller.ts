@@ -16,7 +16,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
         _count: {
           select: {
             posts: true,
-            groupMemberships: true
+            communityMemberships: true
           }
         }
       },
@@ -41,6 +41,12 @@ export const getAllPosts = async (req: Request, res: Response) => {
             lastName: true,
             email: true
           }
+        },
+        community: {
+          select: {
+            id: true,
+            name: true
+          }
         }
       },
       orderBy: { createdAt: 'desc' }
@@ -53,9 +59,9 @@ export const getAllPosts = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllGroups = async (req: Request, res: Response) => {
+export const getAllCommunities = async (req: Request, res: Response) => {
   try {
-    const groups = await prisma.group.findMany({
+    const communities = await prisma.community.findMany({
       include: {
         createdBy: {
           select: {
@@ -68,17 +74,17 @@ export const getAllGroups = async (req: Request, res: Response) => {
         _count: {
           select: {
             members: true,
-            posts: true
+            communityPosts: true
           }
         }
       },
       orderBy: { createdAt: 'desc' }
     });
 
-    res.json(groups);
+    res.json(communities);
   } catch (error) {
-    console.error('Get all groups error:', error);
-    res.status(500).json({ error: 'Failed to fetch groups' });
+    console.error('Get all communities error:', error);
+    res.status(500).json({ error: 'Failed to fetch communities' });
   }
 };
 
@@ -112,18 +118,18 @@ export const deletePostAsAdmin = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteGroupAsAdmin = async (req: Request, res: Response) => {
+export const deleteCommunityAsAdmin = async (req: Request, res: Response) => {
   try {
-    const { groupId } = req.params;
+    const { communityId } = req.params;
 
-    await prisma.group.delete({
-      where: { id: groupId }
+    await prisma.community.delete({
+      where: { id: communityId }
     });
 
-    res.json({ message: 'Group deleted successfully' });
+    res.json({ message: 'Community deleted successfully' });
   } catch (error) {
-    console.error('Delete group error:', error);
-    res.status(500).json({ error: 'Failed to delete group' });
+    console.error('Delete community error:', error);
+    res.status(500).json({ error: 'Failed to delete community' });
   }
 };
 
@@ -157,13 +163,13 @@ export const updatePostAsAdmin = async (req: Request, res: Response) => {
   }
 };
 
-export const updateGroupAsAdmin = async (req: Request, res: Response) => {
+export const updateCommunityAsAdmin = async (req: Request, res: Response) => {
   try {
-    const { groupId } = req.params;
+    const { communityId } = req.params;
     const { name, description, category, isPrivate } = req.body;
 
-    const group = await prisma.group.update({
-      where: { id: groupId },
+    const community = await prisma.community.update({
+      where: { id: communityId },
       data: {
         name: name ?? undefined,
         description: description ?? undefined,
@@ -172,9 +178,125 @@ export const updateGroupAsAdmin = async (req: Request, res: Response) => {
       }
     });
 
-    res.json(group);
+    res.json(community);
   } catch (error) {
-    console.error('Update group error:', error);
-    res.status(500).json({ error: 'Failed to update group' });
+    console.error('Update community error:', error);
+    res.status(500).json({ error: 'Failed to update community' });
+  }
+};
+
+// ===== Event Admin Endpoints =====
+
+export const getAllEvents = async (req: Request, res: Response) => {
+  try {
+    const events = await prisma.event.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true
+          }
+        },
+        community: {
+          select: {
+            id: true,
+            name: true
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    res.json(events);
+  } catch (error) {
+    console.error('Get all events error:', error);
+    res.status(500).json({ error: 'Failed to fetch events' });
+  }
+};
+
+export const getPendingEvents = async (req: Request, res: Response) => {
+  try {
+    const events = await prisma.event.findMany({
+      where: { status: 'PENDING_REVIEW' },
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true
+          }
+        },
+        community: {
+          select: {
+            id: true,
+            name: true
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    res.json(events);
+  } catch (error) {
+    console.error('Get pending events error:', error);
+    res.status(500).json({ error: 'Failed to fetch pending events' });
+  }
+};
+
+export const reviewEvent = async (req: Request, res: Response) => {
+  try {
+    const { eventId } = req.params;
+    const { status, adminNotes } = req.body;
+
+    if (!status || !['APPROVED', 'REJECTED'].includes(status)) {
+      return res.status(400).json({ error: 'Status must be APPROVED or REJECTED' });
+    }
+
+    const event = await prisma.event.update({
+      where: { id: eventId },
+      data: {
+        status,
+        adminNotes: adminNotes || null
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true
+          }
+        },
+        community: {
+          select: {
+            id: true,
+            name: true
+          }
+        }
+      }
+    });
+
+    res.json(event);
+  } catch (error) {
+    console.error('Review event error:', error);
+    res.status(500).json({ error: 'Failed to review event' });
+  }
+};
+
+export const deleteEventAsAdmin = async (req: Request, res: Response) => {
+  try {
+    const { eventId } = req.params;
+
+    await prisma.event.delete({
+      where: { id: eventId }
+    });
+
+    res.json({ message: 'Event deleted successfully' });
+  } catch (error) {
+    console.error('Delete event error:', error);
+    res.status(500).json({ error: 'Failed to delete event' });
   }
 };

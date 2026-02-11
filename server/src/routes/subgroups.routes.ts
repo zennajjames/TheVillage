@@ -17,8 +17,8 @@ router.use(authenticate);
 // Create a new subgroup
 router.post('/', createSubGroup);
 
-// Get all subgroups for a parent group
-router.get('/group/:parentGroupId', getSubGroups);
+// Get all subgroups for a parent community
+router.get('/community/:parentCommunityId', getSubGroups);
 
 // Get a specific subgroup
 router.get('/:id', getSubGroup);

@@ -11,6 +11,7 @@ import {
   leaveCommunity,
   updateMemberRole,
   removeMember,
+  createCommunityPost,
 } from '../controllers/communities.controller';
 
 const router = express.Router();
@@ -28,5 +29,6 @@ router.post('/:id/join', authenticate, joinCommunity);
 router.post('/:id/leave', authenticate, leaveCommunity);
 router.put('/:id/members/:memberId/role', authenticate, updateMemberRole);
 router.delete('/:id/members/:memberId', authenticate, removeMember);
+router.post('/:id/posts', authenticate, createCommunityPost);
 
 export default router;

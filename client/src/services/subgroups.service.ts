@@ -7,8 +7,8 @@ export const subgroupsService = {
     return response.data;
   },
 
-  async getSubGroups(parentGroupId: string): Promise<SubGroup[]> {
-    const response = await api.get<SubGroup[]>(`/subgroups/group/${parentGroupId}`);
+  async getSubGroups(parentCommunityId: string): Promise<SubGroup[]> {
+    const response = await api.get<SubGroup[]>(`/subgroups/community/${parentCommunityId}`);
     return response.data;
   },
 

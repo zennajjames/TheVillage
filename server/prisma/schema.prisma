@@ -40,10 +40,10 @@ model User {
   resetPasswordExpires DateTime?
 
   // Notification preferences
-  emailNotifications Boolean @default(true)
-  notifyOnMessages   Boolean @default(true)
-  notifyOnPosts      Boolean @default(true)
-  notifyOnGroups     Boolean @default(true)
+  emailNotifications  Boolean @default(true)
+  notifyOnMessages    Boolean @default(true)
+  notifyOnPosts       Boolean @default(true)
+  notifyOnCommunities Boolean @default(true)
 
   // Privacy settings
   showEmail       Boolean @default(false)
@@ -51,6 +51,7 @@ model User {
   showPhone       Boolean @default(false)
   showChildrenNames Boolean @default(false)
   allowMessages   Boolean @default(true)
+  appearInSearch  Boolean @default(true)
 
   // Community guidelines agreement
   agreedToGuidelines Boolean @default(false)
@@ -60,12 +61,12 @@ model User {
   updatedAt       DateTime  @updatedAt
 
   posts                    Post[]
+  helpRequests             HelpRequest[]
+  events                   Event[]
   sentMessages             Message[] @relation("SentMessages")
   communityMemberships     CommunityMember[]
-  groupMemberships         GroupMember[]
   subGroupMemberships      SubGroupMember[] @relation("SubGroupMemberships")
   createdCommunities       Community[] @relation("CreatedCommunities")
-  createdGroups            Group[] @relation("CreatedGroups")
   conversationParticipants ConversationParticipant[]
   sentFriendRequests       Friendship[] @relation("SentFriendRequests")
   receivedFriendRequests   Friendship[] @relation("ReceivedFriendRequests")
@@ -78,6 +79,7 @@ model User {
 model Post {
   id          String     @id @default(uuid())
   userId      String
+  communityId String
   type        PostType
   title       String
   description String
@@ -86,9 +88,11 @@ model Post {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([communityId])
   @@index([type])
   @@index([status])
 }
@@ -129,19 +133,25 @@ model Community {
   address     String?
   zipCode     String?
   coverImage  String?
+  category    String?
   isPrivate   Boolean  @default(false)
   createdById String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  createdBy User              @relation("CreatedCommunities", fields: [createdById], references: [id], onDelete: Cascade)
-  members   CommunityMember[]
-  groups    Group[]
-  children  CommunityChild[]
+  createdBy       User              @relation("CreatedCommunities", fields: [createdById], references: [id], onDelete: Cascade)
+  members         CommunityMember[]
+  communityPosts  CommunityPost[]
+  boardPosts      Post[]
+  subGroups       SubGroup[]
+  children        CommunityChild[]
+  helpRequests    HelpRequest[]
+  events          Event[]
 
   @@unique([name, zipCode])
   @@index([zipCode])
   @@index([location])
+  @@index([category])
 }
 
 model CommunityMember {
@@ -159,43 +169,36 @@ model CommunityMember {
   @@index([userId])
 }
 
-model Group {
+model CommunityPost {
   id          String   @id @default(uuid())
   communityId String
-  name        String
-  description String
-  category    String
-  isPrivate   Boolean  @default(false)
-  coverImage  String?
-  createdById String
+  userId      String
+  content     String
+  images      String[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
-  createdBy User @relation("CreatedGroups", fields: [createdById], references: [id], onDelete: Cascade)
-  members   GroupMember[]
-  posts     GroupPost[]
-  subGroups SubGroup[]
 
   @@index([communityId])
-  @@index([category])
+  @@index([createdAt])
 }
 
 model SubGroup {
-  id          String   @id @default(uuid())
-  parentGroupId String
-  name        String
-  description String?
-  teacherName String?
-  grade       String?
-  createdById String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                String   @id @default(uuid())
+  parentCommunityId String
+  name              String
+  description       String?
+  teacherName       String?
+  grade             String?
+  createdById       String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-  parentGroup Group @relation(fields: [parentGroupId], references: [id], onDelete: Cascade)
-  members     SubGroupMember[]
+  parentCommunity Community @relation(fields: [parentCommunityId], references: [id], onDelete: Cascade)
+  members         SubGroupMember[]
 
-  @@index([parentGroupId])
+  @@index([parentCommunityId])
   @@index([teacherName])
   @@index([grade])
 }
@@ -212,36 +215,6 @@ model SubGroupMember {
   @@unique([subGroupId, userId])
   @@index([subGroupId])
   @@index([userId])
-}
-
-model GroupMember {
-  id        String     @id @default(uuid())
-  groupId   String
-  userId    String
-  role      MemberRole @default(MEMBER)
-  joinedAt  DateTime   @default(now())
-
-  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([groupId, userId])
-  @@index([groupId])
-  @@index([userId])
-}
-
-model GroupPost {
-  id        String   @id @default(uuid())
-  groupId   String
-  userId    String
-  content   String
-  images    String[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
-
-  @@index([groupId])
-  @@index([createdAt])
 }
 
 enum MemberRole {
@@ -306,14 +279,14 @@ model Notification {
   message   String
   read      Boolean  @default(false)
   actionUrl String?  // URL to navigate to when notification is clicked
-  relatedUserId  String?
-  relatedPostId  String?
-  relatedGroupId String?
-  relatedMessageId String?
+  relatedUserId      String?
+  relatedPostId      String?
+  relatedCommunityId String?
+  relatedMessageId   String?
   createdAt DateTime @default(now())
-  
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@index([userId])
   @@index([createdAt])
   @@index([read])
@@ -324,10 +297,39 @@ enum NotificationType {
   NEW_POST
   FRIEND_REQUEST
   FRIEND_ACCEPTED
-  GROUP_POST
-  GROUP_INVITE
+  COMMUNITY_POST
+  COMMUNITY_INVITE
   POST_RESPONSE
+  HELP_REQUEST
   SYSTEM
+}
+
+enum RequestVisibility {
+  PUBLIC
+  SEMI_ANONYMOUS
+  ADMIN_ONLY
+}
+
+model HelpRequest {
+  id          String            @id @default(uuid())
+  communityId String
+  userId      String
+  title       String
+  description String
+  category    String
+  visibility  RequestVisibility @default(PUBLIC)
+  status      PostStatus        @default(OPEN)
+  proxyPostId String?           @unique
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([communityId])
+  @@index([userId])
+  @@index([status])
+  @@index([visibility])
 }
 
 model Child {
@@ -356,4 +358,35 @@ model CommunityChild {
   @@unique([communityId, childId])
   @@index([communityId])
   @@index([childId])
+}
+
+enum EventStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
+model Event {
+  id          String      @id @default(uuid())
+  title       String
+  description String
+  location    String?
+  address     String?
+  zipCode     String?
+  startDate   DateTime
+  endDate     DateTime
+  communityId String
+  userId      String
+  status      EventStatus @default(PENDING_REVIEW)
+  adminNotes  String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([communityId])
+  @@index([status])
+  @@index([startDate])
 }

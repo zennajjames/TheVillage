@@ -29,10 +29,11 @@ const Posts: React.FC = () => {
   const [selectedCommunityId, setSelectedCommunityId] = useState('');
 
   const fetchPosts = async () => {
+    if (!selectedCommunityId) return;
     try {
       setIsLoading(true);
       const filterType = filter === 'ALL' ? undefined : filter;
-      const data = await postsService.getPosts(filterType);
+      const data = await postsService.getPosts(filterType, undefined, selectedCommunityId);
       setPosts(data);
     } catch (err: any) {
       setError('Failed to load posts');
@@ -65,18 +66,16 @@ const Posts: React.FC = () => {
   };
 
   useEffect(() => {
-    if (tab === 'board') {
-      fetchPosts();
-    } else {
-      fetchUserCommunities();
-    }
-  }, [tab, filter]);
+    fetchUserCommunities();
+  }, []);
 
   useEffect(() => {
-    if (tab === 'help' && selectedCommunityId) {
+    if (tab === 'board' && selectedCommunityId) {
+      fetchPosts();
+    } else if (tab === 'help' && selectedCommunityId) {
       fetchHelpRequests();
     }
-  }, [tab, selectedCommunityId]);
+  }, [tab, filter, selectedCommunityId]);
 
   const handleCreatePost = async (data: CreatePostData) => {
     await postsService.createPost(data);
@@ -157,6 +156,26 @@ const Posts: React.FC = () => {
             </button>
           </div>
 
+          {/* Community picker (shown for both tabs) */}
+          {userCommunities.length > 0 && !showCreateForm && !showHelpForm && (
+            <div className="flex items-center gap-3 flex-wrap mb-4">
+              <span className="text-sm font-semibold text-gray-600">Community:</span>
+              {userCommunities.map(c => (
+                <button
+                  key={c.id}
+                  onClick={() => setSelectedCommunityId(c.id)}
+                  className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                    selectedCommunityId === c.id
+                      ? 'bg-brand-red text-white'
+                      : 'bg-white text-gray-700 border border-gray-200 hover:border-red-300'
+                  }`}
+                >
+                  {c.name}
+                </button>
+              ))}
+            </div>
+          )}
+
           {/* Board filter pills */}
           {tab === 'board' && !showCreateForm && (
             <div className="flex gap-3 flex-wrap">
@@ -190,26 +209,6 @@ const Posts: React.FC = () => {
               >
                 Offers
               </button>
-            </div>
-          )}
-
-          {/* Community picker for help requests tab */}
-          {tab === 'help' && !showHelpForm && userCommunities.length > 0 && (
-            <div className="flex items-center gap-3 flex-wrap">
-              <span className="text-sm font-semibold text-gray-600">Community:</span>
-              {userCommunities.map(c => (
-                <button
-                  key={c.id}
-                  onClick={() => setSelectedCommunityId(c.id)}
-                  className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
-                    selectedCommunityId === c.id
-                      ? 'bg-brand-red text-white'
-                      : 'bg-white text-gray-700 border border-gray-200 hover:border-red-300'
-                  }`}
-                >
-                  {c.name}
-                </button>
-              ))}
             </div>
           )}
         </div>

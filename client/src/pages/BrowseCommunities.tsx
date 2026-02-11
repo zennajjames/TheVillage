@@ -123,7 +123,7 @@ const BrowseCommunities: React.FC = () => {
 
                   <div className="flex items-center gap-3 text-xs text-gray-600 mb-3">
                     <span>👥 {community._count?.members || 0}</span>
-                    <span>📚 {community._count?.groups || 0}</span>
+                    <span>📝 {community._count?.communityPosts || 0}</span>
                   </div>
 
                   {!community.isMember ? (

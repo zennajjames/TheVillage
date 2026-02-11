@@ -6,7 +6,7 @@ interface NotificationSettings {
   smsNotifications: boolean;
   notifyOnMessages: boolean;
   notifyOnPosts: boolean;
-  notifyOnGroups: boolean;
+  notifyOnCommunities: boolean;
   notifyViaSMS: boolean;
   phoneNumber?: string;
   phoneVerified: boolean;
@@ -18,7 +18,7 @@ const NotificationSettings: React.FC = () => {
     smsNotifications: false,
     notifyOnMessages: true,
     notifyOnPosts: true,
-    notifyOnGroups: true,
+    notifyOnCommunities: true,
     notifyViaSMS: false,
     phoneNumber: '',
     phoneVerified: false
@@ -42,7 +42,7 @@ const NotificationSettings: React.FC = () => {
         smsNotifications: user.smsNotifications || false,
         notifyOnMessages: user.notifyOnMessages,
         notifyOnPosts: user.notifyOnPosts,
-        notifyOnGroups: user.notifyOnGroups,
+        notifyOnCommunities: user.notifyOnCommunities,
         notifyViaSMS: user.notifyViaSMS || false,
         phoneNumber: user.phoneNumber,
         phoneVerified: user.phoneVerified || false
@@ -300,14 +300,14 @@ const NotificationSettings: React.FC = () => {
 
           <label className="flex items-center justify-between cursor-pointer">
             <div>
-              <p className="font-medium text-gray-900">👥 Group Activity</p>
-              <p className="text-sm text-gray-600">When there's activity in your groups</p>
+              <p className="font-medium text-gray-900">👥 Community Activity</p>
+              <p className="text-sm text-gray-600">When there's activity in your communities</p>
             </div>
             <div className="relative">
               <input
                 type="checkbox"
-                checked={settings.notifyOnGroups}
-                onChange={() => handleToggle('notifyOnGroups')}
+                checked={settings.notifyOnCommunities}
+                onChange={() => handleToggle('notifyOnCommunities')}
                 className="sr-only peer"
                 disabled={isSaving}
               />

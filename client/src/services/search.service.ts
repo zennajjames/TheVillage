@@ -5,13 +5,13 @@ export interface SearchResults {
   results: {
     users: any[];
     posts: any[];
-    groups: any[];
+    communities: any[];
     messages: any[];
   };
   counts: {
     users: number;
     posts: number;
-    groups: number;
+    communities: number;
     messages: number;
     total: number;
   };

@@ -4,23 +4,19 @@ import MapView from './MapView';
 import { getUserLocation, getSchoolCoordinates, calculateDistance, MINNEAPOLIS_CENTER } from '../../utils/geocoding';
 import { useAuth } from '../../context/AuthContext';
 
-interface Group {
+interface CommunityMapItem {
   id: string;
   name: string;
   description: string;
-  category?: string;
+  category?: string | null;
   location?: string;
-  community?: {
-    id: string;
-    name: string;
-  };
   _count?: {
     members: number;
   };
 }
 
 interface DashboardMapProps {
-  groups: Group[];
+  communities: CommunityMapItem[];
   radius: number;
 }
 
@@ -43,7 +39,7 @@ const neighborhoodIconUrl = 'data:image/svg+xml;charset=UTF-8,' + encodeURICompo
   </svg>
 `);
 
-const DashboardMap: React.FC<DashboardMapProps> = ({ groups, radius }) => {
+const DashboardMap: React.FC<DashboardMapProps> = ({ communities, radius }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [mapCenter, setMapCenter] = useState(MINNEAPOLIS_CENTER);
@@ -72,30 +68,30 @@ const DashboardMap: React.FC<DashboardMapProps> = ({ groups, radius }) => {
     fetchUserLocation();
   }, [user?.zipCode, user?.street, user?.city, user?.state]);
 
-  // Convert groups to map markers, filtering by distance from user
+  // Convert communities to map markers, filtering by distance from user
   useEffect(() => {
-    const markers = groups
-      .map((group) => {
-        const coords = getSchoolCoordinates(group.name) || getSchoolCoordinates(group.location || '');
+    const markers = communities
+      .map((community) => {
+        const coords = getSchoolCoordinates(community.name) || getSchoolCoordinates(community.location || '');
         if (!coords) return null;
 
         const distance = calculateDistance(mapCenter.lat, mapCenter.lng, coords.lat, coords.lng);
         if (distance > radius) return null;
 
         return {
-          id: group.id,
-          name: group.name,
-          description: group.description,
+          id: community.id,
+          name: community.name,
+          description: community.description,
           position: coords,
-          memberCount: group._count?.members || 0,
-          category: group.category,
-          iconUrl: group.category === 'School' ? schoolIconUrl : neighborhoodIconUrl,
+          memberCount: community._count?.members || 0,
+          category: community.category,
+          iconUrl: community.category === 'School' ? schoolIconUrl : neighborhoodIconUrl,
         };
       })
       .filter((marker): marker is NonNullable<typeof marker> => marker !== null);
 
     setMapMarkers(markers);
-  }, [groups, mapCenter, radius]);
+  }, [communities, mapCenter, radius]);
 
   // Calculate zoom based on radius
   const getZoomLevel = () => {
@@ -106,7 +102,7 @@ const DashboardMap: React.FC<DashboardMapProps> = ({ groups, radius }) => {
   };
 
   const handleMarkerClick = (markerId: string) => {
-    navigate(`/groups/${markerId}`);
+    navigate(`/communities/${markerId}`);
   };
 
   if (isLoadingLocation) {

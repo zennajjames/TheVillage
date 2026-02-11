@@ -11,8 +11,6 @@ import PostDetail from './pages/PostDetail';
 import Profile from './pages/Profile';
 import Communities from './pages/Communities';
 import CommunityDetail from './pages/CommunityDetail';
-import Groups from './pages/Groups';
-import GroupDetail from './pages/GroupDetail';
 import Messages from './pages/Messages';
 import MessageThread from './pages/MessageThread';
 import ForgotPassword from './pages/ForgotPassword';
@@ -23,6 +21,7 @@ import Landing from './pages/Landing';
 import About from './pages/About';
 import Notifications from './pages/Notifications';
 import Privacy from './pages/Privacy';
+import Events from './pages/Events';
 import FindYourCommunity from './components/communities/FindYourCommunity';
 import BrowseCommunities from './pages/BrowseCommunities';
 import AuthCallback from './pages/AuthCallback';
@@ -128,22 +127,11 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/groups"
-        element={
-          <ProtectedRoute>
-            <Groups />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/groups/:id"
-        element={
-          <ProtectedRoute>
-            <GroupDetail />
-          </ProtectedRoute>
-        }
-      />
+
+      {/* Redirects from old /groups routes to /communities */}
+      <Route path="/groups" element={<Navigate to="/communities" replace />} />
+      <Route path="/groups/:id" element={<Navigate to="/communities" replace />} />
+
       <Route
         path="/messages"
         element={
@@ -160,58 +148,50 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      <Route 
-        path="/" 
+
+      <Route
+        path="/admin"
         element={
-        <Navigate to={isAuthenticated ? "/dashboard" : "/login"} />
-        } />
+          <ProtectedRoute>
+            <Admin />
+          </ProtectedRoute>
+        }
+      />
 
-      <Route 
-        path="/forgot-password" 
+      <Route
+        path="/search"
         element={
-        <ForgotPassword />
-        } />
-
-      <Route 
-        path="/reset-password/:token" 
+          <ProtectedRoute>
+            <Search />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/notifications"
         element={
-        <ResetPassword />
-        } />
+          <ProtectedRoute>
+            <Notifications />
+          </ProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute>
-              <Admin />
-            </ProtectedRoute>
-          } />
+      <Route
+        path="/privacy"
+        element={
+          <ProtectedRoute>
+            <Privacy />
+          </ProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/search"
-          element={
-            <ProtectedRoute>
-              <Search />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-           path="/notifications"
-           element={
-            <ProtectedRoute>
-             <Notifications />
-            </ProtectedRoute>
-           }
-          />
-
-        <Route
-          path="/privacy"
-          element={
-            <ProtectedRoute>
-              <Privacy />
-            </ProtectedRoute>
-          }
-        />
-
+      <Route
+        path="/events"
+        element={
+          <ProtectedRoute>
+            <Events />
+          </ProtectedRoute>
+        }
+      />
 
     </Routes>
   );
