@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const AuthCallback: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { loginWithToken } = useAuth();
 
   useEffect(() => {
     const token = searchParams.get('token');
@@ -15,20 +17,23 @@ const AuthCallback: React.FC = () => {
     }
 
     if (token) {
-      // Store the token
-      localStorage.setItem('token', token);
-
-      // Redirect to dashboard - AuthContext will pick up the token and verify it
-      navigate('/dashboard');
+      // Store token and verify with API to set user in AuthContext
+      loginWithToken(token)
+        .then(() => {
+          navigate('/dashboard');
+        })
+        .catch(() => {
+          navigate('/login?error=oauth_failed');
+        });
     } else {
       navigate('/login');
     }
-  }, [searchParams, navigate]);
+  }, [searchParams, navigate, loginWithToken]);
 
   return (
     <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-4"></div>
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-brand-red mx-auto mb-4"></div>
         <p className="text-gray-600">Completing login...</p>
       </div>
     </div>
