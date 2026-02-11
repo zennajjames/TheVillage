@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import LanguageSelector from '../components/layout/LanguageSelector';
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
@@ -14,15 +15,16 @@ const Landing: React.FC = () => {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-2">
               <img
-                src="/VillageLogoGreyCircle.png"
+                src="/villageLogo.png"
                 alt="The Village Logo"
                 className="w-10 h-10"
               />
               <span className="text-2xl font-bold text-brand-black">
-                The Village
+                {t('common.appName')}
               </span>
             </div>
             <div className="flex items-center gap-3">
+              <LanguageSelector />
               <button
                 onClick={() => navigate('/login')}
                 className="text-neutral-700 hover:text-brand-red font-medium transition px-4 py-2 rounded-lg hover:bg-brand-red/10"
@@ -43,26 +45,22 @@ const Landing: React.FC = () => {
       {/* Hero Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">
         <div className="text-center max-w-4xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 bg-brand-red/10 text-brand-red px-4 py-2 rounded-full text-sm font-medium mb-6 border border-brand-red/20">
-            <span className="w-2 h-2 bg-brand-red rounded-full animate-pulse"></span>
-            Community Platform
-          </div>
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
             <span className="text-brand-red">
-              Find Your Community,
+              {t('landing.heroLine1')}
             </span>
             <br />
-            <span className="text-brand-black">Connected</span>
+            <span className="text-brand-black">{t('landing.heroLine2')}</span>
           </h1>
           <p className="text-xl text-neutral-600 mb-8 max-w-2xl mx-auto leading-relaxed">
-            A hyperlocal platform for neighborhoods and schools to organize, communicate, and support each other—built on mutual aid and genuine community connection.
+            {t('landing.description')}
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <button
               onClick={() => navigate('/signup')}
               className="btn-primary px-8 py-4 text-lg hover:shadow-2xl hover:scale-105"
             >
-              Find Your Community
+              {t('landing.findYourCommunity')}
             </button>
             <button
               onClick={() => {
@@ -70,7 +68,7 @@ const Landing: React.FC = () => {
               }}
               className="btn-secondary px-8 py-4 text-lg hover:shadow-lg"
             >
-              Learn More
+              {t('landing.learnMore')}
             </button>
           </div>
         </div>
@@ -83,17 +81,17 @@ const Landing: React.FC = () => {
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full -ml-24 -mb-24 group-hover:scale-110 transition-transform"></div>
             <div className="relative z-10">
               <div className="text-6xl mb-4">🏘️</div>
-              <h3 className="text-3xl md:text-4xl font-bold mb-4">Organized by Community</h3>
+              <h3 className="text-3xl md:text-4xl font-bold mb-4">{t('landing.organizedByCommunity')}</h3>
               <p className="text-white/90 text-lg mb-6 leading-relaxed max-w-2xl">
-                Join your neighborhood or school community. Connect with families nearby, coordinate activities, and support each other.
+                {t('landing.organizedByCommunityDesc')}
               </p>
               <div className="flex flex-wrap gap-2 mb-6">
-                <span className="bg-white/20 backdrop-blur px-4 py-2 rounded-xl text-sm font-medium">By Neighborhood</span>
-                <span className="bg-white/20 backdrop-blur px-4 py-2 rounded-xl text-sm font-medium">By School</span>
-                <span className="bg-white/20 backdrop-blur px-4 py-2 rounded-xl text-sm font-medium">By Interest</span>
+                <span className="bg-white/20 backdrop-blur px-4 py-2 rounded-xl text-sm font-medium">{t('landing.byNeighborhood')}</span>
+                <span className="bg-white/20 backdrop-blur px-4 py-2 rounded-xl text-sm font-medium">{t('landing.bySchool')}</span>
+                <span className="bg-white/20 backdrop-blur px-4 py-2 rounded-xl text-sm font-medium">{t('landing.byInterest')}</span>
               </div>
               <p className="text-white/80 text-sm max-w-xl">
-                Each community has its own dedicated space with groups, making it easy to coordinate activities, share resources, and build connections.
+                {t('landing.organizedByCommunityDetail')}
               </p>
             </div>
           </div>
@@ -101,24 +99,24 @@ const Landing: React.FC = () => {
           {/* Messages */}
           <div className="md:col-span-2 bg-white rounded-3xl p-6 border border-neutral-200 hover:border-brand-red hover:shadow-xl transition-all group">
             <div className="text-4xl mb-3">💬</div>
-            <h3 className="text-xl font-bold text-brand-black mb-2">Direct Messages</h3>
+            <h3 className="text-xl font-bold text-brand-black mb-2">{t('landing.directMessages')}</h3>
             <p className="text-neutral-600 text-sm leading-relaxed mb-4">
-              Chat with other parents, coordinate carpools, and organize playdates.
+              {t('landing.directMessagesDesc')}
             </p>
             <div className="flex items-center gap-2 text-brand-red text-sm font-medium group-hover:gap-3 transition-all">
-              Connect <span>→</span>
+              {t('landing.connect')} <span>→</span>
             </div>
           </div>
 
           {/* Classroom Groups */}
           <div className="md:col-span-2 bg-white rounded-3xl p-6 border border-neutral-200 hover:border-brand-red hover:shadow-xl transition-all group">
             <div className="text-4xl mb-3">👨‍🏫</div>
-            <h3 className="text-xl font-bold text-brand-black mb-2">Classroom Groups</h3>
+            <h3 className="text-xl font-bold text-brand-black mb-2">{t('landing.classroomGroups')}</h3>
             <p className="text-neutral-600 text-sm leading-relaxed mb-4">
-              Join your child's class group to stay in the loop and coordinate support.
+              {t('landing.classroomGroupsDesc')}
             </p>
             <div className="flex items-center gap-2 text-brand-red text-sm font-medium group-hover:gap-3 transition-all">
-              Join class <span>→</span>
+              {t('landing.joinClass')} <span>→</span>
             </div>
           </div>
 
@@ -127,18 +125,18 @@ const Landing: React.FC = () => {
             <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20"></div>
             <div className="relative z-10">
               <div className="text-5xl mb-3">🤝</div>
-              <h3 className="text-2xl font-bold mb-3">Mutual Aid Posts</h3>
+              <h3 className="text-2xl font-bold mb-3">{t('landing.mutualAidPosts')}</h3>
               <p className="text-green-50 mb-4 leading-relaxed">
-                Request help or offer support within your community.
+                {t('landing.mutualAidPostsDesc')}
               </p>
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-white/20 backdrop-blur rounded-xl p-3">
                   <div className="text-3xl mb-1">🙋</div>
-                  <div className="text-sm font-semibold">Need Help</div>
+                  <div className="text-sm font-semibold">{t('landing.needHelp')}</div>
                 </div>
                 <div className="bg-white/20 backdrop-blur rounded-xl p-3">
                   <div className="text-3xl mb-1">👋</div>
-                  <div className="text-sm font-semibold">Can Help</div>
+                  <div className="text-sm font-semibold">{t('landing.canHelp')}</div>
                 </div>
               </div>
             </div>
@@ -147,27 +145,27 @@ const Landing: React.FC = () => {
           {/* Privacy */}
           <div className="bg-white rounded-3xl p-6 border border-neutral-200 hover:border-brand-red hover:shadow-xl transition-all">
             <div className="text-4xl mb-3">🔒</div>
-            <h3 className="text-lg font-bold text-neutral-900 mb-2">Safe & Private</h3>
+            <h3 className="text-lg font-bold text-neutral-900 mb-2">{t('landing.safeAndPrivate')}</h3>
             <p className="text-neutral-600 text-sm leading-relaxed">
-              Verified members only. Your data stays private.
+              {t('landing.safeAndPrivateDesc')}
             </p>
           </div>
 
           {/* Hyperlocal */}
           <div className="bg-white rounded-3xl p-6 border border-neutral-200 hover:border-brand-red hover:shadow-xl transition-all">
             <div className="text-4xl mb-3">📍</div>
-            <h3 className="text-lg font-bold text-neutral-900 mb-2">Hyperlocal</h3>
+            <h3 className="text-lg font-bold text-neutral-900 mb-2">{t('landing.hyperlocal')}</h3>
             <p className="text-neutral-600 text-sm leading-relaxed">
-              Connect with families in your neighborhood or school.
+              {t('landing.hyperlocalDesc')}
             </p>
           </div>
 
           {/* Free Always */}
           <div className="bg-white rounded-3xl p-6 border border-neutral-200 hover:border-brand-red hover:shadow-xl transition-all">
             <div className="text-4xl mb-3">❤️</div>
-            <h3 className="text-lg font-bold text-neutral-900 mb-2">Always Free</h3>
+            <h3 className="text-lg font-bold text-neutral-900 mb-2">{t('landing.alwaysFree')}</h3>
             <p className="text-neutral-600 text-sm leading-relaxed">
-              No ads, no fees. Built for community, not profit.
+              {t('landing.alwaysFreeDesc')}
             </p>
           </div>
         </div>
@@ -176,10 +174,10 @@ const Landing: React.FC = () => {
         <div id="how-it-works" className="max-w-6xl mx-auto mb-16">
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold text-neutral-900 mb-4">
-              How It Works
+              {t('landing.howItWorks')}
             </h2>
             <p className="text-xl text-neutral-600">
-              Three simple steps to connect with your community
+              {t('landing.howItWorksSubtitle')}
             </p>
           </div>
 
@@ -188,9 +186,9 @@ const Landing: React.FC = () => {
               <div className="bg-brand-red w-20 h-20 rounded-lg flex items-center justify-center text-white text-3xl font-bold mb-4 group-hover:scale-110 transition-transform">
                 1
               </div>
-              <h3 className="text-2xl font-bold text-neutral-900 mb-3">Find Your Community</h3>
+              <h3 className="text-2xl font-bold text-neutral-900 mb-3">{t('landing.step1Title')}</h3>
               <p className="text-neutral-600 leading-relaxed">
-                Sign up and find your neighborhood or school community. Connect with families near you.
+                {t('landing.step1Desc')}
               </p>
             </div>
 
@@ -198,9 +196,9 @@ const Landing: React.FC = () => {
               <div className="bg-neutral-900 w-20 h-20 rounded-lg flex items-center justify-center text-white text-3xl font-bold mb-4 group-hover:scale-110 transition-transform">
                 2
               </div>
-              <h3 className="text-2xl font-bold text-neutral-900 mb-3">Join Classroom Groups</h3>
+              <h3 className="text-2xl font-bold text-neutral-900 mb-3">{t('landing.step2Title')}</h3>
               <p className="text-neutral-600 leading-relaxed">
-                Find your child's teacher and grade. Join class-specific groups to coordinate and stay connected.
+                {t('landing.step2Desc')}
               </p>
             </div>
 
@@ -208,9 +206,9 @@ const Landing: React.FC = () => {
               <div className="bg-brand-red w-20 h-20 rounded-lg flex items-center justify-center text-white text-3xl font-bold mb-4 group-hover:scale-110 transition-transform">
                 3
               </div>
-              <h3 className="text-2xl font-bold text-neutral-900 mb-3">Support Each Other</h3>
+              <h3 className="text-2xl font-bold text-neutral-900 mb-3">{t('landing.step3Title')}</h3>
               <p className="text-neutral-600 leading-relaxed">
-                Share needs, offer help, and build the supportive community your family deserves.
+                {t('landing.step3Desc')}
               </p>
             </div>
           </div>
@@ -219,55 +217,55 @@ const Landing: React.FC = () => {
         {/* Use Cases */}
         <div className="bg-white rounded-3xl p-8 md:p-12 shadow-xl mb-16 border border-neutral-100">
           <h2 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-6 text-center">
-            Perfect For
+            {t('landing.perfectFor')}
           </h2>
 
           <div className="grid md:grid-cols-2 gap-6">
             <div className="p-6 bg-brand-red/10 rounded-2xl border border-brand-red/20">
               <div className="text-3xl mb-3">🎒</div>
-              <h3 className="font-bold text-lg text-neutral-900 mb-2">Room Parents</h3>
+              <h3 className="font-bold text-lg text-neutral-900 mb-2">{t('landing.roomParents')}</h3>
               <p className="text-neutral-600 text-sm">
-                Coordinate class events, organize volunteers, and keep parents informed about classroom needs.
+                {t('landing.roomParentsDesc')}
               </p>
             </div>
 
             <div className="p-6 bg-neutral-100 rounded-2xl border border-gray-100">
               <div className="text-3xl mb-3">🚗</div>
-              <h3 className="font-bold text-lg text-neutral-900 mb-2">Carpool Coordination</h3>
+              <h3 className="font-bold text-lg text-neutral-900 mb-2">{t('landing.carpools')}</h3>
               <p className="text-neutral-600 text-sm">
-                Find families nearby to share pickup/dropoff duties and after-school activity transportation.
+                {t('landing.carpoolsDesc')}
               </p>
             </div>
 
             <div className="p-6 bg-neutral-100 rounded-2xl border border-green-100">
               <div className="text-3xl mb-3">📚</div>
-              <h3 className="font-bold text-lg text-neutral-900 mb-2">Classroom Supplies</h3>
+              <h3 className="font-bold text-lg text-neutral-900 mb-2">{t('landing.classroomSupplies')}</h3>
               <p className="text-neutral-600 text-sm">
-                Share school supplies, textbooks, and materials. No family should have to choose between supplies and groceries.
+                {t('landing.classroomSuppliesDesc')}
               </p>
             </div>
 
             <div className="p-6 bg-neutral-100 rounded-2xl border border-yellow-100">
               <div className="text-3xl mb-3">🎉</div>
-              <h3 className="font-bold text-lg text-neutral-900 mb-2">Events & Field Trips</h3>
+              <h3 className="font-bold text-lg text-neutral-900 mb-2">{t('landing.events')}</h3>
               <p className="text-neutral-600 text-sm">
-                Organize fundraisers, coordinate volunteers for field trips, and plan class parties together.
+                {t('landing.eventsDesc')}
               </p>
             </div>
 
             <div className="p-6 bg-brand-red/10 rounded-2xl border border-red-100">
               <div className="text-3xl mb-3">👶</div>
-              <h3 className="font-bold text-lg text-neutral-900 mb-2">Childcare Swaps</h3>
+              <h3 className="font-bold text-lg text-neutral-900 mb-2">{t('landing.childcareSwaps')}</h3>
               <p className="text-neutral-600 text-sm">
-                Trade babysitting hours with trusted families from your community. Support each other with childcare.
+                {t('landing.childcareSwapsDesc')}
               </p>
             </div>
 
             <div className="p-6 bg-neutral-100 rounded-2xl border border-gray-100">
               <div className="text-3xl mb-3">🤝</div>
-              <h3 className="font-bold text-lg text-neutral-900 mb-2">Family Support</h3>
+              <h3 className="font-bold text-lg text-neutral-900 mb-2">{t('landing.familySupport')}</h3>
               <p className="text-neutral-600 text-sm">
-                Request help during tough times or offer support to families in need. Build genuine community bonds.
+                {t('landing.familySupportDesc')}
               </p>
             </div>
           </div>
@@ -276,34 +274,34 @@ const Landing: React.FC = () => {
         {/* Community Values */}
         <div className="bg-white rounded-3xl p-8 md:p-12 shadow-xl mb-16 border border-neutral-100">
           <h2 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-6 text-center">
-            Built on Mutual Aid Principles
+            {t('landing.mutualAidPrinciples')}
           </h2>
           <p className="text-lg text-neutral-600 mb-8 text-center max-w-3xl mx-auto">
-            This isn't charity—it's community. We support each other as equals, building the village our children need to thrive.
+            {t('landing.mutualAidPrinciplesDesc')}
           </p>
 
           <div className="grid md:grid-cols-3 gap-6">
             <div className="text-center p-6">
               <div className="text-5xl mb-3">⚖️</div>
-              <h3 className="font-bold text-lg text-neutral-900 mb-2">Equal</h3>
+              <h3 className="font-bold text-lg text-neutral-900 mb-2">{t('landing.equal')}</h3>
               <p className="text-neutral-600 text-sm">
-                No hierarchy. We all give and receive. Both are valuable.
+                {t('landing.equalDesc')}
               </p>
             </div>
 
             <div className="text-center p-6">
               <div className="text-5xl mb-3">🔄</div>
-              <h3 className="font-bold text-lg text-neutral-900 mb-2">Reciprocal</h3>
+              <h3 className="font-bold text-lg text-neutral-900 mb-2">{t('landing.reciprocal')}</h3>
               <p className="text-neutral-600 text-sm">
-                Support flows both ways. Everyone has something to offer.
+                {t('landing.reciprocalDesc')}
               </p>
             </div>
 
             <div className="text-center p-6">
               <div className="text-5xl mb-3">🌱</div>
-              <h3 className="font-bold text-lg text-neutral-900 mb-2">Community-Led</h3>
+              <h3 className="font-bold text-lg text-neutral-900 mb-2">{t('landing.communityLed')}</h3>
               <p className="text-neutral-600 text-sm">
-                Built by parents, for parents. No corporate agenda.
+                {t('landing.communityLedDesc')}
               </p>
             </div>
           </div>
@@ -315,16 +313,16 @@ const Landing: React.FC = () => {
           <div className="absolute bottom-0 left-0 w-72 h-72 bg-white/10 rounded-full -ml-36 -mb-36"></div>
           <div className="relative z-10">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Ready to Find Your Community?
+              {t('landing.readyToFind')}
             </h2>
             <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-              Join your community today. It's free, always.
+              {t('landing.readyToFindDesc')}
             </p>
             <button
               onClick={() => navigate('/signup')}
               className="bg-white text-brand-red px-10 py-4 rounded-xl hover:scale-105 transition-all font-bold text-lg shadow-2xl hover:shadow-xl"
             >
-              Get Started Now
+              {t('landing.getStartedNow')}
             </button>
           </div>
         </div>
@@ -342,37 +340,37 @@ const Landing: React.FC = () => {
                   className="w-8 h-8"
                 />
                 <span className="font-bold text-brand-red">
-                  The Village
+                  {t('common.appName')}
                 </span>
               </div>
               <p className="text-neutral-600 text-sm">
-                Connecting communities through mutual aid.
+                {t('landing.footerTagline')}
               </p>
             </div>
             <div>
-              <h4 className="font-semibold text-neutral-900 mb-3">Platform</h4>
+              <h4 className="font-semibold text-neutral-900 mb-3">{t('landing.platform')}</h4>
               <ul className="space-y-2 text-sm text-neutral-600">
-                <li><button onClick={() => navigate('/signup')} className="hover:text-brand-red">Join Now</button></li>
-                <li><button onClick={() => navigate('/login')} className="hover:text-brand-red">Log In</button></li>
+                <li><button onClick={() => navigate('/signup')} className="hover:text-brand-red">{t('landing.joinNow')}</button></li>
+                <li><button onClick={() => navigate('/login')} className="hover:text-brand-red">{t('common.login')}</button></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-neutral-900 mb-3">Community</h4>
+              <h4 className="font-semibold text-neutral-900 mb-3">{t('landing.community')}</h4>
               <ul className="space-y-2 text-sm text-neutral-600">
-                <li><a href="#" className="hover:text-brand-red">Guidelines</a></li>
-                <li><a href="#" className="hover:text-brand-red">Support</a></li>
+                <li><a href="#" className="hover:text-brand-red">{t('landing.guidelines')}</a></li>
+                <li><a href="#" className="hover:text-brand-red">{t('landing.support')}</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-neutral-900 mb-3">Legal</h4>
+              <h4 className="font-semibold text-neutral-900 mb-3">{t('landing.legal')}</h4>
               <ul className="space-y-2 text-sm text-neutral-600">
-                <li><a href="#" className="hover:text-brand-red">Privacy</a></li>
-                <li><a href="#" className="hover:text-brand-red">Terms</a></li>
+                <li><a href="#" className="hover:text-brand-red">{t('landing.privacyLink')}</a></li>
+                <li><a href="#" className="hover:text-brand-red">{t('landing.terms')}</a></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-neutral-200 pt-8 text-center">
-            <p className="text-neutral-600 text-sm">© 2024 The Village. Built with ❤️ for communities everywhere.</p>
+            <p className="text-neutral-600 text-sm">{t('landing.copyright')}</p>
           </div>
         </div>
       </footer>

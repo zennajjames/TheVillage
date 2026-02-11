@@ -51,11 +51,11 @@ const LanguageSelector: React.FC = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-purple-50 transition group"
+        className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-brand-red/10 transition group"
         title="Change language"
       >
         <svg
-          className="w-5 h-5 text-gray-700 group-hover:text-purple-600"
+          className="w-5 h-5 text-gray-700 group-hover:text-brand-red"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -67,7 +67,7 @@ const LanguageSelector: React.FC = () => {
             d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
           />
         </svg>
-        <span className="text-sm font-medium text-gray-700 group-hover:text-purple-600 hidden sm:inline">
+        <span className="text-sm font-medium text-gray-700 group-hover:text-brand-red hidden sm:inline">
           {currentLanguage.nativeName}
         </span>
       </button>
@@ -78,8 +78,8 @@ const LanguageSelector: React.FC = () => {
             <button
               key={language.code}
               onClick={() => handleLanguageChange(language.code)}
-              className={`w-full text-left px-4 py-2.5 hover:bg-purple-50 transition flex items-center justify-between ${
-                i18n.language === language.code ? 'bg-purple-50' : ''
+              className={`w-full text-left px-4 py-2.5 hover:bg-brand-red/10 transition flex items-center justify-between ${
+                i18n.language === language.code ? 'bg-brand-red/10' : ''
               }`}
             >
               <div>
@@ -88,7 +88,7 @@ const LanguageSelector: React.FC = () => {
               </div>
               {i18n.language === language.code && (
                 <svg
-                  className="w-5 h-5 text-purple-600"
+                  className="w-5 h-5 text-brand-red"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
