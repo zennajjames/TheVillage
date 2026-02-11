@@ -114,6 +114,8 @@ export interface Community {
   };
   isMember?: boolean;
   userRole?: string | null;
+  joinRequestStatus?: 'PENDING' | 'APPROVED' | 'DENIED' | null;
+  joinRequestId?: string | null;
   members?: CommunityMember[];
   posts?: CommunityPost[];
   subGroups?: SubGroup[];
@@ -143,6 +145,25 @@ export interface CreateCommunityData {
   isPrivate: boolean;
   coverImage?: string;
   category?: string;
+}
+
+// Join Request types
+export interface JoinRequest {
+  id: string;
+  communityId: string;
+  userId: string;
+  status: 'PENDING' | 'APPROVED' | 'DENIED';
+  message?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  user: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    profilePicture?: string;
+    location: string;
+    bio?: string;
+  };
 }
 
 // Place suggestion types (Google Places results)

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { communitiesService } from '../../services/communities.service';
 import { Community, PlaceSuggestion, CreateCommunityData } from '../../types';
@@ -9,20 +8,34 @@ interface FindYourCommunityProps {
   onClose?: () => void;
 }
 
+type ViewState = 'zip-form' | 'results' | 'place-suggestions';
+
 const FindYourCommunity: React.FC<FindYourCommunityProps> = ({ onClose }) => {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [zipCode, setZipCode] = useState('');
   const [communities, setCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [searching, setSearching] = useState(false);
 
-  // Place suggestions state
+  // View state machine: zip-form → results → place-suggestions
+  const [view, setView] = useState<ViewState>('zip-form');
+
+  // Search filter for communities list
+  const [searchFilter, setSearchFilter] = useState('');
+
+  // Category search
+  const [searchType, setSearchType] = useState<'school' | 'neighborhood' | null>(null);
   const [placeSuggestions, setPlaceSuggestions] = useState<PlaceSuggestion[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const [creatingSuggestion, setCreatingSuggestion] = useState<string | null>(null);
+
+  // Search filter for place suggestions
+  const [placeFilter, setPlaceFilter] = useState('');
+
+  // Join request state
+  const [joiningCommunity, setJoiningCommunity] = useState<string | null>(null);
+  const [requestSent, setRequestSent] = useState<Set<string>>(new Set());
 
   const searchByZipCode = async (zip: string) => {
     if (zip.length !== 5) {
@@ -30,40 +43,44 @@ const FindYourCommunity: React.FC<FindYourCommunityProps> = ({ onClose }) => {
       return;
     }
 
-    setSearching(true);
     setLoading(true);
     setError('');
-    setPlaceSuggestions([]);
+    setSearchFilter('');
 
     try {
       const allCommunities = await communitiesService.getAllCommunities();
       const filtered = allCommunities.filter(
         (community) => community.zipCode === zip
       );
-
       setCommunities(filtered);
-
-      if (filtered.length === 0) {
-        // No communities found — search Google Places for local orgs
-        setLoadingSuggestions(true);
-        try {
-          const suggestions = await communitiesService.searchLocalPlaces(zip);
-          setPlaceSuggestions(suggestions);
-          if (suggestions.length === 0) {
-            setError(`No communities found for zip code ${zip}. Try a nearby zip code or browse all communities.`);
-          }
-        } catch (err) {
-          console.error('Places search error:', err);
-          setError(`No communities found for zip code ${zip}. Try a nearby zip code or browse all communities.`);
-        } finally {
-          setLoadingSuggestions(false);
-        }
-      }
+      setView('results');
     } catch (err) {
       setError('Failed to search for communities. Please try again.');
       console.error('Search error:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const searchByCategory = async (type: 'school' | 'neighborhood') => {
+    setSearchType(type);
+    setView('place-suggestions');
+    setLoadingSuggestions(true);
+    setPlaceSuggestions([]);
+    setPlaceFilter('');
+    setError('');
+
+    try {
+      const suggestions = await communitiesService.searchLocalPlaces(zipCode, type);
+      setPlaceSuggestions(suggestions);
+      if (suggestions.length === 0) {
+        setError(`No ${type === 'school' ? 'schools' : 'neighborhoods'} found for zip code ${zipCode}. Try a different category or zip code.`);
+      }
+    } catch (err) {
+      console.error('Places search error:', err);
+      setError(`Failed to search for ${type === 'school' ? 'schools' : 'neighborhoods'}. Please try again.`);
+    } finally {
+      setLoadingSuggestions(false);
     }
   };
 
@@ -73,6 +90,7 @@ const FindYourCommunity: React.FC<FindYourCommunityProps> = ({ onClose }) => {
       setZipCode(user.zipCode);
       searchByZipCode(user.zipCode);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -82,12 +100,20 @@ const FindYourCommunity: React.FC<FindYourCommunityProps> = ({ onClose }) => {
 
   const handleJoinCommunity = async (communityId: string) => {
     try {
+      const community = communities.find(c => c.id === communityId);
+      if (community?.isMember) {
+        navigate(`/communities/${communityId}`);
+        if (onClose) onClose();
+        return;
+      }
+      setJoiningCommunity(communityId);
       await communitiesService.joinCommunity(communityId);
-      navigate(`/communities/${communityId}`);
-      if (onClose) onClose();
-    } catch (err) {
-      console.error('Failed to join community:', err);
-      setError('Failed to join community. Please try again.');
+      setRequestSent(prev => new Set(prev).add(communityId));
+    } catch (err: any) {
+      console.error('Failed to request join:', err);
+      setError(err.response?.data?.error || 'Failed to send join request. Please try again.');
+    } finally {
+      setJoiningCommunity(null);
     }
   };
 
@@ -114,7 +140,6 @@ const FindYourCommunity: React.FC<FindYourCommunityProps> = ({ onClose }) => {
       const errorMsg = err.response?.data?.error || '';
       if (errorMsg.includes('Unique constraint')) {
         setError('A community with this name already exists in your area. Try searching again!');
-        // Re-search to find the existing community
         searchByZipCode(zipCode);
       } else {
         setError('Failed to create community. Please try again.');
@@ -125,12 +150,36 @@ const FindYourCommunity: React.FC<FindYourCommunityProps> = ({ onClose }) => {
   };
 
   const resetSearch = () => {
-    setSearching(false);
+    setView('zip-form');
     setCommunities([]);
     setPlaceSuggestions([]);
+    setSearchType(null);
     setZipCode('');
     setError('');
+    setSearchFilter('');
+    setPlaceFilter('');
   };
+
+  const backToResults = () => {
+    setPlaceSuggestions([]);
+    setSearchType(null);
+    setPlaceFilter('');
+    setView('results');
+    setError('');
+  };
+
+  // Filter communities by search text
+  const filteredCommunities = communities.filter(c =>
+    !searchFilter || c.name.toLowerCase().includes(searchFilter.toLowerCase()) ||
+    c.description?.toLowerCase().includes(searchFilter.toLowerCase()) ||
+    c.address?.toLowerCase().includes(searchFilter.toLowerCase())
+  );
+
+  // Filter place suggestions by search text
+  const filteredSuggestions = placeSuggestions.filter(s =>
+    !placeFilter || s.name.toLowerCase().includes(placeFilter.toLowerCase()) ||
+    s.address.toLowerCase().includes(placeFilter.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4">
@@ -145,8 +194,15 @@ const FindYourCommunity: React.FC<FindYourCommunityProps> = ({ onClose }) => {
           </p>
         </div>
 
-        {/* Search Form */}
-        {!searching && (
+        {/* Error Message */}
+        {error && view !== 'place-suggestions' && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
+
+        {/* ===== ZIP CODE FORM ===== */}
+        {view === 'zip-form' && (
           <form onSubmit={handleSearch} className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Enter Your Zip Code
@@ -174,87 +230,159 @@ const FindYourCommunity: React.FC<FindYourCommunityProps> = ({ onClose }) => {
           </form>
         )}
 
-        {/* Error Message — only shown when no suggestions are loading/available */}
-        {error && placeSuggestions.length === 0 && !loadingSuggestions && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-600">{error}</p>
+        {/* Loading spinner for initial search */}
+        {loading && (
+          <div className="text-center py-8">
+            <div className="w-8 h-8 border-[3px] border-red-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+            <p className="text-sm text-gray-600">Searching communities...</p>
           </div>
         )}
 
-        {/* Search Results — existing communities */}
-        {searching && communities.length > 0 && (
+        {/* ===== RESULTS VIEW: Communities + Category Picker ===== */}
+        {view === 'results' && !loading && (
           <div>
-            <div className="mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">
-                Communities in {zipCode}
-              </h2>
-              <p className="text-sm text-gray-600">
-                Found {communities.length} communit{communities.length !== 1 ? 'ies' : 'y'}
-              </p>
-            </div>
+            {/* Existing communities */}
+            {communities.length > 0 && (
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-900">
+                      Communities in {zipCode}
+                    </h2>
+                    <p className="text-sm text-gray-600">
+                      Found {communities.length} communit{communities.length !== 1 ? 'ies' : 'y'}
+                    </p>
+                  </div>
+                </div>
 
-            <div className="space-y-3 max-h-96 overflow-y-auto">
-              {communities.map((community) => (
-                <div
-                  key={community.id}
-                  className="p-4 border border-gray-200 rounded-lg hover:border-red-300 hover:shadow-md transition"
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 mb-1">
-                        {community.name}
-                      </h3>
-                      <p className="text-sm text-gray-600 mb-2">
-                        {community.description}
-                      </p>
-                      <div className="flex items-center gap-4 text-xs text-gray-500">
-                        {community.address && (
-                          <span>📍 {community.address}</span>
-                        )}
-                        {community._count && (
-                          <>
-                            <span>👥 {community._count.members} members</span>
-                            <span>📝 {community._count.communityPosts} posts</span>
-                          </>
+                {/* Search filter */}
+                {communities.length > 3 && (
+                  <div className="mb-3">
+                    <input
+                      type="text"
+                      value={searchFilter}
+                      onChange={(e) => setSearchFilter(e.target.value)}
+                      placeholder="Search communities..."
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                    />
+                  </div>
+                )}
+
+                <div className="space-y-3 max-h-80 overflow-y-auto">
+                  {filteredCommunities.length > 0 ? filteredCommunities.map((community) => (
+                    <div
+                      key={community.id}
+                      className="p-4 border border-gray-200 rounded-lg hover:border-red-300 hover:shadow-md transition"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900 mb-1">
+                            {community.name}
+                          </h3>
+                          <p className="text-sm text-gray-600 mb-2">
+                            {community.description}
+                          </p>
+                          <div className="flex items-center gap-4 text-xs text-gray-500">
+                            {community.address && (
+                              <span>📍 {community.address}</span>
+                            )}
+                            {community._count && (
+                              <>
+                                <span>👥 {community._count.members} members</span>
+                                <span>📝 {community._count.communityPosts} posts</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        {community.isMember ? (
+                          <button
+                            onClick={() => handleJoinCommunity(community.id)}
+                            className="ml-4 px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition whitespace-nowrap"
+                          >
+                            View
+                          </button>
+                        ) : requestSent.has(community.id) || community.joinRequestStatus === 'PENDING' ? (
+                          <span className="ml-4 px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg text-sm font-medium whitespace-nowrap">
+                            ⏳ Request Sent
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => handleJoinCommunity(community.id)}
+                            disabled={joiningCommunity === community.id}
+                            className="ml-4 px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition whitespace-nowrap disabled:opacity-50"
+                          >
+                            {joiningCommunity === community.id ? 'Sending...' : 'Request to Join'}
+                          </button>
                         )}
                       </div>
                     </div>
-                    <button
-                      onClick={() => handleJoinCommunity(community.id)}
-                      className="ml-4 px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition whitespace-nowrap"
-                    >
-                      {community.isMember ? 'View' : 'Join Community'}
-                    </button>
-                  </div>
+                  )) : (
+                    <p className="text-sm text-gray-500 text-center py-4">
+                      No communities match "{searchFilter}"
+                    </p>
+                  )}
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
 
-            <button
-              onClick={resetSearch}
-              className="mt-4 w-full py-2 text-sm text-gray-600 hover:text-gray-900"
-            >
-              ← Search different zip code
-            </button>
+            {/* Category Picker — always shown */}
+            <div className={communities.length > 0 ? 'pt-6 border-t border-gray-200' : ''}>
+              <div className="text-center mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-1">
+                  {communities.length > 0 ? "Don't see yours?" : `No communities yet in ${zipCode}`}
+                </h2>
+                <p className="text-sm text-gray-600">
+                  {communities.length > 0 ? 'Search for a school or neighborhood to start a new community' : 'What are you looking for?'}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <button
+                  onClick={() => searchByCategory('school')}
+                  className="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 rounded-xl hover:border-red-400 hover:bg-red-50 transition group"
+                >
+                  <span className="text-4xl">🏫</span>
+                  <span className="font-semibold text-gray-900 group-hover:text-red-600">Schools</span>
+                  <span className="text-xs text-gray-500 text-center">Elementary, middle & high schools</span>
+                </button>
+                <button
+                  onClick={() => searchByCategory('neighborhood')}
+                  className="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 rounded-xl hover:border-red-400 hover:bg-red-50 transition group"
+                >
+                  <span className="text-4xl">🏘️</span>
+                  <span className="font-semibold text-gray-900 group-hover:text-red-600">Neighborhoods</span>
+                  <span className="text-xs text-gray-500 text-center">Local neighborhoods & areas</span>
+                </button>
+              </div>
+
+              <button
+                onClick={resetSearch}
+                className="w-full py-2 text-sm text-gray-600 hover:text-gray-900"
+              >
+                ← Search different zip code
+              </button>
+            </div>
           </div>
         )}
 
-        {/* Place Suggestions — shown when no DB communities found */}
-        {searching && communities.length === 0 && !loading && (
+        {/* ===== PLACE SUGGESTIONS VIEW ===== */}
+        {view === 'place-suggestions' && (
           <div>
             {loadingSuggestions ? (
               <div className="text-center py-8">
                 <div className="w-8 h-8 border-[3px] border-red-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-                <p className="text-sm text-gray-600">Searching for local community groups...</p>
+                <p className="text-sm text-gray-600">
+                  Searching for {searchType === 'school' ? 'schools' : 'neighborhoods'}...
+                </p>
               </div>
             ) : placeSuggestions.length > 0 ? (
               <div>
                 <div className="mb-4">
                   <h2 className="text-xl font-semibold text-gray-900">
-                    No communities yet in {zipCode}
+                    {searchType === 'school' ? 'Schools' : 'Neighborhoods'} near {zipCode}
                   </h2>
                   <p className="text-sm text-gray-600 mt-1">
-                    We found {placeSuggestions.length} local group{placeSuggestions.length !== 1 ? 's' : ''} near you.
+                    Found {placeSuggestions.length} result{placeSuggestions.length !== 1 ? 's' : ''}.
                     Pick one to start a community!
                   </p>
                 </div>
@@ -265,8 +393,21 @@ const FindYourCommunity: React.FC<FindYourCommunityProps> = ({ onClose }) => {
                   </div>
                 )}
 
-                <div className="space-y-3 max-h-96 overflow-y-auto">
-                  {placeSuggestions.map((suggestion) => (
+                {/* Search filter for place suggestions */}
+                {placeSuggestions.length > 3 && (
+                  <div className="mb-3">
+                    <input
+                      type="text"
+                      value={placeFilter}
+                      onChange={(e) => setPlaceFilter(e.target.value)}
+                      placeholder={`Search ${searchType === 'school' ? 'schools' : 'neighborhoods'}...`}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                    />
+                  </div>
+                )}
+
+                <div className="space-y-3 max-h-80 overflow-y-auto">
+                  {filteredSuggestions.length > 0 ? filteredSuggestions.map((suggestion) => (
                     <div
                       key={suggestion.placeId}
                       className="p-4 border border-gray-200 rounded-lg hover:border-red-300 hover:shadow-md transition"
@@ -306,17 +447,43 @@ const FindYourCommunity: React.FC<FindYourCommunityProps> = ({ onClose }) => {
                         </button>
                       </div>
                     </div>
-                  ))}
+                  )) : (
+                    <p className="text-sm text-gray-500 text-center py-4">
+                      No results match "{placeFilter}"
+                    </p>
+                  )}
                 </div>
 
+                <div className="mt-4 flex gap-3">
+                  <button
+                    onClick={backToResults}
+                    className="flex-1 py-2 text-sm text-gray-600 hover:text-gray-900"
+                  >
+                    ← Back to categories
+                  </button>
+                  <button
+                    onClick={resetSearch}
+                    className="flex-1 py-2 text-sm text-gray-600 hover:text-gray-900"
+                  >
+                    ← Different zip code
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                {error && (
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-600">{error}</p>
+                  </div>
+                )}
                 <button
-                  onClick={resetSearch}
+                  onClick={backToResults}
                   className="mt-4 w-full py-2 text-sm text-gray-600 hover:text-gray-900"
                 >
-                  ← Search different zip code
+                  ← Back to categories
                 </button>
               </div>
-            ) : null}
+            )}
           </div>
         )}
 

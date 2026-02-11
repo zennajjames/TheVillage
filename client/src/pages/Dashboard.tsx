@@ -35,7 +35,17 @@ const Dashboard: React.FC = () => {
       setUserCommunities(communities);
 
       if (communities.length === 0) {
-        navigate('/find-your-community');
+        // Check if user has pending join requests before redirecting
+        // If they do, they should see the dashboard with a waiting message
+        try {
+          const allCommunities = await communitiesService.getAllCommunities();
+          const hasPendingRequests = allCommunities.some(c => c.joinRequestStatus === 'PENDING');
+          if (!hasPendingRequests) {
+            navigate('/find-your-community');
+          }
+        } catch {
+          navigate('/find-your-community');
+        }
       }
     } catch (error) {
       console.error('Failed to check user communities:', error);

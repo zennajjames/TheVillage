@@ -105,7 +105,13 @@ const Notifications: React.FC = () => {
       case 'FRIEND_ACCEPTED': return '🤝';
       case 'GROUP_POST': return '👥';
       case 'GROUP_INVITE': return '🎉';
+      case 'COMMUNITY_POST': return '📝';
+      case 'COMMUNITY_INVITE': return '🎉';
+      case 'JOIN_REQUEST': return '📩';
+      case 'JOIN_REQUEST_APPROVED': return '✅';
+      case 'JOIN_REQUEST_DENIED': return '❌';
       case 'POST_RESPONSE': return '💭';
+      case 'HELP_REQUEST': return '🤝';
       case 'SYSTEM': return '🔔';
       default: return '📬';
     }

@@ -71,6 +71,7 @@ model User {
   sentFriendRequests       Friendship[] @relation("SentFriendRequests")
   receivedFriendRequests   Friendship[] @relation("ReceivedFriendRequests")
   children                 Child[]
+  joinRequests             JoinRequest[]
 
   @@index([zipCode])
   @@index([resetPasswordToken])
@@ -147,6 +148,7 @@ model Community {
   children        CommunityChild[]
   helpRequests    HelpRequest[]
   events          Event[]
+  joinRequests    JoinRequest[]
 
   @@unique([name, zipCode])
   @@index([zipCode])
@@ -167,6 +169,24 @@ model CommunityMember {
   @@unique([communityId, userId])
   @@index([communityId])
   @@index([userId])
+}
+
+model JoinRequest {
+  id          String            @id @default(uuid())
+  communityId String
+  userId      String
+  status      JoinRequestStatus @default(PENDING)
+  message     String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([communityId, userId])
+  @@index([communityId])
+  @@index([userId])
+  @@index([status])
 }
 
 model CommunityPost {
@@ -299,9 +319,18 @@ enum NotificationType {
   FRIEND_ACCEPTED
   COMMUNITY_POST
   COMMUNITY_INVITE
+  JOIN_REQUEST
+  JOIN_REQUEST_APPROVED
+  JOIN_REQUEST_DENIED
   POST_RESPONSE
   HELP_REQUEST
   SYSTEM
+}
+
+enum JoinRequestStatus {
+  PENDING
+  APPROVED
+  DENIED
 }
 
 enum RequestVisibility {

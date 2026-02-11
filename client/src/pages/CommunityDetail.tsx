@@ -3,7 +3,8 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { communitiesService } from '../services/communities.service';
 import { subgroupsService } from '../services/subgroups.service';
 import { helpRequestsService } from '../services/helpRequests.service';
-import { Community, SubGroup, CommunityPost, HelpRequest, CreateHelpRequestData, CreateSubGroupData } from '../types';
+import { messagesService } from '../services/messages.service';
+import { Community, SubGroup, CommunityPost, HelpRequest, CreateHelpRequestData, CreateSubGroupData, JoinRequest } from '../types';
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/layout/Header';
 import SubGroupCard from '../components/communities/SubGroupCard';
@@ -38,6 +39,14 @@ const CommunityDetail: React.FC = () => {
   const [helpLoading, setHelpLoading] = useState(false);
   const [showHelpForm, setShowHelpForm] = useState(false);
 
+  // Join request state
+  const [joinRequesting, setJoinRequesting] = useState(false);
+  const [cancellingRequest, setCancellingRequest] = useState(false);
+
+  // Admin join requests state
+  const [pendingJoinRequests, setPendingJoinRequests] = useState<JoinRequest[]>([]);
+  const [joinRequestsLoading, setJoinRequestsLoading] = useState(false);
+
   const fetchCommunity = async () => {
     try {
       if (!id) return;
@@ -70,6 +79,19 @@ const CommunityDetail: React.FC = () => {
     }
   };
 
+  const fetchJoinRequests = async () => {
+    if (!id) return;
+    try {
+      setJoinRequestsLoading(true);
+      const data = await communitiesService.getJoinRequests(id);
+      setPendingJoinRequests(data);
+    } catch {
+      // silent - user might not be admin
+    } finally {
+      setJoinRequestsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchCommunity();
   }, [id]);
@@ -78,15 +100,55 @@ const CommunityDetail: React.FC = () => {
     if (activeTab === 'help-requests' && id) {
       fetchHelpRequests();
     }
+    if (activeTab === 'admin-inbox' && id) {
+      fetchJoinRequests();
+    }
   }, [activeTab, id]);
 
   const handleJoin = async () => {
     if (!id) return;
+    setJoinRequesting(true);
     try {
       await communitiesService.joinCommunity(id);
       fetchCommunity();
     } catch (err: any) {
-      alert(err.response?.data?.error || 'Failed to join community');
+      alert(err.response?.data?.error || 'Failed to submit join request');
+    } finally {
+      setJoinRequesting(false);
+    }
+  };
+
+  const handleCancelJoinRequest = async () => {
+    if (!id) return;
+    setCancellingRequest(true);
+    try {
+      await communitiesService.cancelJoinRequest(id);
+      fetchCommunity();
+    } catch (err: any) {
+      alert(err.response?.data?.error || 'Failed to cancel request');
+    } finally {
+      setCancellingRequest(false);
+    }
+  };
+
+  const handleMessageAdmin = async () => {
+    if (!community?.createdBy?.id) return;
+    try {
+      const conversation = await messagesService.getOrCreateConversation(community.createdBy.id);
+      navigate(`/messages`);
+    } catch (err: any) {
+      alert(err.response?.data?.error || 'Failed to start conversation');
+    }
+  };
+
+  const handleRespondToJoinRequest = async (requestId: string, status: 'APPROVED' | 'DENIED') => {
+    if (!id) return;
+    try {
+      await communitiesService.respondToJoinRequest(id, requestId, status);
+      fetchJoinRequests();
+      fetchCommunity(); // Refresh member count
+    } catch (err: any) {
+      alert(err.response?.data?.error || `Failed to ${status.toLowerCase()} request`);
     }
   };
 
@@ -169,6 +231,7 @@ const CommunityDetail: React.FC = () => {
   const isMod = community.userRole === 'MODERATOR';
   const isAdminOrMod = isAdmin || isMod;
   const isSchool = community.category === 'School';
+  const hasPendingRequest = community.joinRequestStatus === 'PENDING';
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -223,14 +286,45 @@ const CommunityDetail: React.FC = () => {
                   <p className="text-gray-600 mb-2">📍 {community.location}</p>
                 )}
               </div>
-              <div className="flex gap-2">
-                {!isMember && (
-                  <button
-                    onClick={handleJoin}
-                    className="bg-brand-red text-white px-6 py-3 rounded-md hover:bg-brand-red-dark transition font-semibold"
-                  >
-                    Join Community
-                  </button>
+              <div className="flex gap-2 items-center">
+                {/* Not a member and no pending request → Request to Join */}
+                {!isMember && !hasPendingRequest && (
+                  <>
+                    <button
+                      onClick={handleJoin}
+                      disabled={joinRequesting}
+                      className="bg-brand-red text-white px-6 py-3 rounded-md hover:bg-brand-red-dark transition font-semibold disabled:opacity-50"
+                    >
+                      {joinRequesting ? 'Sending...' : 'Request to Join'}
+                    </button>
+                    <button
+                      onClick={handleMessageAdmin}
+                      className="bg-white text-gray-700 px-4 py-3 rounded-md border border-gray-300 hover:bg-gray-50 transition font-medium text-sm"
+                    >
+                      Message Admin
+                    </button>
+                  </>
+                )}
+                {/* Pending request → show status + cancel */}
+                {!isMember && hasPendingRequest && (
+                  <>
+                    <span className="bg-yellow-100 text-yellow-800 px-4 py-3 rounded-md font-semibold text-sm">
+                      ⏳ Request Pending
+                    </span>
+                    <button
+                      onClick={handleCancelJoinRequest}
+                      disabled={cancellingRequest}
+                      className="bg-white text-red-600 px-4 py-3 rounded-md border border-red-300 hover:bg-red-50 transition font-medium text-sm disabled:opacity-50"
+                    >
+                      {cancellingRequest ? 'Cancelling...' : 'Cancel Request'}
+                    </button>
+                    <button
+                      onClick={handleMessageAdmin}
+                      className="bg-white text-gray-700 px-4 py-3 rounded-md border border-gray-300 hover:bg-gray-50 transition font-medium text-sm"
+                    >
+                      Message Admin
+                    </button>
+                  </>
                 )}
                 {isMember && !isAdmin && (
                   <button
@@ -293,13 +387,18 @@ const CommunityDetail: React.FC = () => {
               {isAdminOrMod && (
                 <button
                   onClick={() => setActiveTab('admin-inbox')}
-                  className={`px-5 py-2.5 rounded-xl font-semibold transition-all ${
+                  className={`px-5 py-2.5 rounded-xl font-semibold transition-all relative ${
                     activeTab === 'admin-inbox'
                       ? 'bg-brand-red text-white'
                       : 'bg-white text-gray-700 border border-gray-200 hover:border-red-300'
                   }`}
                 >
                   🔐 Admin Inbox
+                  {pendingJoinRequests.length > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                      {pendingJoinRequests.length}
+                    </span>
+                  )}
                 </button>
               )}
             </div>
@@ -484,7 +583,98 @@ const CommunityDetail: React.FC = () => {
 
             {/* ===== ADMIN INBOX TAB ===== */}
             {activeTab === 'admin-inbox' && isAdminOrMod && (
-              <AdminInbox communityId={id!} communityName={community.name} />
+              <div>
+                {/* Join Requests Section */}
+                <div className="mb-8">
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="text-2xl">📩</span>
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900">Join Requests</h3>
+                      <p className="text-sm text-gray-500">People who want to join {community.name}</p>
+                    </div>
+                  </div>
+
+                  {joinRequestsLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="w-8 h-8 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  ) : pendingJoinRequests.length === 0 ? (
+                    <div className="bg-gray-50 rounded-2xl p-6 text-center mb-6">
+                      <div className="text-3xl mb-2">✅</div>
+                      <p className="text-gray-600 font-medium">No pending join requests</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3 mb-6">
+                      {pendingJoinRequests.map((request) => (
+                        <div key={request.id} className="bg-white rounded-2xl border border-gray-200 p-5">
+                          <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 rounded-full bg-brand-red/10 flex items-center justify-center text-brand-red font-bold text-lg flex-shrink-0">
+                              {request.user.profilePicture ? (
+                                <img src={request.user.profilePicture} alt="" className="w-12 h-12 rounded-full object-cover" />
+                              ) : (
+                                `${request.user.firstName[0]}${request.user.lastName[0]}`
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-semibold text-gray-900">
+                                {request.user.firstName} {request.user.lastName}
+                              </h4>
+                              {request.user.location && (
+                                <p className="text-sm text-gray-500">📍 {request.user.location}</p>
+                              )}
+                              {request.user.bio && (
+                                <p className="text-sm text-gray-600 mt-1 line-clamp-2">{request.user.bio}</p>
+                              )}
+                              {request.message && (
+                                <p className="text-sm text-gray-700 mt-2 bg-gray-50 rounded-lg p-3 italic">
+                                  "{request.message}"
+                                </p>
+                              )}
+                              <p className="text-xs text-gray-400 mt-2">
+                                Requested {new Date(request.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                              </p>
+                            </div>
+                            <div className="flex gap-2 flex-shrink-0">
+                              <button
+                                onClick={() => handleRespondToJoinRequest(request.id, 'APPROVED')}
+                                className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-700 transition"
+                              >
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => {
+                                  if (window.confirm(`Deny ${request.user.firstName}'s request to join?`)) {
+                                    handleRespondToJoinRequest(request.id, 'DENIED');
+                                  }
+                                }}
+                                className="bg-white text-red-600 px-4 py-2 rounded-lg text-sm font-semibold border border-red-300 hover:bg-red-50 transition"
+                              >
+                                Deny
+                              </button>
+                              <button
+                                onClick={async () => {
+                                  try {
+                                    await messagesService.getOrCreateConversation(request.user.id);
+                                    navigate('/messages');
+                                  } catch {
+                                    alert('Failed to start conversation');
+                                  }
+                                }}
+                                className="bg-white text-gray-700 px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 hover:bg-gray-50 transition"
+                              >
+                                Message
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Existing Admin Inbox (help requests) */}
+                <AdminInbox communityId={id!} communityName={community.name} />
+              </div>
             )}
           </>
         )}
@@ -492,17 +682,53 @@ const CommunityDetail: React.FC = () => {
         {/* Non-Member Message */}
         {!isMember && (
           <div className="bg-white rounded-3xl border border-gray-200 p-12 text-center">
-            <div className="text-6xl mb-4">🔒</div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">Join to see content</h3>
-            <p className="text-gray-600 mb-6">
-              Become a member of this community to view posts and participate
-            </p>
-            <button
-              onClick={handleJoin}
-              className="bg-brand-red text-white px-8 py-3 rounded-md hover:bg-brand-red-dark transition font-semibold"
-            >
-              Join Community
-            </button>
+            {hasPendingRequest ? (
+              <>
+                <div className="text-6xl mb-4">⏳</div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Your request is pending</h3>
+                <p className="text-gray-600 mb-6">
+                  The community admin will review your request to join. You'll be notified when they respond.
+                </p>
+                <div className="flex justify-center gap-3">
+                  <button
+                    onClick={handleCancelJoinRequest}
+                    disabled={cancellingRequest}
+                    className="bg-white text-red-600 px-6 py-3 rounded-md border border-red-300 hover:bg-red-50 transition font-semibold disabled:opacity-50"
+                  >
+                    {cancellingRequest ? 'Cancelling...' : 'Cancel Request'}
+                  </button>
+                  <button
+                    onClick={handleMessageAdmin}
+                    className="bg-brand-red text-white px-6 py-3 rounded-md hover:bg-brand-red-dark transition font-semibold"
+                  >
+                    Message Admin
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-6xl mb-4">🔒</div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Request to join</h3>
+                <p className="text-gray-600 mb-6">
+                  Send a request to the community admin to join and view posts
+                </p>
+                <div className="flex justify-center gap-3">
+                  <button
+                    onClick={handleJoin}
+                    disabled={joinRequesting}
+                    className="bg-brand-red text-white px-8 py-3 rounded-md hover:bg-brand-red-dark transition font-semibold disabled:opacity-50"
+                  >
+                    {joinRequesting ? 'Sending...' : 'Request to Join'}
+                  </button>
+                  <button
+                    onClick={handleMessageAdmin}
+                    className="bg-white text-gray-700 px-6 py-3 rounded-md border border-gray-300 hover:bg-gray-50 transition font-semibold"
+                  >
+                    Message Admin
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>

@@ -44,13 +44,31 @@ export const getAllCommunities = async (req: Request, res: Response) => {
       },
     });
 
+    // Look up join requests for the current user
+    let userJoinRequests: { communityId: string; id: string; status: string }[] = [];
+    if (userId) {
+      userJoinRequests = await prisma.joinRequest.findMany({
+        where: { userId },
+        select: { communityId: true, id: true, status: true },
+      });
+    }
+
+    const joinRequestMap = new Map(
+      userJoinRequests.map((jr) => [jr.communityId, jr])
+    );
+
     // Add isMember and userRole to each community
-    const communitiesWithStatus = communities.map((community) => ({
-      ...community,
-      isMember: community.members && community.members.length > 0,
-      userRole: community.members && community.members.length > 0 ? community.members[0].role : null,
-      members: undefined, // Remove members array from response
-    }));
+    const communitiesWithStatus = communities.map((community) => {
+      const jr = joinRequestMap.get(community.id);
+      return {
+        ...community,
+        isMember: community.members && community.members.length > 0,
+        userRole: community.members && community.members.length > 0 ? community.members[0].role : null,
+        joinRequestStatus: jr ? jr.status : null,
+        joinRequestId: jr ? jr.id : null,
+        members: undefined, // Remove members array from response
+      };
+    });
 
     res.json(communitiesWithStatus);
   } catch (error) {
@@ -177,10 +195,25 @@ export const getCommunityById = async (req: Request, res: Response) => {
       ? community.members.find((m) => m.userId === userId)
       : null;
 
+    // Check for join request
+    let joinRequestStatus: string | null = null;
+    let joinRequestId: string | null = null;
+    if (userId && !userMembership) {
+      const joinRequest = await prisma.joinRequest.findUnique({
+        where: { communityId_userId: { communityId: id, userId } },
+      });
+      if (joinRequest) {
+        joinRequestStatus = joinRequest.status;
+        joinRequestId = joinRequest.id;
+      }
+    }
+
     const communityWithStatus = {
       ...community,
       isMember: !!userMembership,
       userRole: userMembership?.role || null,
+      joinRequestStatus,
+      joinRequestId,
     };
 
     res.json(communityWithStatus);
@@ -355,6 +388,7 @@ export const joinCommunity = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = req.user?.id;
+    const { message } = req.body;
 
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });
@@ -374,7 +408,7 @@ export const joinCommunity = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Already a member of this community' });
     }
 
-    // Check if community exists and is not private (or handle invitation logic)
+    // Check if community exists
     const community = await prisma.community.findUnique({
       where: { id },
     });
@@ -383,22 +417,213 @@ export const joinCommunity = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Community not found' });
     }
 
-    if (community.isPrivate) {
-      return res.status(403).json({ error: 'This community is private. You need an invitation to join.' });
-    }
-
-    const membership = await prisma.communityMember.create({
-      data: {
-        communityId: id,
-        userId,
-        role: 'MEMBER',
+    // Check if there's already a pending join request
+    const existingRequest = await prisma.joinRequest.findUnique({
+      where: {
+        communityId_userId: {
+          communityId: id,
+          userId,
+        },
       },
     });
 
-    res.status(201).json(membership);
+    if (existingRequest && existingRequest.status === 'PENDING') {
+      return res.status(400).json({ error: 'You already have a pending join request for this community' });
+    }
+
+    // Create or update join request
+    const joinRequest = existingRequest
+      ? await prisma.joinRequest.update({
+          where: { id: existingRequest.id },
+          data: { status: 'PENDING', message: message || null },
+        })
+      : await prisma.joinRequest.create({
+          data: {
+            communityId: id,
+            userId,
+            status: 'PENDING',
+            message: message || null,
+          },
+        });
+
+    // Notify community admins
+    const admins = await prisma.communityMember.findMany({
+      where: { communityId: id, role: 'ADMIN' },
+      select: { userId: true },
+    });
+
+    const requester = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { firstName: true, lastName: true },
+    });
+
+    const requesterName = requester ? `${requester.firstName} ${requester.lastName}` : 'Someone';
+
+    for (const admin of admins) {
+      await notificationService.notifyJoinRequest(
+        admin.userId,
+        userId,
+        requesterName,
+        id,
+        community.name
+      );
+    }
+
+    res.status(201).json({ joinRequest });
   } catch (error) {
-    console.error('Error joining community:', error);
-    res.status(500).json({ error: 'Failed to join community' });
+    console.error('Error requesting to join community:', error);
+    res.status(500).json({ error: 'Failed to submit join request' });
+  }
+};
+
+// Get pending join requests for a community (admin only)
+export const getJoinRequests = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    // Verify caller is admin of this community
+    const membership = await prisma.communityMember.findUnique({
+      where: { communityId_userId: { communityId: id, userId } },
+    });
+
+    if (!membership || membership.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Only community admins can view join requests' });
+    }
+
+    const joinRequests = await prisma.joinRequest.findMany({
+      where: { communityId: id, status: 'PENDING' },
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            profilePicture: true,
+            location: true,
+            bio: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    res.json(joinRequests);
+  } catch (error) {
+    console.error('Error fetching join requests:', error);
+    res.status(500).json({ error: 'Failed to fetch join requests' });
+  }
+};
+
+// Approve or deny a join request (admin only)
+export const respondToJoinRequest = async (req: Request, res: Response) => {
+  try {
+    const { id, requestId } = req.params;
+    const { status } = req.body;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    if (!['APPROVED', 'DENIED'].includes(status)) {
+      return res.status(400).json({ error: 'Status must be APPROVED or DENIED' });
+    }
+
+    // Verify caller is admin
+    const membership = await prisma.communityMember.findUnique({
+      where: { communityId_userId: { communityId: id, userId } },
+    });
+
+    if (!membership || membership.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Only community admins can respond to join requests' });
+    }
+
+    // Find the join request
+    const joinRequest = await prisma.joinRequest.findUnique({
+      where: { id: requestId },
+      include: { community: { select: { name: true } } },
+    });
+
+    if (!joinRequest || joinRequest.communityId !== id) {
+      return res.status(404).json({ error: 'Join request not found' });
+    }
+
+    if (joinRequest.status !== 'PENDING') {
+      return res.status(400).json({ error: 'This request has already been processed' });
+    }
+
+    if (status === 'APPROVED') {
+      // Create membership and update request
+      await prisma.$transaction([
+        prisma.joinRequest.update({
+          where: { id: requestId },
+          data: { status: 'APPROVED' },
+        }),
+        prisma.communityMember.create({
+          data: {
+            communityId: id,
+            userId: joinRequest.userId,
+            role: 'MEMBER',
+          },
+        }),
+      ]);
+
+      await notificationService.notifyJoinRequestApproved(
+        joinRequest.userId,
+        id,
+        joinRequest.community.name
+      );
+    } else {
+      // Deny: delete the request so they can re-request later
+      await prisma.joinRequest.delete({
+        where: { id: requestId },
+      });
+
+      await notificationService.notifyJoinRequestDenied(
+        joinRequest.userId,
+        id,
+        joinRequest.community.name
+      );
+    }
+
+    res.json({ message: `Join request ${status.toLowerCase()}` });
+  } catch (error) {
+    console.error('Error responding to join request:', error);
+    res.status(500).json({ error: 'Failed to respond to join request' });
+  }
+};
+
+// Cancel a pending join request (user)
+export const cancelJoinRequest = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const joinRequest = await prisma.joinRequest.findUnique({
+      where: { communityId_userId: { communityId: id, userId } },
+    });
+
+    if (!joinRequest || joinRequest.status !== 'PENDING') {
+      return res.status(404).json({ error: 'No pending join request found' });
+    }
+
+    await prisma.joinRequest.delete({
+      where: { id: joinRequest.id },
+    });
+
+    res.json({ message: 'Join request cancelled' });
+  } catch (error) {
+    console.error('Error cancelling join request:', error);
+    res.status(500).json({ error: 'Failed to cancel join request' });
   }
 };
 

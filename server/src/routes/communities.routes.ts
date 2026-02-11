@@ -12,6 +12,9 @@ import {
   updateMemberRole,
   removeMember,
   createCommunityPost,
+  getJoinRequests,
+  respondToJoinRequest,
+  cancelJoinRequest,
 } from '../controllers/communities.controller';
 
 const router = express.Router();
@@ -30,5 +33,10 @@ router.post('/:id/leave', authenticate, leaveCommunity);
 router.put('/:id/members/:memberId/role', authenticate, updateMemberRole);
 router.delete('/:id/members/:memberId', authenticate, removeMember);
 router.post('/:id/posts', authenticate, createCommunityPost);
+
+// Join request routes
+router.get('/:id/join-requests', authenticate, getJoinRequests);
+router.patch('/:id/join-requests/:requestId', authenticate, respondToJoinRequest);
+router.delete('/:id/join-request', authenticate, cancelJoinRequest);
 
 export default router;

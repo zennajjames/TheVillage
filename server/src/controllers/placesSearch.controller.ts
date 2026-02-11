@@ -35,7 +35,7 @@ const ALLOWED_TYPES = new Set([
 
 export const searchLocalCommunities = async (req: Request, res: Response) => {
   try {
-    const { zipCode } = req.query;
+    const { zipCode, searchType } = req.query;
 
     if (!zipCode || typeof zipCode !== 'string' || zipCode.length !== 5 || !/^\d{5}$/.test(zipCode)) {
       return res.status(400).json({ error: 'A valid 5-digit zip code is required' });
@@ -46,8 +46,16 @@ export const searchLocalCommunities = async (req: Request, res: Response) => {
       return res.status(500).json({ error: 'Google Maps API key not configured' });
     }
 
+    // Filter queries by searchType if provided
+    let queries = COMMUNITY_SEARCH_QUERIES;
+    if (searchType === 'school') {
+      queries = COMMUNITY_SEARCH_QUERIES.filter(q => q.type === 'school');
+    } else if (searchType === 'neighborhood') {
+      queries = COMMUNITY_SEARCH_QUERIES.filter(q => q.type === 'neighborhood');
+    }
+
     // Run all search queries in parallel
-    const searchPromises = COMMUNITY_SEARCH_QUERIES.map(async ({ query, category, type }) => {
+    const searchPromises = queries.map(async ({ query, category, type }) => {
       try {
         const response = await axios.get(
           'https://maps.googleapis.com/maps/api/place/textsearch/json',

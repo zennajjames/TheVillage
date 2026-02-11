@@ -1,5 +1,5 @@
 import { api } from './api';
-import { Community, CommunityPost, CreateCommunityData, PlaceSuggestion } from '../types';
+import { Community, CommunityPost, CreateCommunityData, PlaceSuggestion, JoinRequest } from '../types';
 
 export const communitiesService = {
   // Get all communities with optional category filter
@@ -40,9 +40,26 @@ export const communitiesService = {
     await api.delete(`/communities/${id}`);
   },
 
-  // Join a community
-  joinCommunity: async (id: string): Promise<void> => {
-    await api.post(`/communities/${id}/join`);
+  // Request to join a community
+  joinCommunity: async (id: string, message?: string): Promise<{ joinRequest: JoinRequest }> => {
+    const response = await api.post(`/communities/${id}/join`, { message });
+    return response.data;
+  },
+
+  // Get pending join requests for a community (admin only)
+  getJoinRequests: async (communityId: string): Promise<JoinRequest[]> => {
+    const response = await api.get(`/communities/${communityId}/join-requests`);
+    return response.data;
+  },
+
+  // Respond to a join request (admin only)
+  respondToJoinRequest: async (communityId: string, requestId: string, status: 'APPROVED' | 'DENIED'): Promise<void> => {
+    await api.patch(`/communities/${communityId}/join-requests/${requestId}`, { status });
+  },
+
+  // Cancel own pending join request
+  cancelJoinRequest: async (communityId: string): Promise<void> => {
+    await api.delete(`/communities/${communityId}/join-request`);
   },
 
   // Leave a community
@@ -67,8 +84,10 @@ export const communitiesService = {
   },
 
   // Search for local community places via Google Places when no communities exist
-  searchLocalPlaces: async (zipCode: string): Promise<PlaceSuggestion[]> => {
-    const response = await api.get(`/places/local-communities?zipCode=${zipCode}`);
+  searchLocalPlaces: async (zipCode: string, searchType?: 'school' | 'neighborhood'): Promise<PlaceSuggestion[]> => {
+    const params = new URLSearchParams({ zipCode });
+    if (searchType) params.append('searchType', searchType);
+    const response = await api.get(`/places/local-communities?${params.toString()}`);
     return response.data;
   },
 };

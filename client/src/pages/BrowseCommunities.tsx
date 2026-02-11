@@ -29,9 +29,19 @@ const BrowseCommunities: React.FC = () => {
   const handleJoinCommunity = async (communityId: string) => {
     try {
       await communitiesService.joinCommunity(communityId);
-      navigate('/communities');
+      // Refresh to show updated status
+      fetchCommunities();
     } catch (err: any) {
-      alert(err.response?.data?.error || 'Failed to join community');
+      alert(err.response?.data?.error || 'Failed to submit join request');
+    }
+  };
+
+  const handleCancelJoinRequest = async (communityId: string) => {
+    try {
+      await communitiesService.cancelJoinRequest(communityId);
+      fetchCommunities();
+    } catch (err: any) {
+      alert(err.response?.data?.error || 'Failed to cancel request');
     }
   };
 
@@ -126,18 +136,30 @@ const BrowseCommunities: React.FC = () => {
                     <span>📝 {community._count?.communityPosts || 0}</span>
                   </div>
 
-                  {!community.isMember ? (
-                    <button
-                      onClick={() => handleJoinCommunity(community.id)}
-                      className="w-full bg-brand-red text-white py-2 px-4 rounded-md font-medium hover:bg-brand-red-dark transition text-sm"
-                    >
-                      Join This Community
-                    </button>
-                  ) : (
+                  {community.isMember ? (
                     <div className="flex items-center justify-center gap-2 text-green-600 font-medium py-2 text-sm">
                       <span>✓</span>
                       <span>Your Current Community</span>
                     </div>
+                  ) : community.joinRequestStatus === 'PENDING' ? (
+                    <div className="flex gap-2">
+                      <span className="flex-1 text-center bg-yellow-100 text-yellow-800 py-2 px-4 rounded-md font-medium text-sm">
+                        ⏳ Request Pending
+                      </span>
+                      <button
+                        onClick={() => handleCancelJoinRequest(community.id)}
+                        className="bg-white text-red-600 py-2 px-3 rounded-md text-sm border border-red-300 hover:bg-red-50 transition"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handleJoinCommunity(community.id)}
+                      className="w-full bg-brand-red text-white py-2 px-4 rounded-md font-medium hover:bg-brand-red-dark transition text-sm"
+                    >
+                      Request to Join
+                    </button>
                   )}
                 </div>
               </div>

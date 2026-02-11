@@ -8,6 +8,9 @@ export type NotificationType =
   | 'FRIEND_ACCEPTED'
   | 'COMMUNITY_POST'
   | 'COMMUNITY_INVITE'
+  | 'JOIN_REQUEST'
+  | 'JOIN_REQUEST_APPROVED'
+  | 'JOIN_REQUEST_DENIED'
   | 'POST_RESPONSE'
   | 'HELP_REQUEST'
   | 'SYSTEM';
@@ -168,6 +171,53 @@ export const notificationService = {
       title: 'Community Invitation',
       message: `${inviterName} invited you to join ${communityName}`,
       actionUrl: `/communities/${communityId}`,
+      relatedCommunityId: communityId
+    });
+  },
+
+  async notifyJoinRequest(
+    adminUserId: string,
+    requesterId: string,
+    requesterName: string,
+    communityId: string,
+    communityName: string
+  ) {
+    return this.createNotification({
+      userId: adminUserId,
+      type: 'JOIN_REQUEST',
+      title: 'New Join Request',
+      message: `${requesterName} wants to join ${communityName}`,
+      actionUrl: `/communities/${communityId}`,
+      relatedUserId: requesterId,
+      relatedCommunityId: communityId
+    });
+  },
+
+  async notifyJoinRequestApproved(
+    userId: string,
+    communityId: string,
+    communityName: string
+  ) {
+    return this.createNotification({
+      userId,
+      type: 'JOIN_REQUEST_APPROVED',
+      title: 'Join Request Approved',
+      message: `You've been approved to join ${communityName}!`,
+      actionUrl: `/communities/${communityId}`,
+      relatedCommunityId: communityId
+    });
+  },
+
+  async notifyJoinRequestDenied(
+    userId: string,
+    communityId: string,
+    communityName: string
+  ) {
+    return this.createNotification({
+      userId,
+      type: 'JOIN_REQUEST_DENIED',
+      title: 'Join Request Update',
+      message: `Your request to join ${communityName} was not approved at this time.`,
       relatedCommunityId: communityId
     });
   },
