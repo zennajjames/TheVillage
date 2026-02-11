@@ -9,7 +9,7 @@ export const googleAuth = passport.authenticate('google', {
 
 // Helper function to handle OAuth callback logic
 const handleOAuthCallback = (provider: string) => (req: Request, res: Response, next: NextFunction) => {
-  passport.authenticate(provider, { session: false }, (err: any, user: any, info: any) => {
+  passport.authenticate(provider, { session: false }, async (err: any, user: any, info: any) => {
     if (err || !user) {
       console.error(`OAuth ${provider} callback error:`, err);
       console.error(`OAuth ${provider} user:`, user);
@@ -17,30 +17,19 @@ const handleOAuthCallback = (provider: string) => (req: Request, res: Response, 
       return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:3000'}/login?error=oauth_failed`);
     }
 
-    // Check if user has agreed to guidelines
+    // Auto-agree to guidelines for OAuth users if not already agreed
     if (!user.agreedToGuidelines) {
-      // Generate a temporary token for completing onboarding
-      const tempToken = jwt.sign(
-        { userId: user.id, needsGuidelines: true },
-        process.env.JWT_SECRET!,
-        { expiresIn: '1h' }
-      );
-      return res.redirect(
-        `${process.env.CLIENT_URL || 'http://localhost:3000'}/onboarding?token=${tempToken}&step=guidelines`
-      );
-    }
-
-    // Check if user has set their zip code
-    if (!user.zipCode || user.zipCode === '00000') {
-      // Generate a temporary token for completing onboarding
-      const tempToken = jwt.sign(
-        { userId: user.id, needsZipCode: true },
-        process.env.JWT_SECRET!,
-        { expiresIn: '1h' }
-      );
-      return res.redirect(
-        `${process.env.CLIENT_URL || 'http://localhost:3000'}/onboarding?token=${tempToken}&step=zipcode`
-      );
+      try {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            agreedToGuidelines: true,
+            guidelinesAgreedAt: new Date(),
+          },
+        });
+      } catch (updateErr) {
+        console.error('Failed to auto-agree guidelines:', updateErr);
+      }
     }
 
     // Generate JWT token
@@ -48,7 +37,7 @@ const handleOAuthCallback = (provider: string) => (req: Request, res: Response, 
       expiresIn: '7d',
     });
 
-    // Redirect to client with token
+    // Redirect to client with token — AuthCallback will store it and go to dashboard
     res.redirect(`${process.env.CLIENT_URL || 'http://localhost:3000'}/auth/callback?token=${token}`);
   })(req, res, next);
 };
