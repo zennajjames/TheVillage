@@ -108,16 +108,6 @@ const Communities: React.FC = () => {
               My Communities ({myCommunities.length})
             </button>
             <button
-              onClick={() => setActiveTab('all')}
-              className={`px-6 py-2.5 rounded-xl font-semibold transition-all ${
-                activeTab === 'all'
-                  ? 'bg-brand-red text-white'
-                  : 'bg-white text-gray-700 border border-gray-200 hover:border-purple-300'
-              }`}
-            >
-              All Communities ({communities.length})
-            </button>
-            <button
               onClick={() => setActiveTab('explore')}
               className={`px-6 py-2.5 rounded-xl font-semibold transition-all ${
                 activeTab === 'explore'
@@ -262,17 +252,12 @@ const Communities: React.FC = () => {
                     onClick={() => navigate(`/communities/${community.id}`)}
                   >
                     {community.coverImage && (
-                      <div className="h-40 bg-brand-red">
+                      <div className="h-40">
                         <img
                           src={community.coverImage}
                           alt={community.name}
                           className="w-full h-full object-cover"
                         />
-                      </div>
-                    )}
-                    {!community.coverImage && (
-                      <div className="h-40 bg-brand-red flex items-center justify-center">
-                        <span className="text-6xl">🏫</span>
                       </div>
                     )}
 
@@ -321,25 +306,6 @@ const Communities: React.FC = () => {
               </div>
             )}
 
-            {/* Stats */}
-            {communities.length > 0 && (
-              <div className="mt-8 bg-white rounded-3xl border border-gray-200 p-6">
-                <div className="grid grid-cols-2 gap-4 text-center">
-                  <div>
-                    <div className="text-3xl font-bold text-brand-red">
-                      {communities.length}
-                    </div>
-                    <div className="text-sm text-gray-600 font-medium">Total Communities</div>
-                  </div>
-                  <div>
-                    <div className="text-3xl font-bold text-brand-black">
-                      {myCommunities.length}
-                    </div>
-                    <div className="text-sm text-gray-600 font-medium">Your Communities</div>
-                  </div>
-                </div>
-              </div>
-            )}
           </>
         )}
       </div>

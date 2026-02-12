@@ -13,6 +13,7 @@ const Header: React.FC = () => {
   const { t } = useTranslation();
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   // Fetch unread message count
   useEffect(() => {
@@ -40,12 +41,17 @@ const Header: React.FC = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
+  const handleMobileNav = (path: string) => {
+    navigate(path);
+    setShowMobileMenu(false);
+  };
+
   return (
     <nav className="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-neutral-200/50 shadow-soft">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex items-center gap-3 md:gap-6">
+          <div className="flex items-center gap-3 nav:gap-6">
             <button
               onClick={() => navigate('/dashboard')}
               className="flex items-center gap-2 hover:opacity-80 transition"
@@ -55,16 +61,16 @@ const Header: React.FC = () => {
                 alt="The Village Logo"
                 className="w-8 h-8 sm:w-10 sm:h-10"
               />
-              <span className="text-lg sm:text-xl md:text-2xl font-bold text-brand-black hidden sm:block">
+              <span className="text-lg sm:text-xl lg:text-2xl font-bold text-brand-black hidden sm:block">
                 The Village
               </span>
             </button>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex gap-1">
+            {/* Desktop Navigation — visible at nav (1120px) and up */}
+            <div className="hidden nav:flex gap-1">
               <button
                 onClick={() => navigate('/dashboard')}
-                className={`px-3 lg:px-4 py-2 rounded-xl text-sm lg:text-base font-medium transition ${
+                className={`px-4 py-2 rounded-xl text-base font-medium transition ${
                   isActive('/dashboard')
                     ? 'bg-brand-red/10 text-brand-red'
                     : 'text-neutral-700 hover:bg-neutral-100'
@@ -74,7 +80,7 @@ const Header: React.FC = () => {
               </button>
               <button
                 onClick={() => navigate('/about')}
-                className={`px-3 lg:px-4 py-2 rounded-xl text-sm lg:text-base font-medium transition ${
+                className={`px-4 py-2 rounded-xl text-base font-medium transition ${
                   isActive('/about')
                     ? 'bg-brand-red/10 text-brand-red'
                     : 'text-neutral-700 hover:bg-neutral-100'
@@ -84,7 +90,7 @@ const Header: React.FC = () => {
               </button>
               <button
                 onClick={() => navigate('/communities')}
-                className={`px-3 lg:px-4 py-2 rounded-xl text-sm lg:text-base font-medium transition ${
+                className={`px-4 py-2 rounded-xl text-base font-medium transition ${
                   isActive('/communities')
                     ? 'bg-brand-red/10 text-brand-red'
                     : 'text-neutral-700 hover:bg-neutral-100'
@@ -94,7 +100,7 @@ const Header: React.FC = () => {
               </button>
               <button
                 onClick={() => navigate('/events')}
-                className={`px-3 lg:px-4 py-2 rounded-xl text-sm lg:text-base font-medium transition ${
+                className={`px-4 py-2 rounded-xl text-base font-medium transition ${
                   isActive('/events')
                     ? 'bg-brand-red/10 text-brand-red'
                     : 'text-neutral-700 hover:bg-neutral-100'
@@ -104,7 +110,7 @@ const Header: React.FC = () => {
               </button>
               <button
                 onClick={() => navigate('/search')}
-                className={`px-3 lg:px-4 py-2 rounded-xl text-sm lg:text-base font-medium transition flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-xl text-base font-medium transition flex items-center gap-2 ${
                   isActive('/search')
                     ? 'bg-brand-red/10 text-brand-red'
                     : 'text-neutral-700 hover:bg-neutral-100'
@@ -118,7 +124,7 @@ const Header: React.FC = () => {
               {user?.isAdmin && (
                 <button
                   onClick={() => navigate('/admin')}
-                  className={`px-3 lg:px-4 py-2 rounded-xl text-sm lg:text-base font-medium transition ${
+                  className={`px-4 py-2 rounded-xl text-base font-medium transition ${
                     isActive('/admin')
                       ? 'bg-brand-red/10 text-brand-red'
                       : 'text-neutral-700 hover:bg-neutral-100'
@@ -131,7 +137,7 @@ const Header: React.FC = () => {
           </div>
 
           {/* Right Side */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Language Selector */}
             <LanguageSelector />
 
@@ -182,7 +188,7 @@ const Header: React.FC = () => {
                     {user?.firstName?.[0]}{user?.lastName?.[0]}
                   </div>
                 )}
-                <span className="text-sm lg:text-base text-neutral-700 font-medium hidden lg:block">
+                <span className="text-base text-neutral-700 font-medium hidden nav:block">
                   {user?.firstName}
                 </span>
                 <svg
@@ -191,7 +197,7 @@ const Header: React.FC = () => {
                   viewBox="0 0 24 24"
                   strokeWidth={2}
                   stroke="currentColor"
-                  className="w-4 h-4 text-neutral-500 hidden lg:block"
+                  className="w-4 h-4 text-neutral-500 hidden nav:block"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                 </svg>
@@ -252,9 +258,104 @@ const Header: React.FC = () => {
                 </>
               )}
             </div>
+
+            {/* Mobile Hamburger — visible below nav (1120px) */}
+            <button
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="nav:hidden p-2 rounded-xl hover:bg-neutral-100 transition"
+            >
+              {showMobileMenu ? (
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6 text-neutral-700">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6 text-neutral-700">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </svg>
+              )}
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile Menu Dropdown — visible below nav (1120px) */}
+      {showMobileMenu && (
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-black/20"
+            onClick={() => setShowMobileMenu(false)}
+          ></div>
+          <div className="nav:hidden absolute top-16 left-0 right-0 bg-white border-b border-neutral-200 shadow-lg z-50">
+            <div className="max-w-7xl mx-auto px-4 py-3 space-y-1">
+              <button
+                onClick={() => handleMobileNav('/dashboard')}
+                className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition ${
+                  isActive('/dashboard')
+                    ? 'bg-brand-red/10 text-brand-red'
+                    : 'text-neutral-700 hover:bg-neutral-100'
+                }`}
+              >
+                {t('nav.home')}
+              </button>
+              <button
+                onClick={() => handleMobileNav('/about')}
+                className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition ${
+                  isActive('/about')
+                    ? 'bg-brand-red/10 text-brand-red'
+                    : 'text-neutral-700 hover:bg-neutral-100'
+                }`}
+              >
+                {t('nav.about')}
+              </button>
+              <button
+                onClick={() => handleMobileNav('/communities')}
+                className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition ${
+                  isActive('/communities')
+                    ? 'bg-brand-red/10 text-brand-red'
+                    : 'text-neutral-700 hover:bg-neutral-100'
+                }`}
+              >
+                {t('nav.communities')}
+              </button>
+              <button
+                onClick={() => handleMobileNav('/events')}
+                className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition ${
+                  isActive('/events')
+                    ? 'bg-brand-red/10 text-brand-red'
+                    : 'text-neutral-700 hover:bg-neutral-100'
+                }`}
+              >
+                Events
+              </button>
+              <button
+                onClick={() => handleMobileNav('/search')}
+                className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition flex items-center gap-2 ${
+                  isActive('/search')
+                    ? 'bg-brand-red/10 text-brand-red'
+                    : 'text-neutral-700 hover:bg-neutral-100'
+                }`}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+                Search
+              </button>
+              {user?.isAdmin && (
+                <button
+                  onClick={() => handleMobileNav('/admin')}
+                  className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition ${
+                    isActive('/admin')
+                      ? 'bg-brand-red/10 text-brand-red'
+                      : 'text-neutral-700 hover:bg-neutral-100'
+                  }`}
+                >
+                  Admin
+                </button>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </nav>
   );
 };

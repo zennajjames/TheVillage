@@ -22,6 +22,7 @@ import About from './pages/About';
 import Notifications from './pages/Notifications';
 import Privacy from './pages/Privacy';
 import Events from './pages/Events';
+import HelpRequests from './pages/HelpRequests';
 import FindYourCommunity from './components/communities/FindYourCommunity';
 import BrowseCommunities from './pages/BrowseCommunities';
 import AuthCallback from './pages/AuthCallback';
@@ -189,6 +190,15 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <Events />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/help-requests"
+        element={
+          <ProtectedRoute>
+            <HelpRequests />
           </ProtectedRoute>
         }
       />

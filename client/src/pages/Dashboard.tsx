@@ -235,7 +235,7 @@ const Dashboard: React.FC = () => {
                 Help Requests
               </h2>
               <button
-                onClick={() => navigate('/communities')}
+                onClick={() => navigate('/help-requests')}
                 className="text-brand-red hover:text-brand-red-dark font-semibold text-sm transition-colors"
               >
                 View All →
@@ -375,7 +375,7 @@ const Dashboard: React.FC = () => {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-3xl border-2 border-neutral-200 p-6 shadow-soft">
               <h3 className="font-bold text-neutral-900 mb-4">Quick Actions</h3>
-              <div className="grid sm:grid-cols-3 gap-3">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <button
                   onClick={() => navigate('/posts')}
                   className="text-left px-4 py-3 bg-brand-red/10 rounded-xl hover:bg-brand-red/20 transition flex items-center gap-3 border-2 border-brand-red/20"
@@ -386,6 +386,23 @@ const Dashboard: React.FC = () => {
                   <div>
                     <div className="font-semibold text-neutral-900 text-sm">Create Post</div>
                     <div className="text-xs text-neutral-600">Share a request or offer</div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => {
+                    if (userCommunities.length > 0) {
+                      navigate(`/communities/${userCommunities[0].id}?tab=help`);
+                    }
+                  }}
+                  className="text-left px-4 py-3 bg-orange-50 rounded-xl hover:bg-orange-100 transition flex items-center gap-3 border-2 border-orange-200"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6 text-orange-500 flex-shrink-0">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                  </svg>
+                  <div>
+                    <div className="font-semibold text-neutral-900 text-sm">Request Help</div>
+                    <div className="text-xs text-neutral-600">Ask your community for help</div>
                   </div>
                 </button>
 

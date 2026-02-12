@@ -136,10 +136,10 @@ const Profile: React.FC = () => {
               </div>
             </button>
             <div>
-              <h1 className="text-3xl font-bold mb-1">
+              <h1 className="text-3xl font-bold mb-1 text-white">
                 {user?.firstName} {user?.lastName}
               </h1>
-              <p className="text-purple-100 text-lg">📍 {user?.location}</p>
+              <p className="text-white/80 text-lg">📍 {user?.location}</p>
             </div>
           </div>
         </div>
