@@ -5,6 +5,8 @@
 A hyperlocal platform for neighborhoods and schools to organize, communicate, and support each other—built on mutual aid and genuine community connection.
 Launching soon.
 
+Deployed here: https://the-village-six.vercel.app/
+
 ## Table of Contents
 
 - [Overview](#overview)
