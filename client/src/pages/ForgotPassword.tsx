@@ -30,7 +30,7 @@ const ForgotPassword: React.FC = () => {
       <div className="card-modern w-full max-w-md">
         <div className="text-center mb-8">
           <img
-            src="/VillageLogoGreyCircle.png"
+            src="/villageLogo.png"
             alt="The Village Logo"
             className="w-20 h-20 mx-auto mb-4"
           />
