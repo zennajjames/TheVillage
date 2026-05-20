@@ -11,7 +11,7 @@ interface PlaceResult {
   category: string;
 }
 
-// Only search for neighborhoods, towns, and schools — no businesses
+// Only search for neighborhoods, towns, and schools
 const COMMUNITY_SEARCH_QUERIES = [
   { query: 'neighborhood in', category: 'Neighborhood', type: 'neighborhood' },
   { query: 'elementary school in', category: 'School', type: 'school' },

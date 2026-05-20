@@ -125,7 +125,7 @@ const Landing: React.FC = () => {
             <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20"></div>
             <div className="relative z-10">
               <div className="text-5xl mb-3">🤝</div>
-              <h3 className="text-2xl font-bold mb-3">{t('landing.mutualAidPosts')}</h3>
+              <h3 className="text-2xl font-bold mb-3 text-white">{t('landing.mutualAidPosts')}</h3>
               <p className="text-green-50 mb-4 leading-relaxed">
                 {t('landing.mutualAidPostsDesc')}
               </p>
@@ -335,7 +335,7 @@ const Landing: React.FC = () => {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <img
-                  src="/VillageLogoGreyCircle.png"
+                  src="/villageLogo.png"
                   alt="The Village Logo"
                   className="w-8 h-8"
                 />
