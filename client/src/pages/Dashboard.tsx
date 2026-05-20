@@ -127,7 +127,7 @@ const Dashboard: React.FC = () => {
               Welcome back, {user?.firstName}!
             </h1>
             <p className="text-white/90 text-lg mb-6 max-w-2xl">
-              Your community is here for you. Connect, share, and support each other.
+              Your parent community is here. Connect, share, and support each other.
             </p>
             <div className="flex gap-3 flex-wrap">
               <button
@@ -442,7 +442,7 @@ const Dashboard: React.FC = () => {
             </svg>
             <h3 className="font-bold text-neutral-900 mb-2">Community Tip</h3>
             <p className="text-sm text-neutral-700 leading-relaxed">
-              The best way to build trust in your community is to start small. Offer to help a neighbor with something simple!
+              The best way to build trust with other parents is to start small. Offer to help with a carpool or share a resource — it grows from there.
             </p>
           </div>
         </div>

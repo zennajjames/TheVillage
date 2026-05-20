@@ -111,7 +111,7 @@ const Onboarding: React.FC = () => {
             Welcome to The Village!
           </h1>
           <p className="text-neutral-600">
-            Let's find your community
+            Let's find your parent community
           </p>
         </div>
 

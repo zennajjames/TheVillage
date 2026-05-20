@@ -143,7 +143,7 @@ const Signup: React.FC = () => {
             Join The Village
           </h1>
           <p className="text-neutral-600">
-            Connect with your community
+            A community for parents & caregivers
           </p>
         </div>
 
