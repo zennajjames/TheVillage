@@ -1,3 +1,5 @@
+// Simple uncontrolled address form with street, city, state, and zip fields.
+// Use AddressAutocomplete instead when Google Maps is available.
 import React from 'react';
 
 interface AddressComponents {

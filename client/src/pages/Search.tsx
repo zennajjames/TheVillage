@@ -1,3 +1,5 @@
+// Global search page. Searches across communities, posts, help requests, and members,
+// reading the initial query from the ?q= URL param so links can deep-link to results.
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { searchService, SearchResults } from '../services/search.service';

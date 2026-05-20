@@ -1,3 +1,5 @@
+// Public community directory. Allows any logged-in user to browse all communities and
+// send a join request to ones they don't already belong to.
 import React, { useState, useEffect } from 'react';
 import { communitiesService } from '../services/communities.service';
 import { Community } from '../types';

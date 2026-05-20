@@ -1,3 +1,5 @@
+// Privacy settings page. Lets users control profile visibility, notification preferences,
+// and data sharing options.
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';

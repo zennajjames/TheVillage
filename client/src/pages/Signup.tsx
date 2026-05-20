@@ -1,3 +1,5 @@
+// Email/password signup page. Collects name, email, password, and zip code, then prompts
+// the user to accept community guidelines before creating the account.
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';

@@ -1,3 +1,5 @@
+// React context for authentication state. On mount, verifies the stored JWT with the API
+// and populates the current user. Exposes signup, login, and logout helpers app-wide.
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { User, SignupData, LoginData } from '../types';
 import { authService } from '../services/auth.service';

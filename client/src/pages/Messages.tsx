@@ -1,3 +1,4 @@
+// Inbox page listing all direct message conversations, sorted by most recent activity.
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { messagesService } from '../services/messages.service';

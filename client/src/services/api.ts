@@ -1,3 +1,4 @@
+// Shared Axios instance with base URL and automatic JWT injection for all API calls.
 import axios from 'axios';
 
 const API_URL = `${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api`;

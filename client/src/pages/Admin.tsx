@@ -1,3 +1,5 @@
+// Site-wide admin panel (super-admin only). Manages all communities, pending event approvals,
+// and user accounts. Regular community admins use the AdminInbox component inside CommunityDetail instead.
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';

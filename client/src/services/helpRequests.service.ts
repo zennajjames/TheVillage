@@ -1,3 +1,4 @@
+// Service for help request API calls: create, fetch by community, and admin status updates.
 import { api } from './api';
 import { HelpRequest, CreateHelpRequestData } from '../types';
 

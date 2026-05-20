@@ -1,3 +1,4 @@
+// Form for creating a new subgroup (e.g. "Room 4 Parents") within a community.
 import React, { useState } from 'react';
 import { CreateSubGroupData } from '../../types';
 

@@ -1,3 +1,4 @@
+// Service for the global search API. Returns results across communities, posts, help requests, and members.
 import { api } from './api';
 
 export interface SearchResults {

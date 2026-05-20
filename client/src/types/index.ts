@@ -1,4 +1,7 @@
-// User types
+// Shared TypeScript type definitions for the entire client. Grouped by domain:
+// User/Auth, Posts, Communities, Help Requests, Events, Messaging, Subgroups.
+
+// --- User / Auth ---
 
 export interface User {
   id: string;

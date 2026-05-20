@@ -1,4 +1,6 @@
-import React, { useState, useCallback } from 'react';
+// Reusable Google Maps view that renders a user-location marker and clickable community markers
+// with an info window popup. Used by Dashboard and community detail pages.
+import React, { useState } from 'react';
 import { GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
 import { useGoogleMaps } from '../../context/GoogleMapsContext';
 
@@ -38,14 +40,6 @@ const MapView: React.FC<MapViewProps> = ({
   const [selectedMarker, setSelectedMarker] = useState<MapMarker | null>(null);
 
   const { isLoaded, loadError } = useGoogleMaps();
-
-  const onLoad = useCallback(() => {
-    // Map loaded successfully
-  }, []);
-
-  const onUnmount = useCallback(() => {
-    // Map unmounted
-  }, []);
 
   if (loadError) {
     return (
@@ -97,8 +91,6 @@ const MapView: React.FC<MapViewProps> = ({
         mapContainerStyle={mapContainerStyle}
         center={center}
         zoom={zoom}
-        onLoad={onLoad}
-        onUnmount={onUnmount}
         options={mapOptions}
       >
         {/* User location marker */}

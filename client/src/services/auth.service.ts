@@ -1,3 +1,4 @@
+// Authentication service: signup, login, profile fetch, and password reset flows.
 import { api } from './api';
 import { AuthResponse, SignupData, LoginData, User } from '../types';
 

@@ -1,3 +1,5 @@
+// Top navigation bar. Renders full desktop nav at ≥1120px and a hamburger menu below that.
+// Polls for unread message count every 30 seconds and highlights the active route.
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';

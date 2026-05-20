@@ -1,3 +1,5 @@
+// Root application component. Wraps the app in Auth, Socket, and GoogleMaps providers,
+// then defines all client-side routes including legacy /groups → /communities redirects.
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';

@@ -1,3 +1,5 @@
+// Real-time direct message thread between two users. Uses Socket.IO for live message
+// delivery and a typing indicator, with REST API for history and message sending.
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { messagesService } from '../services/messages.service';

@@ -1,3 +1,5 @@
+// Cross-community events calendar and list view. Shows upcoming events across all of the
+// user's communities with a monthly calendar picker and RSVP controls.
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { eventsService } from '../services/events.service';

@@ -1,3 +1,5 @@
+// Cross-community posts board with a "Help Requests" tab. Lets users browse and create
+// general posts or help requests across all communities they belong to.
 import React, { useState, useEffect } from 'react';
 import { postsService } from '../services/posts.service';
 import { helpRequestsService } from '../services/helpRequests.service';

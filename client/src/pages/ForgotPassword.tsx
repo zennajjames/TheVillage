@@ -1,3 +1,4 @@
+// Forgot password page. Sends a password-reset email to the provided address.
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api';

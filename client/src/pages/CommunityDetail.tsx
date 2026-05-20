@@ -1,3 +1,5 @@
+// Detail view for a single community. Contains tabbed sections for posts, help requests,
+// events, subgroups, members, and (for admins) a join-request inbox.
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { communitiesService } from '../services/communities.service';

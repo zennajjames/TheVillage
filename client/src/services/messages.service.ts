@@ -1,3 +1,4 @@
+// Service for direct messaging: list conversations, fetch thread history, and send messages.
 import { api } from './api';
 import { Conversation, Message, ConversationDetail } from '../types';
 

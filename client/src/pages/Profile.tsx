@@ -1,3 +1,5 @@
+// User profile page. Allows editing name, bio, and address, and uploading a profile photo.
+// Photo uploads are resized client-side before sending to the API.
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -7,6 +9,7 @@ import AddressAutocomplete from '../components/forms/AddressAutocomplete';
 
 const MAX_IMAGE_SIZE = 512;
 
+// Resizes an image file to at most MAX_IMAGE_SIZE px on its longest side and returns a base64 JPEG string.
 function resizeImage(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -80,12 +83,10 @@ const Profile: React.FC = () => {
     e.preventDefault();
     setIsSaving(true);
     try {
-      // Update using your existing API
       await api.patch('/auth/profile', formData);
       setIsEditing(false);
       setMessage('Profile updated successfully!');
       setTimeout(() => setMessage(''), 3000);
-      // Refresh user data
       window.location.reload();
     } catch (error) {
       setMessage('Failed to update profile');

@@ -1,3 +1,5 @@
+// React context that manages the Socket.IO connection. Connects when the user is logged in
+// and disconnects on logout. Exposes the socket instance for real-time messaging.
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';

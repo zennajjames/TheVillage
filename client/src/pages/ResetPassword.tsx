@@ -1,3 +1,5 @@
+// Password reset page. Validates the reset token from the URL, then allows the user to
+// set a new password.
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';

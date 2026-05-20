@@ -1,3 +1,5 @@
+// Notifications page. Lists all in-app notifications for the current user with
+// options to mark individual items or all items as read, and to delete read notifications.
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';

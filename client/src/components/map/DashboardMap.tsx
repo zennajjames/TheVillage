@@ -1,3 +1,5 @@
+// Dashboard map widget. Gets the user's geolocation, converts their communities to map markers
+// filtered by distance, and renders them via MapView with dynamically calculated zoom.
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MapView from './MapView';

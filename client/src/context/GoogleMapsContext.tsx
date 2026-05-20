@@ -1,3 +1,5 @@
+// Loads the Google Maps JS API once at the app root and shares isLoaded/loadError state
+// via context. The `libraries` array is defined outside the component to prevent re-renders.
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useJsApiLoader } from '@react-google-maps/api';
 

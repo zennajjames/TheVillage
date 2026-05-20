@@ -1,3 +1,5 @@
+// Configures i18next with browser language detection and locale bundles for English, Spanish,
+// Somali, and Hmong. Language preference is persisted in localStorage.
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';

@@ -1,3 +1,5 @@
+// Notification preferences panel embedded in the profile/settings page. Controls email,
+// push, and SMS notification channels, plus per-type toggles and phone number verification.
 import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api';
 

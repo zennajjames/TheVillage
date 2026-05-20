@@ -1,3 +1,5 @@
+// Displays The Village community guidelines. Used both as a standalone page section and as
+// a modal during signup/onboarding. Pass showActions=true to show the Agree/Decline buttons.
 import React from 'react';
 
 interface CommunityGuidelinesProps {

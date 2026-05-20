@@ -1,3 +1,5 @@
+// "My Communities" page. Lists all communities the current user belongs to and an "Explore"
+// tab that shows nearby communities sorted by distance. Redirects new users to the onboarding flow.
 import React, { useState, useEffect } from 'react';
 import { communitiesService } from '../services/communities.service';
 import { Community } from '../types';

@@ -1,3 +1,4 @@
+// Detail view for a single community post, including the comment thread and reply form.
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { postsService } from '../services/posts.service';

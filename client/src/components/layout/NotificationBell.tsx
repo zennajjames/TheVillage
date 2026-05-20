@@ -1,3 +1,5 @@
+// Bell icon that polls for unread notifications every 30 seconds and shows a badge count.
+// Clicking opens a dropdown preview; individual items can be marked read or deleted inline.
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';

@@ -1,3 +1,4 @@
+// Display card for a single community post. Clicking navigates to the PostDetail page.
 import React from 'react';
 import { Post, PostType } from '../../types';
 import { useNavigate } from 'react-router-dom';

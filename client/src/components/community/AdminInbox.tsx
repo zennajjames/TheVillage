@@ -1,3 +1,5 @@
+// Admin-only inbox for a community showing all help requests regardless of visibility level.
+// Community admins can review ADMIN_ONLY and SEMI_ANONYMOUS requests here.
 import React, { useState, useEffect } from 'react';
 import { HelpRequest } from '../../types';
 import { helpRequestsService } from '../../services/helpRequests.service';

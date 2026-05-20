@@ -1,3 +1,4 @@
+// Service for user profile API calls: fetch profile, update details, and manage account settings.
 import { api } from './api';
 import { User } from '../types';
 

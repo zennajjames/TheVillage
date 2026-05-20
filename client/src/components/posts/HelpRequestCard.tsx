@@ -1,3 +1,5 @@
+// Display card for a single help request. Shows category, visibility badge, status,
+// author info, and admin approve/deny controls when rendered in an admin context.
 import React from 'react';
 import { HelpRequest, RequestVisibility, PostStatus } from '../../types';
 

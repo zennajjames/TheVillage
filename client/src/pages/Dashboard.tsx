@@ -1,3 +1,5 @@
+// Main dashboard shown after login. Aggregates activity from all of the user's communities —
+// recent posts, help requests, and upcoming events — with quick-action shortcuts in the sidebar.
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -427,8 +429,8 @@ const Dashboard: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                   </svg>
                   <div>
-                    <div className="font-semibold text-neutral-900 text-sm">Find Neighbors</div>
-                    <div className="text-xs text-neutral-600">Connect with people nearby</div>
+                    <div className="font-semibold text-neutral-900 text-sm">Find Parents</div>
+                    <div className="text-xs text-neutral-600">Connect with parents nearby</div>
                   </div>
                 </button>
               </div>

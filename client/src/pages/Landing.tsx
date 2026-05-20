@@ -1,3 +1,5 @@
+// Public-facing marketing landing page. All visible copy is driven by i18n translation keys
+// so it renders in the user's selected language (English, Spanish, Somali, or Hmong).
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';

@@ -1,3 +1,5 @@
+// Two-step onboarding flow for new OAuth users: community guidelines acceptance, then zip code entry.
+// The step is determined by the ?step= URL param passed from the backend OAuth redirect.
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../services/api';

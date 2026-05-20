@@ -1,4 +1,7 @@
-// Minneapolis, MN coordinates
+// Geocoding utilities: static school/neighborhood coordinate lookups, browser geolocation,
+// distance calculations, and address parsing helpers. All coordinates are for the Minneapolis-St. Paul metro.
+
+// Minneapolis, MN coordinates — used as the default map center when user location is unavailable
 export const MINNEAPOLIS_CENTER = {
   lat: 44.9778,
   lng: -93.2650

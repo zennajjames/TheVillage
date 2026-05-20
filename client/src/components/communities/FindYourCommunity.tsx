@@ -1,3 +1,5 @@
+// Guided flow that helps a new user find or create a community by zip code.
+// Walks through: zip entry → existing community results → school/neighborhood category picker → place suggestions.
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -124,7 +126,7 @@ const FindYourCommunity: React.FC<FindYourCommunityProps> = ({ onClose }) => {
     try {
       const communityData: CreateCommunityData = {
         name: suggestion.name,
-        description: `${suggestion.category} serving the ${zipCode} area. Join to connect with your neighbors!`,
+        description: `${suggestion.category} serving the ${zipCode} area. Join to connect with parents and caregivers nearby!`,
         address: suggestion.address,
         zipCode: zipCode,
         location: suggestion.address,

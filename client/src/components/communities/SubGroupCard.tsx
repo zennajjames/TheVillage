@@ -1,3 +1,4 @@
+// Card displaying a single subgroup with member count, join/leave toggle, and admin delete.
 import React, { useState } from 'react';
 import { SubGroup } from '../../types';
 import { subgroupsService } from '../../services/subgroups.service';

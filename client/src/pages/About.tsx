@@ -1,3 +1,4 @@
+// Static "About The Village" page. All copy is driven by i18n translation keys.
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Header from '../components/layout/Header';

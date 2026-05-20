@@ -1,3 +1,4 @@
+// Dropdown for switching the app's display language. Supports English, Spanish, Somali, and Hmong.
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import i18n from '../../i18n/config';
@@ -29,16 +30,9 @@ const LanguageSelector: React.FC = () => {
 
   const handleLanguageChange = async (langCode: string) => {
     try {
-      console.log('Attempting to change language to:', langCode);
-      console.log('i18n object:', i18n);
-      console.log('Current language:', i18n?.language);
-
       if (i18n && typeof i18n.changeLanguage === 'function') {
         await i18n.changeLanguage(langCode);
-        console.log('Language changed to:', i18n.language);
         setIsOpen(false);
-      } else {
-        console.error('i18n.changeLanguage is not available');
       }
     } catch (error) {
       console.error('Error changing language:', error);

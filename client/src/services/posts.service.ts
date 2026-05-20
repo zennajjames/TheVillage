@@ -1,3 +1,4 @@
+// Service for community post API calls: create, fetch, comment, like, and moderation.
 import { api } from './api';
 import { Post, CreatePostData } from '../types';
 

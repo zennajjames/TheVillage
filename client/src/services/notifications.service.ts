@@ -1,3 +1,4 @@
+// API service for notifications (fetch, mark as read/delete) and phone verification endpoints.
 import axios from 'axios';
 
 const API_URL = `${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api`;
@@ -50,10 +51,7 @@ export const notificationsAPI = {
   }
 };
 
-// Add these to authAPI:
 export const authAPI = {
-  // ... existing methods ...
-
   sendPhoneVerification: async (phoneNumber: string) => {
     const response = await api.post('/auth/send-phone-verification', { phoneNumber });
     return response.data;

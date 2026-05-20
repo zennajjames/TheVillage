@@ -1,3 +1,4 @@
+// Service for event API calls: create, fetch, RSVP, and approval workflow (approve/reject).
 import { api } from './api';
 import { Event, CreateEventData } from '../types';
 

@@ -1,3 +1,4 @@
+// Service for all community-related API calls: CRUD, join requests, posts, events, and nearby place search.
 import { api } from './api';
 import { Community, CommunityPost, CreateCommunityData, PlaceSuggestion, JoinRequest } from '../types';
 

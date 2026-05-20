@@ -1,3 +1,5 @@
+// Cross-community help requests feed. Aggregates all open requests from every community
+// the user belongs to, groups them by community, and sorts by activity level.
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';

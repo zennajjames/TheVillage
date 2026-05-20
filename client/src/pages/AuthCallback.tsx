@@ -1,3 +1,5 @@
+// OAuth callback landing page. Receives the JWT token from the Google OAuth redirect,
+// stores it, and forwards the user to onboarding or the dashboard.
 import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';

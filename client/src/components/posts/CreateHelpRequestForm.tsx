@@ -1,3 +1,5 @@
+// Form for submitting a new help request to a community. Automatically sets the default
+// visibility based on the selected category (e.g. sensitive categories default to SEMI_ANONYMOUS).
 import React, { useState, useEffect } from 'react';
 import { RequestVisibility, Community } from '../../types';
 import { communitiesService } from '../../services/communities.service';

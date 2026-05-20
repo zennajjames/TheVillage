@@ -1,3 +1,5 @@
+// Address input with Google Places Autocomplete. Parses the selected place into
+// individual street, city, state, and zip code fields and calls back with the result.
 import React, { useRef, useEffect, useCallback } from 'react';
 import { useGoogleMaps } from '../../context/GoogleMapsContext';
 
@@ -50,10 +52,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       if (autocompleteRef.current) {
         const place = autocompleteRef.current.getPlace();
 
-        console.log('Place selected:', place);
-
         if (!place.address_components) {
-          console.log('No address components found');
           return;
         }
 
@@ -85,13 +84,6 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
         const newStreet = streetNumber && route ? `${streetNumber} ${route}` : route;
 
-        console.log('Parsed address:', {
-          street: newStreet,
-          city: newCity,
-          state: newState,
-          zipCode: newZipCode
-        });
-
         // Clear the input field first to prevent the full address from showing
         if (inputRef.current) {
           inputRef.current.value = '';
@@ -122,7 +114,6 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
   useEffect(() => {
     if (isLoaded && inputRef.current && !autocompleteRef.current) {
-      console.log('Initializing autocomplete');
       try {
         const input = inputRef.current;
 
@@ -148,11 +139,8 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
         // Add listener for place selection
         google.maps.event.addListener(autocompleteRef.current, 'place_changed', () => {
-          console.log('place_changed event fired!');
           handlePlaceChanged();
         });
-
-        console.log('Autocomplete listener added');
 
         return () => {
           input.removeEventListener('keydown', handleKeyDown);

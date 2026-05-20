@@ -1,3 +1,4 @@
+// Service for subgroup API calls: create, fetch, join, and leave subgroups within a community.
 import { api } from './api';
 import { SubGroup, CreateSubGroupData } from '../types';
 

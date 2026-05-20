@@ -1,3 +1,4 @@
+// Form for creating a new community post (general announcement, question, or event stub).
 import React, { useState, useEffect } from 'react';
 import { PostType, Community } from '../../types';
 import { communitiesService } from '../../services/communities.service';
@@ -34,7 +35,7 @@ const CreatePostForm: React.FC<CreatePostFormProps> = ({ onSubmit, onCancel }) =
           setFormData(prev => ({ ...prev, communityId: data[0].id }));
         }
       } catch {
-        // ignore
+        // Community list fetch failing is non-critical; the user will see an empty selector
       }
     };
     fetchCommunities();
