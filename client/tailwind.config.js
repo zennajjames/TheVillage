@@ -14,14 +14,11 @@ module.exports = {
     },
     extend: {
       colors: {
-        // Primary brand colors — warm coral-red, soft whites
+        // Primary brand colors
         brand: {
           red: '#FF385C',
           'red-dark': '#E31C5F',
           'red-light': '#FFF1F3',
-          black: '#222222',
-          white: '#FFFFFF',
-          gray: '#717171',
         },
         // Neutral palette — soft, Airbnb-inspired
         neutral: {
@@ -50,7 +47,6 @@ module.exports = {
         'soft': '0 1px 2px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05)',
         'soft-lg': '0 4px 16px rgba(0, 0, 0, 0.10)',
         'card': '0 2px 8px rgba(0, 0, 0, 0.08)',
-        'card-hover': '0 4px 20px rgba(0, 0, 0, 0.14)',
       }
     },
   },

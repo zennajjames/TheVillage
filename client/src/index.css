@@ -39,11 +39,6 @@
            flex items-center justify-center gap-3;
   }
 
-  /* Coral alias */
-  .btn-coral {
-    @apply btn-primary;
-  }
-
   /* Input — clean, light border, generous radius */
   .input-modern {
     @apply w-full px-4 py-3 rounded-xl border border-neutral-300

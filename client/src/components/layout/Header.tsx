@@ -61,7 +61,7 @@ const Header: React.FC = () => {
                 alt="The Village Logo"
                 className="w-8 h-8 sm:w-10 sm:h-10"
               />
-              <span className="text-lg sm:text-xl lg:text-2xl font-bold text-brand-black hidden sm:block">
+              <span className="text-lg sm:text-xl lg:text-2xl font-bold text-neutral-800 hidden sm:block">
                 The Village
               </span>
             </button>
@@ -184,7 +184,7 @@ const Header: React.FC = () => {
                     className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-brand-red/30"
                   />
                 ) : (
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-brand-red/10 flex items-center justify-center text-xs sm:text-sm font-bold text-brand-black">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-brand-red/10 flex items-center justify-center text-xs sm:text-sm font-bold text-neutral-800">
                     {user?.firstName?.[0]}{user?.lastName?.[0]}
                   </div>
                 )}

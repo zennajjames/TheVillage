@@ -94,7 +94,7 @@ const CommunityGuidelines: React.FC<CommunityGuidelinesProps> = ({
         </div>
 
         <div className="bg-brand-red/10 border-2 border-brand-red/30 rounded-xl p-4 mt-6">
-          <p className="text-sm font-medium text-brand-black">
+          <p className="text-sm font-medium text-neutral-800">
             By agreeing to these guidelines, you commit to creating a supportive, caring community
             where we lift each other up and work together for the collective good.
           </p>

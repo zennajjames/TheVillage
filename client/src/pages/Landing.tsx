@@ -19,7 +19,7 @@ const Landing: React.FC = () => {
                 alt="The Village Logo"
                 className="w-10 h-10"
               />
-              <span className="text-2xl font-bold text-brand-black">
+              <span className="text-2xl font-bold text-neutral-800">
                 {t('common.appName')}
               </span>
             </div>
@@ -50,7 +50,7 @@ const Landing: React.FC = () => {
               {t('landing.heroLine1')}
             </span>
             <br />
-            <span className="text-brand-black">{t('landing.heroLine2')}</span>
+            <span className="text-neutral-800">{t('landing.heroLine2')}</span>
           </h1>
           <p className="text-xl text-neutral-600 mb-8 max-w-2xl mx-auto leading-relaxed">
             {t('landing.description')}
@@ -99,7 +99,7 @@ const Landing: React.FC = () => {
           {/* Messages */}
           <div className="md:col-span-2 bg-white rounded-3xl p-6 border border-neutral-200 hover:border-brand-red hover:shadow-xl transition-all group">
             <div className="text-4xl mb-3">💬</div>
-            <h3 className="text-xl font-bold text-brand-black mb-2">{t('landing.directMessages')}</h3>
+            <h3 className="text-xl font-bold text-neutral-800 mb-2">{t('landing.directMessages')}</h3>
             <p className="text-neutral-600 text-sm leading-relaxed mb-4">
               {t('landing.directMessagesDesc')}
             </p>
@@ -111,7 +111,7 @@ const Landing: React.FC = () => {
           {/* Classroom Groups */}
           <div className="md:col-span-2 bg-white rounded-3xl p-6 border border-neutral-200 hover:border-brand-red hover:shadow-xl transition-all group">
             <div className="text-4xl mb-3">👨‍🏫</div>
-            <h3 className="text-xl font-bold text-brand-black mb-2">{t('landing.classroomGroups')}</h3>
+            <h3 className="text-xl font-bold text-neutral-800 mb-2">{t('landing.classroomGroups')}</h3>
             <p className="text-neutral-600 text-sm leading-relaxed mb-4">
               {t('landing.classroomGroupsDesc')}
             </p>
