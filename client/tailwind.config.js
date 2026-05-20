@@ -14,40 +14,43 @@ module.exports = {
     },
     extend: {
       colors: {
-        // Primary brand colors — stark red, black, white
+        // Primary brand colors — warm coral-red, soft whites
         brand: {
-          red: '#EF0000',
-          'red-dark': '#CC0000',
-          'red-light': '#1A0000',
-          black: '#000000',
+          red: '#FF385C',
+          'red-dark': '#E31C5F',
+          'red-light': '#FFF1F3',
+          black: '#222222',
           white: '#FFFFFF',
-          gray: '#888888',
+          gray: '#717171',
         },
-        // Neutral palette — high contrast terminal aesthetic
+        // Neutral palette — soft, Airbnb-inspired
         neutral: {
-          50: '#F5F5F5',
-          100: '#E8E8E8',
-          200: '#D0D0D0',
-          300: '#A0A0A0',
-          400: '#787878',
-          500: '#555555',
-          600: '#333333',
-          700: '#222222',
-          800: '#111111',
-          900: '#000000',
+          50: '#F7F7F7',
+          100: '#EBEBEB',
+          200: '#DDDDDD',
+          300: '#B0B0B0',
+          400: '#878787',
+          500: '#6A6A6A',
+          600: '#484848',
+          700: '#333333',
+          800: '#222222',
+          900: '#111111',
         }
       },
       fontFamily: {
-        sans: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
-        mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       borderRadius: {
-        '2xl': '0.5rem',
-        '3xl': '0.75rem',
+        '2xl': '1rem',
+        '3xl': '1.5rem',
+        '4xl': '2rem',
       },
       boxShadow: {
-        'soft': '0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08)',
-        'soft-lg': '0 4px 12px rgba(0, 0, 0, 0.15)',
+        'soft': '0 1px 2px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05)',
+        'soft-lg': '0 4px 16px rgba(0, 0, 0, 0.10)',
+        'card': '0 2px 8px rgba(0, 0, 0, 0.08)',
+        'card-hover': '0 4px 20px rgba(0, 0, 0, 0.14)',
       }
     },
   },
